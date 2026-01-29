@@ -1,9 +1,9 @@
 import { View, Text, ScrollView, FlatList } from 'react-native'
 import React from 'react'
 import Header from '@/components/Header';
-import { episode, subscribed } from '../../constants/podcasts';
+import { episode, subscribed } from '../constants/podcasts';
 import EpisodeCard from '@/components/EpisodeCard';
-import {filter} from '../../constants/filter';
+import {filter} from '../constants/filter';
 
 const Podcasts = () => {
   return (

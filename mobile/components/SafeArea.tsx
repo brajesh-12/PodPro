@@ -14,6 +14,7 @@ const SafeArea:React.FC<SafeAreaProps> = ({children}) => {
       style={{
         paddingTop: insets.top,
         flex: 1,
+        backgroundColor: 'rgb(242, 242, 242)'
       }}
     >
       {children}

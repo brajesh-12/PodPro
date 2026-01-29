@@ -1,33 +1,33 @@
 export const trendings = [
   {
     id: '1',
-    title: 'The Rest is Science',
-    host: 'Goalhanger'
+    podcastTitle: 'The Rest is Science',
+    artist: 'Goalhanger'
   },
   {
     id:'2',
-    title: 'Fela Kuti: Fear No Man',
-    host: "Higher Ground"
+    podcastTitle: 'Fela Kuti: Fear No Man',
+    artist: "Higher Ground"
   },
   {
     id:'3',
-    title: "BETH'S DEAD",
-    host: "Monica Padman, Elizabeth Laime, Andy Rosen"
+    podcastTitle: "BETH'S DEAD",
+    artist: "Monica Padman, Elizabeth Laime, Andy Rosen"
   },
   {
     id:'4',
-    title: "The Rest is History",
-    host: "Goalhanger"
+    podcastTitle: "The Rest is History",
+    artist: "Goalhanger"
   },
   {
     id:'5',
-    title: "Good Hang with Amy Poehler",
-    host: "The Ringer"
+    podcastTitle: "Good Hang with Amy Poehler",
+    artist: "The Ringer"
   },
   {
     id:'6',
-    title: "Pluribus: The Official Podcast",
-    host: "Apple TV"
+    podcastTitle: "Pluribus: The Official Podcast",
+    artist: "Apple TV"
   }
 ];
 

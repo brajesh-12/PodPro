@@ -3,7 +3,7 @@ import { ChevronDown, LayoutGrid, List } from 'lucide-react-native';
 import { View, Text, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import { BoardLayout, ListLayout } from '@/components/Playlist';
-import { playlists } from '../../constants/library';
+import { playlists } from '../constants/library';
 
 const Library = () => {
   const [layout, setLayout] = useState(true);

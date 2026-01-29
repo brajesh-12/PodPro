@@ -2,8 +2,19 @@ import { View, Text, FlatList, ScrollView } from 'react-native';
 import Header from '@/components/Header';
 import Trending from '@/components/Trending';
 import {filter} from '../../constants/filter';
+import Section from '@/components/Section';
+import { usePodcastStore } from '@/store/usePodcastStore';
+import { useEffect } from 'react';
 
-const index = () => {
+const Index = () => {
+  const {history, trending, fetchData, science, comedy, education} = usePodcastStore();
+
+  const historyPods = history.slice(0, 10);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   return (
     <ScrollView>
       <Header screen='home'/>
@@ -49,9 +60,14 @@ const index = () => {
           flexShrink: 0
         }}
       />
-      <Trending />
+      <Trending data={trending}/>
+
+      <Section title={'History'} data={historyPods} />
+      <Section title={'Comedy'} data={comedy} />
+      <Section title={'Education'} data={education} />
+      <Section title={'Science'} data={science} />
     </ScrollView>
   )
 }
 
-export default index;
+export default Index;
