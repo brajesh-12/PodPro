@@ -67,7 +67,7 @@ export const fetchPodcast = async (podcastId: string) => {
       genres: result.genres
     }
 
-    console.log("Podcast feedUrl:", tranformedData.feedUrl);
+    console.log("Podcast Data:", tranformedData);
 
     return tranformedData || null;
 
