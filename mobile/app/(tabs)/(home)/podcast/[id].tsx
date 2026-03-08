@@ -5,19 +5,39 @@ import PodInfo from '@/components/PodInfo';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { useEffect } from 'react';
 import Episodes from '@/components/Episodes';
+import useSubscriptionStore from '@/store/useSubscriptionStore';
+import API from '@/services/api';
 
 const PodcastDetail = () => {
   const { id } = useLocalSearchParams();
   const podcastId = Array.isArray(id) ? id[0] : id;
+  const numId = Number(podcastId);
   
   const router = useRouter();
 
-  const {fetchPod, podcast, fetchEpisodesData} = usePodcastStore();
+  const { fetchPod, podcast, fetchEpisodesData, setPodcast } = usePodcastStore();
+  const { subscriptionIds } = useSubscriptionStore();
+
+  console.log("SubscriptionIds:",subscriptionIds);
+
+  const isSubscribed = subscriptionIds.has(numId);
+  console.log(isSubscribed);
+
+  const fetchingPodcast = async () => {
+    if(isSubscribed) {
+      const podcast = await API.podcast(numId);
+      setPodcast(podcast);
+      console.log("Fetching podcast from database.");
+
+    } else {
+      fetchPod(podcastId);
+    }
+  }
 
   useEffect(() => {
-    fetchPod(podcastId);
-
-  }, [fetchPod, podcastId]);
+    fetchingPodcast();
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if(podcast) {

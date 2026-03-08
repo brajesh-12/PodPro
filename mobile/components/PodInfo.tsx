@@ -1,11 +1,15 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { Settings, Share2, Star } from 'lucide-react-native';
+import useSubscriptionStore from '@/store/useSubscriptionStore';
 
 const PodInfo = () => {
   const {podcast} = usePodcastStore();
+  const { toggleSubscription, subscriptionIds } = useSubscriptionStore();
+
+  const isSubscribed = podcast?.id !== undefined ? subscriptionIds.has(podcast?.id) : false;
 
   if(!podcast) {
     return <View><Text>Loading...</Text></View>
@@ -97,7 +101,7 @@ const PodInfo = () => {
               textAlign: "center"
             }}
           >
-            {podcast.podcastTitle}
+            {podcast.title}
           </Text>
 
           <Text
@@ -137,7 +141,8 @@ const PodInfo = () => {
         </View>
 
         {/* Button */}
-        <View
+        <TouchableOpacity
+          onPress={() => toggleSubscription(podcast.id)}
           style={{
             height: 44,
             width: 172,
@@ -155,8 +160,14 @@ const PodInfo = () => {
               lineHeight: 28,
               color: "white"
             }}
-          >Follow</Text>
-        </View>
+          >
+            {isSubscribed 
+              ? "Unfollow"
+              : "Follow"
+            }
+          </Text>
+
+        </TouchableOpacity>
 
         <View
           style={{

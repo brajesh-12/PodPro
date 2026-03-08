@@ -1,24 +1,47 @@
-import { View, Text } from 'react-native';
-import React from 'react';
+import { View, Text, Pressable } from 'react-native';
 import { ArrowDownToLine, CirclePlay, EllipsisVertical, Save } from 'lucide-react-native';
+import useSubscriptionStore, { SavedEpisode } from '@/store/useSubscriptionStore';
+import { formatDuration, formatDate } from '@/lib/utils';
+import { Image } from 'expo-image';
+import useModalStore from '@/store/useModalStore';
+import { useRouter } from 'expo-router';
+import usePlayerStore from '@/store/usePlayerStore';
 
-interface Episode {
-  id: string,
-  podcast: string,
-  brief: string,
-  title: string,
-  date: string,
-  playTime: string
-}
+const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
+  const router = useRouter();
 
-const EpisodeCard: React.FC<{data: Episode}> = ({data}) => {
+  const { setIsOpen, setType, setTappedEpisode, setPodcastId } = useModalStore();
+  const { setActiveEpisode } = usePlayerStore();
+  const { followingPodcasts } = useSubscriptionStore();
+
+  const podcastId = () => {
+    const podcast = followingPodcasts.find((pod) => pod.podcastId === episode.podcastId);
+
+    if(podcast) {
+      return podcast.id
+    }
+
+    return null
+  };
+
+  const podId = podcastId();
+
   return (
-    <View
+    <Pressable
+      onPress={() => {
+        router.navigate({
+          pathname: "/(tabs)/(podcast)/episode/[id]",
+          params: { id: `${episode.episodeId}` }
+        })
+      }}
+      key={episode.id}
       style={{
         paddingHorizontal: 20,
-        paddingVertical: 12,
+        paddingBottom: 12,
+        paddingTop: 6,
         borderBottomWidth: 0.8,
-        borderBottomColor: 'grey'
+        borderBottomColor: 'grey',
+        marginBottom: 8
       }}
     >
 
@@ -51,7 +74,16 @@ const EpisodeCard: React.FC<{data: Episode}> = ({data}) => {
                 borderRadius: 4,
                 backgroundColor: 'grey'
               }}
-            ></View>
+            >
+              <Image
+                source={{ uri: episode.image }}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  borderRadius: 4
+                }}
+              />
+            </View>
 
             <View
               style={{
@@ -70,7 +102,7 @@ const EpisodeCard: React.FC<{data: Episode}> = ({data}) => {
                   width: 237
                 }}
               >
-                {data.title}
+                {episode.title}
               </Text>
 
               <Text
@@ -81,15 +113,22 @@ const EpisodeCard: React.FC<{data: Episode}> = ({data}) => {
                   lineHeight: 16
                 }}
               >
-                {data.podcast}
+                {episode.podcastTitle}
               </Text>
             </View>
           </View>
 
           {/* Right side */}
-          <View>
+          <Pressable
+            onPress={() => {
+              setIsOpen(true);
+              setType("episode");
+              setTappedEpisode(episode);
+              setPodcastId(podId)
+            }}
+          >
             <EllipsisVertical size={20} strokeWidth={2} />
-          </View>
+          </Pressable>
         </View>
 
         {/* Description Section */}
@@ -104,7 +143,7 @@ const EpisodeCard: React.FC<{data: Episode}> = ({data}) => {
             fontWeight: '400'
           }}
         >
-          {data.brief}
+          {episode.description}
         </Text>
       </View>
 
@@ -127,7 +166,7 @@ const EpisodeCard: React.FC<{data: Episode}> = ({data}) => {
               lineHeight: 20
             }}
           >
-            {data.date} &#xB7; {data.playTime}
+            {formatDate(episode.publishDate)} &#xB7; {formatDuration(episode.duration)}
           </Text>
         </View>
 
@@ -137,12 +176,20 @@ const EpisodeCard: React.FC<{data: Episode}> = ({data}) => {
             gap: 16
           }}
         >
-          <ArrowDownToLine size={22} strokeWidth={2}/>
-          <Save size={22} strokeWidth={2}/>
-          <CirclePlay size={22} strokeWidth={2}/>
+          <ArrowDownToLine size={22} strokeWidth={2} />
+          <Save size={22} strokeWidth={2} />
+
+          <Pressable
+            onPress={() => {
+              setActiveEpisode(episode);
+            }}
+          >
+            <CirclePlay size={22} strokeWidth={2} />
+          </Pressable>
+
         </View>
       </View>
-    </View>
+    </Pressable>
   )
 }
 

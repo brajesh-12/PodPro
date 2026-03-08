@@ -1,13 +1,15 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native'
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { Image } from 'expo-image';
 import { ArrowDown, CirclePlay, Download, EllipsisVertical } from 'lucide-react-native';
-import {formatDate, formatDuration} from '../lib/utils';
+import { formatDate, formatDuration } from '../lib/utils';
 import { useRouter } from 'expo-router';
+import useModalStore from '@/store/useModalStore';
 
 const Episodes = () => {
   const router = useRouter();
-  const {episodes, podcast} = usePodcastStore();
+  const { episodes, podcast } = usePodcastStore();
+  const { setIsOpen, setType, setTappedEpisode } = useModalStore();
 
   return (
     <View>
@@ -71,12 +73,12 @@ const Episodes = () => {
         scrollEnabled={false}
         data={episodes}
         keyExtractor={(item) => item.id}
-        renderItem={({item}) => {
+        renderItem={({ item }) => {
           return (
             <TouchableOpacity
               onPress={() => router.navigate({
-                pathname: "/(home)/episode/[id]",
-                params: {id: `${item.id}`}
+                pathname: "/(tabs)/(home)/episode/[id]",
+                params: { id: `${item.id}` }
               })}
               style={{
                 paddingHorizontal: 20,
@@ -94,7 +96,7 @@ const Episodes = () => {
                 }}
               >
                 {/* title and image */}
-                <View 
+                <View
                   style={{
                     flexDirection: "row",
                     gap: 12,
@@ -110,7 +112,7 @@ const Episodes = () => {
                     }}
                   >
                     <Image
-                      source={{uri: podcast?.thumbnail}}
+                      source={{ uri: podcast?.thumbnail }}
                       style={{
                         width: "100%",
                         height: "100%",
@@ -134,7 +136,16 @@ const Episodes = () => {
                     {item.title}
                   </Text>
 
-                  <EllipsisVertical size={20} strokeWidth={2}/>
+                  <Pressable
+                    onPress={() => {
+                      setIsOpen(true);
+                      setType("episode");
+                      setTappedEpisode(item);
+                    }}
+                  >
+                    <EllipsisVertical size={20} strokeWidth={2} />
+                  </Pressable>
+
                 </View>
 
                 <View>
@@ -184,9 +195,9 @@ const Episodes = () => {
                     alignItems: "center"
                   }}
                 >
-                  <ArrowDown size={24} strokeWidth={2}/>
-                  <Download size={24} strokeWidth={2}/>
-                  <CirclePlay size={24} strokeWidth={2}/>
+                  <ArrowDown size={24} strokeWidth={2} />
+                  <Download size={24} strokeWidth={2} />
+                  <CirclePlay size={24} strokeWidth={2} />
 
                 </View>
               </View>

@@ -2,6 +2,7 @@ import usePlayerStore from '@/store/usePlayerStore';
 import { Image } from 'expo-image';
 import { Play, Pause } from 'lucide-react-native';
 import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import Slider from './Slider';
 
 const MiniPlayer = () => {
   const { activeEpisode, minimizedPlayer, isPlaying, togglePlay } = usePlayerStore();
@@ -12,7 +13,6 @@ const MiniPlayer = () => {
     <TouchableOpacity
       onPress={() => minimizedPlayer(false)}
       style={{
-        height: 64,
         position: "absolute",
         bottom: 80,
         right: 0,
@@ -20,13 +20,14 @@ const MiniPlayer = () => {
         backgroundColor: "white",
       }}
     >
+      {/* Info section */}
       <View
         style={{
-          flex: 1,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingHorizontal: 20
+          paddingHorizontal: 20,
+          paddingVertical: 8
         }}
       >
         <View
@@ -98,6 +99,9 @@ const MiniPlayer = () => {
           )}
         </Pressable>
       </View>
+
+      {/* Slider */}
+      <Slider width={293} />
 
     </TouchableOpacity>
   )

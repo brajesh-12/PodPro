@@ -9,8 +9,10 @@ const parserConfig = {
 
 const parser = new XMLParser(parserConfig);
 
-export const saveEpisodes = async(feedUrl, podcastId) => {
+export const saveEpisodes = async(podcast) => {
   try {
+    const feedUrl = podcast.feedUrl;
+    
     if(!feedUrl) {
       console.error("FeedUrl is not true.");
       return [];
@@ -42,11 +44,40 @@ export const saveEpisodes = async(feedUrl, podcastId) => {
       audioUrl: ep.enclosure?.url || ep.enclosure?.['@_url'] || '',
       duration: ep['itunes:duration'],
       episodeType: ep['itunes:episodeType'],
-      podcastId,
+      image: podcast.thumbnail,
+      podcastTitle: podcast.title,
+      podcastId: podcast._id,
     }));
 
   } catch (error) {
     console.error("Error saving episodes:", error);
     return [];
+  }
+}
+
+export const fetchPodcast = async (id) => {
+  try {
+    const response = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=podcast`);
+    const jsonResponse = await response.json();
+    const result = jsonResponse.results[0];
+    console.log("fetch result:", result);
+
+    if(!response.ok) {
+      throw new Error(`API error: ${response.status} - ${response.statusText}`);
+    }
+
+    const transformData = {
+      id: result.collectionId,
+      title: result.collectionName,
+      artist: result.artistName,
+      thumbnail: result.artworkUrl600,
+      feedUrl: result.feedUrl,
+      genres: result.genres
+    }
+
+    return transformData || null;
+
+  } catch (error) {
+    console.error("Error fetching podcast from itunes:", error);
   }
 }

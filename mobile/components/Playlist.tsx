@@ -1,16 +1,23 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { EllipsisVertical } from "lucide-react-native";
 import React from "react";
+import { Playlist } from "@/services/api";
+import { useRouter } from "expo-router";
+import { formatDate } from "@/lib/utils";
+import useModalStore from "@/store/useModalStore";
 
-interface Playlist {
-  id: string,
-  title: string,
-  subTitle: string
-}
 
-export const ListLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
+export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
+  const router = useRouter();
+
+  const { setIsOpen, setTappedPlaylist, setType } = useModalStore();
+
   return (
-    <View
+    <Pressable
+      onPress={() => router.navigate({
+        pathname: "/(tabs)/(library)/playlist/[id]",
+        params: { id: `${playlist.id}` }
+      })}
       style={{
         flexDirection: 'row',
         justifyContent: "space-between",
@@ -42,11 +49,14 @@ export const ListLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
         {/* Text conatiner */}
         <View>
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               fontFamily: "SF Pro",
               fontSize: 16,
               fontWeight: '500',
-              lineHeight: 24
+              lineHeight: 24,
+              width: "100%"
             }}
           >
             {playlist.title}
@@ -59,13 +69,21 @@ export const ListLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
               lineHeight: 20
             }}
           >
-            {playlist.subTitle}
+            {playlist.type === 'Save' || playlist.type === 'Download'
+              ? "Auto Playlist"
+              : `createdAt ${formatDate(playlist.createdAt)}`
+            }
           </Text>
         </View>
       </View>
 
       {/* Right conatiner */}
-      <View
+      <Pressable
+        onPress={() => {
+          setIsOpen(true);
+          setType("playlist");
+          setTappedPlaylist(playlist);
+        }}
         style={{
           height: 30,
           width: 30,
@@ -73,14 +91,26 @@ export const ListLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
         }}
       >
         <EllipsisVertical size={20} strokeWidth={2} />
-      </View>
-    </View>
+      </Pressable>
+    </Pressable>
   )
 }
 
 export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
+  const router = useRouter();
+  const { setIsOpen, setTappedPlaylist, setType } = useModalStore();
+
   return (
-    <View
+    <Pressable
+      onPress={() => router.navigate({
+        pathname: "/(tabs)/(library)/playlist/[id]",
+        params: { id: `${playlist.id}` }
+      })}
+      onLongPress={() => {
+        setIsOpen(true);
+        setType("playlist");
+        setTappedPlaylist(playlist);
+      }}
       style={{
         flexDirection: 'column',
         gap: 8,
@@ -103,11 +133,14 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
         }}
       >
         <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
           style={{
             fontFamily: "SF Pro",
             fontSize: 16,
             fontWeight: "500",
-            lineHeight: 24
+            lineHeight: 24,
+            width: 168
           }}
         >
           {playlist.title}
@@ -121,9 +154,12 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
             lineHeight: 20
           }}
         >
-          {playlist.subTitle}
+          {playlist.type === 'Save' || playlist.type === 'Download'
+            ? "Auto Playlist"
+            : `createdAt ${formatDate(playlist.createdAt)}`
+          }
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 };

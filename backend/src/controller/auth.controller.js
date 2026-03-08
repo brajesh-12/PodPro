@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import RefreshTokens from '../model/RefreshToken.js';
 import jwt from 'jsonwebtoken';
 import ENV from "../lib/env.js";
+import { defaultPlaylists } from "./playlists.controller.js";
 
 export const signup = async (req, res) => {
   const { email, password, userName } = req.body;
@@ -59,15 +60,19 @@ export const signup = async (req, res) => {
       await saveToken.save();
 
       res.status(201).json({
-        id: newUser._id,
-        email: newUser.email,
-        userName: newUser.userName,
-        profilePic: newUser.profilePic,
+        user: {
+          id: newUser._id,
+          email: newUser.email,
+          userName: newUser.userName,
+          profilePic: newUser.profilePic,
+        },
         tokens: {
           accessToken,
           refreshToken
         }
       });
+
+      defaultPlaylists(newUser._id);
 
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -114,15 +119,17 @@ export const login = async (req, res) => {
       expiresAt: expiryDate,
     });
 
-    if(newRefreshToken) {
+    if (newRefreshToken) {
       await newRefreshToken.save();
     }
 
     res.status(200).json({
-      id: user._id,
-      email,
-      userName: user.userName,
-      profilePic: user.profilePic,
+      user: {
+        id: user._id,
+        email,
+        userName: user.userName,
+        profilePic: user.profilePic,
+      },
       tokens: {
         accessToken,
         refreshToken,
@@ -148,23 +155,23 @@ export const Refresh = async (req, res) => {
     // get token
     const token = req.headers['authorization']?.split(" ")[1]
 
-    if(!token) {
-      return res.status(401).json({message: "Unauthorized: Token is not found"});
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: Token is not found" });
     }
 
     const decoded = jwt.verify(token, ENV.REFRESH_JWT_SECRET);
-    if(!decoded) {
-      return res.status(401).json({message: "Unauthorized: Invalid token"});
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
     }
 
-    const savedToken = await RefreshTokens.findOne({token: token});
-    if(token ==! savedToken.token) {
-      return res.status(401).json({message: "Unauthorized: Invalid token"});
+    const savedToken = await RefreshTokens.findOne({ token: token });
+    if (token == !savedToken.token) {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
     }
 
-    if(savedToken.isUsed) {
-      await RefreshTokens.deleteMany({familyId: savedToken.familyId});
-      return res.status(401).json({message: "Security Breach Detected. Please log in again."});
+    if (savedToken.isUsed) {
+      await RefreshTokens.deleteMany({ familyId: savedToken.familyId });
+      return res.status(401).json({ message: "Security Breach Detected. Please log in again." });
     }
 
     const newAccessToken = generateAccessToken(savedToken.userId);
@@ -173,7 +180,7 @@ export const Refresh = async (req, res) => {
     // after using previous token, toggle isUsed to true
     await RefreshTokens.findByIdAndUpdate(
       savedToken._id,
-      {$set: {isUsed: true}}
+      { $set: { isUsed: true } }
     );
 
     const familyId = savedToken.familyId
@@ -188,7 +195,7 @@ export const Refresh = async (req, res) => {
       expiresAt: expiryDate
     });
 
-    if(tokenDoc) {
+    if (tokenDoc) {
       await tokenDoc.save();
 
       res.status(201).json({
@@ -200,8 +207,8 @@ export const Refresh = async (req, res) => {
     }
 
   } catch (error) {
-    if(error.name === "TokenExpiredError") {
-      return res.status(401).json({message: "Unauthorized: Invalid token"});
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
     }
 
     if (error.name === 'JsonWebTokenError') {
@@ -209,6 +216,6 @@ export const Refresh = async (req, res) => {
     }
 
     console.error("Error refreshing token:", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 }

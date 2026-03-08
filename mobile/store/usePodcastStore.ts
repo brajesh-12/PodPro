@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { fetchPodcasts, CATEGORIES, fetchPodcast, fetchEpisodes } from '@/services/podcastAPI';
 
 export interface Podcast {
-  id: string,
-  podcastTitle: string,
+  id: number,
+  title: string,
   artist: string,
   thumbnail: string,
   genres: [],
@@ -45,6 +45,7 @@ interface PodcastState {
   fetchPod: (podcastId: string) => Promise<void>;
   fetchEpisodesData: (feedUrl: string) => Promise<void>;
   getEpisodeById: (episodeId: any) => void;
+  setPodcast: (podcast: any) => void,
 }
 
 export const usePodcastStore = create<PodcastState>((set, get) => ({
@@ -61,11 +62,13 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
 
   isLoading: false,
 
+  setPodcast: (podcast: any) => set({podcast: podcast}), 
+
   fetchData: async () => {
     try {
       set({isLoading: true});
       const trendingData = await fetchPodcasts(CATEGORIES.ALL, '12');
-      const historyData = await fetchPodcasts(CATEGORIES.HISTORY, '50');
+      const historyData = await fetchPodcasts(CATEGORIES.HISTORY, '5');
       const comedyData = await fetchPodcasts(CATEGORIES.COMEDY, '5');
       const scienceData = await fetchPodcasts(CATEGORIES.SCIENCE, '5');
       const educationData = await fetchPodcasts(CATEGORIES.EDUCATION, '5');

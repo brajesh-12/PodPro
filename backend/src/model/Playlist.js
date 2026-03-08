@@ -19,12 +19,14 @@ const playlistSchema = mongoose.Schema({
     default: 'custom'
   },
   image: {
-    type: String
+    type: String,
+    default: ""
   },
   description: {
-    type: String
+    type: String,
+    default: ""
   }
-});
+}, {timestamps: true});
 
 const Playlist = mongoose.model("Playlists", playlistSchema);
 

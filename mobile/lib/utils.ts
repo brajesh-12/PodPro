@@ -47,7 +47,7 @@ export const formatDuration = (duration: any) => {
 }
 
 export const formatProgress = (duration: any) => {
-  if(!duration) return null;
+  if(!duration || isNaN(duration)) return "00:00";
 
   const pad = (num: any) => num.toString().padStart(2, "0");
 

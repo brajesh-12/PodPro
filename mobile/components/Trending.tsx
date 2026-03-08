@@ -1,17 +1,20 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { EllipsisVertical } from 'lucide-react-native';
 import React from 'react';
 import {Image} from 'expo-image';
 import { useRouter } from 'expo-router';
+import { Podcast, usePodcastStore } from '@/store/usePodcastStore';
+import useModalStore from '@/store/useModalStore';
 
-const PodcastCard: React.FC<{podcast: any}> = ({podcast}) => {
-
+const PodcastCard: React.FC<{podcast: Podcast}> = ({podcast}) => {
   const router = useRouter();
+
+  const { setIsOpen, setType, setTappedPodcast } = useModalStore();
 
   return (
     <TouchableOpacity
       onPress={() => router.navigate({
-        pathname: "/(home)/podcast/[id]",
+        pathname: "/(tabs)/(home)/podcast/[id]",
         params: {id: `${podcast.id}`}
       })}
       key={podcast.id}
@@ -74,7 +77,7 @@ const PodcastCard: React.FC<{podcast: any}> = ({podcast}) => {
               width: 215
             }}
           >
-            {podcast.podcastTitle}
+            {podcast.title}
           </Text>
 
           <Text
@@ -95,7 +98,12 @@ const PodcastCard: React.FC<{podcast: any}> = ({podcast}) => {
       </View>
 
       {/* more icon */}
-      <View
+      <Pressable
+        onPress={() => {
+          setIsOpen(true);
+          setTappedPodcast(podcast);
+          setType("podcast");
+        }}
         style={{
           height: 30,
           width: 30,
@@ -105,7 +113,7 @@ const PodcastCard: React.FC<{podcast: any}> = ({podcast}) => {
         }}
       >
         <EllipsisVertical size={20}/>
-      </View>
+      </Pressable>
     </TouchableOpacity>
   )
 }

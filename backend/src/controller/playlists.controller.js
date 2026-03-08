@@ -2,7 +2,7 @@ import Episode from "../model/Episode.js";
 import Playlist from "../model/Playlist.js";
 import PlaylistItem from "../model/PlaylistItem.js";
 import Podcast from "../model/Podcast.js";
-import { saveEpisodes } from "../lib/utils.js";
+import { fetchPodcast, saveEpisodes } from "../lib/utils.js";
 
 export const getPlaylists = async (req, res) => {
   try {
@@ -17,8 +17,29 @@ export const getPlaylists = async (req, res) => {
     res.status(200).json(playlists);
 
   } catch (error) {
-    console.error("Error getting playlist:", error);
+    console.error("Error getting playlists:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export const lookupPlaylist = async (req, res) => {
+  try {
+    const id = req.query.id;
+
+    if(!id) {
+      return res.status(401).json({message: "Insufficient data"});
+    }
+    const playlist = await Playlist.findOne({_id: id});
+
+    if(!playlist) {
+      return res.status(404).json({message: "Playlist not found."});
+    }
+
+    res.status(200).json(playlist);
+
+  } catch (error) {
+    console.error("Error getting playlist:", error);
+    res.status(500).json({message: "Internal server error"});
   }
 }
 
@@ -55,18 +76,21 @@ export const addEpisode = async (req, res) => {
   try {
     // get podcastid, episodeId and playlistId from body
     // check if podcast with this id exists in podcasts collection
-    // if present then check the episode with this id in episodes and same it in playlistItem with playlistId
+    // if present then check the episode with this id in episodes and save it in playlistItem with playlistId
     // if not then add this podcast in database, then again get episode with this id in playlistItem, with playlistId
 
-    const { podInfo, episodeId, playlistId } = req.body;
+    const { podcast, episodeId, playlistId } = req.body;
 
-    if(!episodeId || !playlistId) {
-      return res.status(404).json({message: "EpisodeId and PlaylistId are not found."});
+    if(!episodeId || !playlistId || !podcast) {
+      return res.status(404).json({message: "Insufficient data for adding episode."});
     }
 
-    const podInData = await Podcast.findOne({ id: podInfo.id });
+    const podInData = await Podcast.findOne({ id: podcast });
 
     if (!podInData) {
+      const podInfo = fetchPodcast(podcast);
+      console.log("Adding new podcast in DB:", podcast);
+      
       const newPodcast = new Podcast({
         id: podInfo.id,
         title: podInfo.title,
@@ -111,6 +135,14 @@ export const addEpisode = async (req, res) => {
 
     if (!episode) {
       return res.status(404).json({ message: "Episode doesn't found" });
+    }
+
+    // check if episode is already in playlist
+
+    const episodeExists = await PlaylistItem.findOne({playlistId: playlistId, episodeId: episode._id});
+
+    if(episodeExists) {
+      return res.status(400).json({message: "This episode is already in this playlist."});
     }
 
     const saveToEpisode = new PlaylistItem({

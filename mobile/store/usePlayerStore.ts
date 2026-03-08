@@ -23,6 +23,7 @@ interface PlayerState {
   minimizedPlayer: (value: any) => void,
   setProgress: (progress: any) => void,
   seekTo: (time: any) => void,
+  resetPlayer: () => void,
 }
 
 const usePlayerStore = create<PlayerState>()(
@@ -53,6 +54,13 @@ const usePlayerStore = create<PlayerState>()(
         console.log(progress);
       },
       seekTo: (time) => set({seekTarget: time}),
+
+      resetPlayer: () => {
+        set({activeEpisode: null});
+        set({isPlaying: false});
+        set({progress: {position: 0, duration: 0}});
+        set({seekTarget: null});
+      }
     }),
     {
       name: 'player-storage',

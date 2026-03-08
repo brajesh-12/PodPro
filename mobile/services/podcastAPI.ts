@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {XMLParser} from 'fast-xml-parser';
 
 const parserConfig = {
@@ -36,7 +37,7 @@ export const fetchPodcasts = async (query: string, limit: string) => {
 
     return entries.map((item: any) => ({
       id: item.id.attributes['im:id'],
-      podcastTitle: item['im:name'].label,
+      title: item['im:name'].label,
       artist: item['im:artist'].label,
       thumbnail: item['im:image'][2].label
     }));
@@ -60,7 +61,7 @@ export const fetchPodcast = async (podcastId: string) => {
 
     const tranformedData = {
       id: result.collectionId,
-      podcastTitle: result.collectionName,
+      title: result.collectionName,
       artist: result.artistName,
       thumbnail: result.artworkUrl600,
       feedUrl: result.feedUrl,
@@ -108,5 +109,34 @@ export const fetchEpisodes = async (feedUrl: string) => {
     return sortedEpisodes;
   } catch (error) {
     console.error("Error fetching episodes:", error);
+  }
+}
+
+export const searchPodcast = async (query: string, limit: number) => {
+  try {
+    console.log("Running search api.");
+    const response = await axios.get(`${BASE_API}/search`, {
+      params: {
+        term: query,
+        media: 'podcast',
+        entity: 'podcast',
+        limit: limit,
+        country: 'us',
+        explicit: 'Yes'
+      },
+    });
+
+    const results = response.data.results;
+
+    return results.map((result: any) => ({
+      id: result.collectionId,
+      title: result.collectionName,
+      artist: result.artistName,
+      thumbnail: result.artworkUrl600,
+      feedUrl: result.feedUrl,
+      genres: result.genres
+    }));
+  } catch (error) {
+    console.log("Error searching podcast:", error);
   }
 }

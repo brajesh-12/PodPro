@@ -24,7 +24,7 @@ const EpisodeDetail = () => {
       audioUrl: selectedEpisode?.audioUrl,
       podcastId: podcast?.id,
       image: podcast?.thumbnail,
-      podcastTitle: podcast?.podcastTitle
+      podcastTitle: podcast?.title
     });
   }
 
@@ -92,7 +92,7 @@ const EpisodeDetail = () => {
               lineHeight: 16,
             }}
           >
-            {podcast?.podcastTitle}
+            {podcast?.title}
           </Text>
         </View>
 

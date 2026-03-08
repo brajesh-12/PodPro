@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const podcastSchema = mongoose.Schema({
   id: {
-    type: String,
+    type: Number,
     required: true
   },
   title: {
@@ -25,7 +25,7 @@ const podcastSchema = mongoose.Schema({
     type: String,
     required: true
   }
-});
+}, {timestamps: true});
 
 const Podcast = mongoose.model("Podcasts", podcastSchema);
 

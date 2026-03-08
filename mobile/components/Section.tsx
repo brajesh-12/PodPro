@@ -1,9 +1,14 @@
 import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router';
+import { Podcast, usePodcastStore } from '@/store/usePodcastStore';
+import useModalStore from '@/store/useModalStore';
 
-const Section = ({title, data}: { title: string; data: any[] }) => {
+const Section = ({title, data}: { title: string; data: Podcast[] }) => {
   const router = useRouter();
+
+  const { setIsOpen } = useModalStore();
+  const { setTappedOnPodcast } = usePodcastStore();
 
   return (
     <View
@@ -36,7 +41,7 @@ const Section = ({title, data}: { title: string; data: any[] }) => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{
           paddingLeft: 20
         }}
@@ -44,9 +49,13 @@ const Section = ({title, data}: { title: string; data: any[] }) => {
           return (
             <TouchableOpacity
               onPress={() => router.navigate({
-                pathname: "/(home)/podcast/[id]",
-                params: {id: `${item.id}`}
+                pathname: "/(tabs)/(home)/podcast/[id]",
+                params: {id: item.id}
               })}
+              onLongPress={() => {
+                setIsOpen(true);
+                setTappedOnPodcast(item.id);
+              }}
               style={{
                 flexDirection: 'column',
                 gap: 8,
@@ -90,7 +99,7 @@ const Section = ({title, data}: { title: string; data: any[] }) => {
                     lineHeight: 16
                   }}
                 >
-                  {item.podcastTitle}
+                  {item.title}
                 </Text>
 
                 <Text

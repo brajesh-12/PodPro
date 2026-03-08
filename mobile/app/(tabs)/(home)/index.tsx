@@ -1,7 +1,7 @@
 import { View, Text, FlatList, ScrollView } from 'react-native';
 import Header from '@/components/Header';
 import Trending from '@/components/Trending';
-import {filter} from '../../constants/filter';
+import {filter} from '../../../constants/filter';
 import Section from '@/components/Section';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { useEffect } from 'react';

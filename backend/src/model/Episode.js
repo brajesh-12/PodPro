@@ -34,10 +34,18 @@ const episodeSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  type: {
+  episodeType: {
     type: String
   },
-});
+  image: {
+    type: String,
+    required: true
+  },
+  podcastTitle: {
+    type: String,
+    required: true
+  }
+}, {timestamps: true});
 
 const Episode = mongoose.model("Episodes", episodeSchema);
 

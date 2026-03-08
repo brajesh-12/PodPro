@@ -11,8 +11,9 @@ interface CustomSliderProps {
 }
 
 const Slider = ({ width }: CustomSliderProps) => {
-  const { seekTo, progress, isPlaying } = usePlayerStore();
-  const [ slidingValue, setSlidingValue ] = useState(0);
+  const { seekTo, progress, isPlaying, minimized } = usePlayerStore();
+  const [slidingValue, setSlidingValue] = useState(0);
+  const [slidingState, setSlidingState] = useState(false);
 
   const sliderWidth = 353;
   const isSliding = useSharedValue<boolean>(false);
@@ -38,10 +39,13 @@ const Slider = ({ width }: CustomSliderProps) => {
   const panGesture = Gesture.Pan()
     .onBegin(() => {
       isSliding.value = true;
+      scheduleOnRN(setSlidingState, true);
       offset.value = translateX.value;
     })
     .onChange((event) => {
-      const nextX = offset.value + event.translationX;
+      let nextX = offset.value + event.translationX;
+      nextX = Math.max(0, Math.min(nextX, sliderWidth));
+
       const slidingPercent = nextX / sliderWidth;
       const slidingValue = slidingPercent * progress.duration;
       scheduleOnRN(setSlidingValue, slidingValue);
@@ -49,8 +53,11 @@ const Slider = ({ width }: CustomSliderProps) => {
     })
     .onFinalize(() => {
       isSliding.set(false);
+      scheduleOnRN(setSlidingState, false);
       const newPercent = syncContainerWidth.value / sliderWidth;
-      const seekTime = newPercent * progress.duration;
+
+      let seekTime = newPercent * progress.duration;
+      seekTime = Math.max(0, Math.min(seekTime, progress.duration));
 
       if (seekTo) {
         scheduleOnRN(seekTo, seekTime);
@@ -66,6 +73,36 @@ const Slider = ({ width }: CustomSliderProps) => {
       scale: isSliding.value ? 1.5 : 1
     }]
   }));
+
+  if (minimized) {
+    return (
+      <GestureHandlerRootView>
+        <Animated.View
+          style={[{
+            position: "absolute",
+            flexDirection: "row",
+            gap: -4,
+            alignItems: "center",
+            alignContent: "flex-start",
+            maxWidth: 393,
+            minWidth: 0,
+            backgroundColor: "grey"
+          }, activeContainerStyle]}
+        >
+          {/* active track */}
+          <Animated.View
+            style={[
+              {
+                width: "100%",
+                height: 2,
+                backgroundColor: "black",
+              },
+            ]}
+          />
+        </Animated.View>
+      </GestureHandlerRootView>
+    )
+  }
 
   return (
     <GestureHandlerRootView
@@ -170,17 +207,10 @@ const Slider = ({ width }: CustomSliderProps) => {
           }}
         >
           {
-            isSliding 
-            ? formatProgress(slidingValue)
-            : (progress.position === 0 
-              ? `00:00`
-              : formatProgress(progress.position))
+            slidingState
+              ? formatProgress(slidingValue)
+              : formatProgress(progress.position)
           }
-          {/* {progress.position === 0
-            ? `00:00`
-            : formatProgress(progress.position)
-          } */}
-          {/* {formatProgress(progress.position)} */}
         </Text>
 
         <Text
