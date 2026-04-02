@@ -1,61 +1,59 @@
-import useAuthStore from "@/store/useAuthStore";
 import axios from "axios";
+import useAuthStore from "@/store/useAuthStore";
 import * as secureStorage from 'expo-secure-store';
 import tokenRefreshLock from "./tokenRefreshLock";
 
-const authApi = axios.create({
+const multipartAPI = axios.create({
   baseURL: "http://localhost:3000/api",
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'multipart/form-data',
   }
 });
 
-authApi.interceptors.request.use(
+multipartAPI.interceptors.request.use(
   (request) => {
-    const token = useAuthStore.getState().token;
+  const token = useAuthStore.getState().token;
 
-    console.log("Request headers:", JSON.stringify(request.headers, null, 2));
+  console.log("Request headers:", JSON.stringify(request.headers, null, 2));
 
-    if (token) {
-      request.headers.Authorization = `Bearer ${token}`
-    }
-    return request;
-  }, (error) => Promise.reject(error)
+  if(token) {
+    request.headers.Authorization = `Bearer ${token}`
+  }
+  return request;
+}, (error) => Promise.reject(error)
 );
 
-authApi.interceptors.response.use(
+multipartAPI.interceptors.response.use(
   (response) => {
     // we will return the response if not any error
     return response;
   },
   async (error) => {
-    const { setToken, logout } = useAuthStore.getState();
+    const {setToken, logout} = useAuthStore.getState();
 
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if(error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      if (tokenRefreshLock.isRefreshing()) {
+      if(tokenRefreshLock.isRefreshing()) {
         return new Promise((resolve, reject) => {
           tokenRefreshLock.addToQueue({
             resolve: (token: string) => {
               originalRequest.headers.Authentication = `Bearer${token}`;
-              resolve(authApi(originalRequest));
+              resolve(multipartAPI(originalRequest));
             },
-            reject: (error) => reject(error)
-          });
+            reject: (error: any) => reject(error)
+          })
         });
-      }
-
-      tokenRefreshLock.setIsRefreshing(true);
+      };
 
       try {
         console.log("[API] Access token expired, Attempting refresh");
 
         const refreshToken = await secureStorage.getItemAsync('refreshToken');
 
-        if (!refreshToken) {
+        if(!refreshToken) {
           throw new Error("No refresh token available")
         }
 
@@ -76,7 +74,7 @@ authApi.interceptors.response.use(
 
         // now set accesstoken in header of original request
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return authApi(originalRequest);
+        return multipartAPI(originalRequest);
 
       } catch (error) {
         console.log('Error attempting refresh:', error);
@@ -84,14 +82,13 @@ authApi.interceptors.response.use(
         // if error refreshing token then logout
         logout();
         await secureStorage.deleteItemAsync('refreshToken');
+
         tokenRefreshLock.processQueue(error);
         return Promise.reject(error);
-      } finally {
-        tokenRefreshLock.setIsRefreshing(false);
       }
     }
     return Promise.reject(error);
   }
 );
 
-export default authApi;
+export default multipartAPI;

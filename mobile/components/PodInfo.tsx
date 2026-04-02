@@ -1,12 +1,11 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image';
-import { usePodcastStore } from '@/store/usePodcastStore';
+import { Podcast} from '@/store/usePodcastStore';
 import { Settings, Share2, Star } from 'lucide-react-native';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 
-const PodInfo = () => {
-  const {podcast} = usePodcastStore();
+const PodInfo: React.FC<{podcast: Podcast | null}> = ({podcast}) => {
   const { toggleSubscription, subscriptionIds } = useSubscriptionStore();
 
   const isSubscribed = podcast?.id !== undefined ? subscriptionIds.has(podcast?.id) : false;

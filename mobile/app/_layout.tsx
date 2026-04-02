@@ -13,7 +13,7 @@ import PlaylistSelection from "@/components/PlaylistSelectionModal";
 import usePlaylistStore from "@/store/usePlaylistStore";
 import { initNetworkListener, useNetworkStore } from "@/store/useNetworkStore";
 import useDownloadStore from "@/store/useDownloadStore";
-import { Text, View } from "react-native";
+// import { Text, View } from "react-native";
 
 export default function RootLayout() {
   // here we use isHydration for loading splash screen
@@ -66,7 +66,7 @@ export default function RootLayout() {
     >
       <AudioController />
 
-      {
+      {/* {
         !isOnline && (
           <View
             style={{
@@ -78,7 +78,7 @@ export default function RootLayout() {
             </Text>
           </View>
         )
-      }
+      } */}
 
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={isAuthorized}>

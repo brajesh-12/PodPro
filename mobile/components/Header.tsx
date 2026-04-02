@@ -344,8 +344,8 @@ export const SubscriptionHeader = () => {
               <Pressable
                 onPress={() => {
                   router.navigate({
-                    pathname: "/(tabs)/(home)/podcast/[id]",
-                    params: { id: `${selectedPodcast?.id}` }
+                    pathname: "/(tabs)/(podcast)/[podcastId]",
+                    params: { podcastId: `${selectedPodcast?.id}` }
                   })
                 }}
                 style={{

@@ -1,19 +1,22 @@
 import { View, Text, Modal, TouchableOpacity, Pressable } from 'react-native';
 import usePlayerStore from '@/store/usePlayerStore';
 import SafeArea from './SafeArea';
-import { ChevronDown, EllipsisVertical, FastForward, Pause, Play, Tally1 } from 'lucide-react-native';
+import { ChevronDown, EllipsisVertical, Pause, Play } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import Slider from '../components/Slider';
+import { Backward, Forward, SleepTimer, SpeedControl } from '@/Icons-assets/Icon';
 
 const FullPlayer = () => {
   const { minimized, activeEpisode, minimizedPlayer, isPlaying, togglePlay } = usePlayerStore();
 
-  if (minimized || !activeEpisode) return null;
+  if ( minimized || !activeEpisode ) return null;
   return (
     <Modal
       visible={!minimized} animationType="slide"
     >
-      <SafeArea>
+      <SafeArea
+        backgroundColor='none'
+      >
         <View
           style={{
             flexDirection: "row",
@@ -130,11 +133,18 @@ const FullPlayer = () => {
             }}
           >
             <View>
-              <Tally1 size={24} strokeWidth={2}/>
+              <SpeedControl size={24}/>
             </View>
 
-            <View>
-              <FastForward size={32} strokeWidth={2}/>
+            <View
+              style={{
+                alignContent: 'center',
+                justifyContent: 'center',
+                width: 40,
+                height: 40
+              }}
+            >
+              <Backward size={32} strokeWidth={1.88}/>
             </View>
 
             {/* Play and Pause */}
@@ -156,12 +166,19 @@ const FullPlayer = () => {
               )}
             </Pressable>
 
-            <View>
-              <FastForward size={32} strokeWidth={2}/>
+            <View
+              style={{
+                alignContent: 'center',
+                justifyContent: 'center',
+                width: 40,
+                height: 40
+              }}
+            >
+              <Forward size={32} strokeWidth={1.88}/>
             </View>
 
             <View>
-              <Tally1 size={24} strokeWidth={2}/>
+              <SleepTimer size={24}/>
             </View>
           </View>
 

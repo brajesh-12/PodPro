@@ -1,14 +1,13 @@
 import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router';
-import { Podcast, usePodcastStore } from '@/store/usePodcastStore';
+import { Podcast } from '@/store/usePodcastStore';
 import useModalStore from '@/store/useModalStore';
 
 const Section = ({title, data}: { title: string; data: Podcast[] }) => {
   const router = useRouter();
 
-  const { setIsOpen } = useModalStore();
-  const { setTappedOnPodcast } = usePodcastStore();
+  const { openGlobalModal, setTappedPodcast } = useModalStore();
 
   return (
     <View
@@ -53,8 +52,8 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
                 params: {id: item.id}
               })}
               onLongPress={() => {
-                setIsOpen(true);
-                setTappedOnPodcast(item.id);
+                openGlobalModal('podcast');
+                setTappedPodcast(item);
               }}
               style={{
                 flexDirection: 'column',

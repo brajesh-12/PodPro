@@ -5,12 +5,13 @@ import { Playlist } from "@/services/api";
 import { useRouter } from "expo-router";
 import { formatDate } from "@/lib/utils";
 import useModalStore from "@/store/useModalStore";
+import { Image } from "expo-image";
 
 
 export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
   const router = useRouter();
 
-  const { setIsOpen, setTappedPlaylist, setType } = useModalStore();
+  const { setTappedPlaylist, openGlobalModal } = useModalStore();
 
   return (
     <Pressable
@@ -44,7 +45,16 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
             borderRadius: 4,
             backgroundColor: 'grey'
           }}
-        ></View>
+        >
+          <Image
+            style={{
+              height: "100%",
+              width: "100%",
+              borderRadius: 4
+            }}
+            source={{ uri: playlist.image }}
+          />
+        </View>
 
         {/* Text conatiner */}
         <View>
@@ -80,8 +90,7 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
       {/* Right conatiner */}
       <Pressable
         onPress={() => {
-          setIsOpen(true);
-          setType("playlist");
+          openGlobalModal('playlist');
           setTappedPlaylist(playlist);
         }}
         style={{
@@ -98,7 +107,7 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
 
 export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
   const router = useRouter();
-  const { setIsOpen, setTappedPlaylist, setType } = useModalStore();
+  const { setTappedPlaylist, openGlobalModal } = useModalStore();
 
   return (
     <Pressable
@@ -107,8 +116,7 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
         params: { id: `${playlist.id}` }
       })}
       onLongPress={() => {
-        setIsOpen(true);
-        setType("playlist");
+        openGlobalModal('playlist')
         setTappedPlaylist(playlist);
       }}
       style={{
@@ -124,7 +132,16 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
           borderRadius: 6,
           backgroundColor: 'grey'
         }}
-      ></View>
+      >
+        <Image
+          style={{
+            height: '100%',
+            width: '100%',
+            borderRadius: 6
+          }}
+          source={{ uri: playlist.image }}
+        />
+      </View>
 
       <View
         style={{

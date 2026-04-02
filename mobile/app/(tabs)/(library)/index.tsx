@@ -1,16 +1,25 @@
 import Header from '@/components/Header';
 import { ChevronDown, LayoutGrid, List } from 'lucide-react-native';
-import { View, Text, FlatList, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
 import { BoardLayout, ListLayout } from '@/components/Playlist';
 import API from '@/services/api';
 import usePlaylistStore from '@/store/usePlaylistStore';
+import { useNetworkStore } from '@/store/useNetworkStore';
+import useDownloadStore from '@/store/useDownloadStore';
+import { formatDuration } from '@/lib/utils';
+import { Image } from 'expo-image';
+import usePlayerStore from '@/store/usePlayerStore';
 
 const Library = () => {
   const [layout, setLayout] = useState(true);
   // const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
-  const { allPlaylists, fetchPlaylists} = usePlaylistStore();
+  const { allPlaylists, fetchPlaylists } = usePlaylistStore();
+  const { isOnline } = useNetworkStore();
+  const { downloadEpisodes } = useDownloadStore();
+  const downloadEpisodesArr = Object.values(downloadEpisodes);
+  const { setActiveEpisode } = usePlayerStore();
 
   const [modalVisibile, setModalVisible] = useState(false);
 
@@ -48,7 +57,7 @@ const Library = () => {
           backgroundColor: "black",
           position: "absolute",
           right: 20,
-          bottom: 32,
+          bottom: 72,
           borderRadius: 32,
           height: 48
         }}
@@ -62,7 +71,7 @@ const Library = () => {
         </Text>
       </TouchableOpacity>
     )
-  }
+  };
 
   const LibraryHeader = () => {
     return (
@@ -120,6 +129,127 @@ const Library = () => {
           </TouchableOpacity>
 
         </View>
+      </View>
+    )
+  };
+
+  const offlineHeader = () => {
+    return (
+      <View
+        style={{
+          height: 48,
+          width: "auto",
+          alignItems: "flex-start",
+          paddingHorizontal: 16,
+          justifyContent: "center"
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "SF Pro",
+            fontSize: 18,
+            fontWeight: "600",
+            lineHeight: 28
+          }}
+        >
+          Downloads
+        </Text>
+      </View>
+    )
+  }
+
+  if (!isOnline) {
+    return (
+      <View
+        style={{
+          flex: 1
+        }}
+      >
+        <FlatList
+          data={downloadEpisodesArr}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={offlineHeader}
+          renderItem={({ item }) => {
+            return (
+              <Pressable
+                onPress={() => setActiveEpisode(item)}
+                style={{
+                  flexDirection: "row",
+                  paddingLeft: 16,
+                  paddingRight: 10,
+                  paddingBottom: 12,
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  width: 393
+                }}
+              >
+                {/* left container */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                    flexShrink: 1
+                  }}
+                >
+                  {/* image */}
+                  <View
+                    style={{
+                      height: 64,
+                      width: 64,
+                    }}
+                  >
+                    <Image
+                      source={{ uri: item.image }}
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: 4
+                      }}
+                    />
+                  </View>
+
+                  {/* title container */}
+                  <View
+                    style={{
+                      gap: 4,
+                      flexShrink: 1,
+                      width: "auto"
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode='tail'
+                      style={{
+                        fontFamily: "SF Pro",
+                        fontSize: 16,
+                        fontWeight: "500",
+                        lineHeight: 24,
+                        width: "auto"
+                      }}
+                    >
+                      {item.title}
+                    </Text>
+
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode='tail'
+                      style={{
+                        fontFamily: "SF Pro",
+                        fontSize: 14,
+                        fontWeight: "400",
+                        lineHeight: 20
+                      }}
+                    >
+                      {formatDuration(item.duration)} &#183; {item.podcastTitle}
+                    </Text>
+                  </View>
+                </View>
+              </Pressable>
+            )
+          }}
+        />
       </View>
     )
   }
@@ -264,7 +394,7 @@ const Library = () => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={async() => {
+                onPress={async () => {
                   const inputData = {
                     title,
                     description
@@ -272,7 +402,7 @@ const Library = () => {
 
                   const response = await API.createPlaylist(inputData);
                   console.log("New Playlist:", response);
-                  
+
                   fetchPlaylists();
                   setTitle("");
                   setDescription("");
@@ -301,7 +431,7 @@ const Library = () => {
         </View>
       </Modal>
     </View>
-  )
+  );
 }
 
 export default Library;

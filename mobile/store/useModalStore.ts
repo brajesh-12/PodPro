@@ -3,23 +3,23 @@ import { Episode, Podcast } from './usePodcastStore';
 import { Playlist } from '@/services/api';
 
 interface ModalStore {
-  isOpen: boolean,
-  setIsOpen: (value: boolean) => void,
-  type: string,
-  setType: (type: string) => void,
+  isOpen: boolean;
+  openGlobalModal: (type: string) => void;
+  type: string;
+  closeGlobalModal: () => void;
 
-  isAddTo: boolean,
-  setIsAddTo: (value: boolean) => void,
+  isAddTo: boolean;
+  setIsAddTo: (value: boolean) => void;
 
-  tappedEpisode: Episode | null,
-  tappedPodcast: Podcast | null,
-  tappedPlaylist: Playlist | null,
-  podcastId: number | null,
+  tappedEpisode: Episode | null;
+  tappedPodcast: Podcast | null;
+  tappedPlaylist: Playlist | null;
+  podcastId: number | null;
 
-  setTappedEpisode: (episode: any) => void,
-  setTappedPodcast: (podcast: any) => void,
-  setTappedPlaylist: (playlist: any) => void,
-  setPodcastId: (id: number | null) => void,
+  setTappedEpisode: (episode: any | null) => void;
+  setTappedPodcast: (podcast: any | null) => void;
+  setTappedPlaylist: (playlist: any) => void;
+  setPodcastId: (id: number | null) => void;
 }
 
 const useModalStore = create<ModalStore>(
@@ -32,12 +32,13 @@ const useModalStore = create<ModalStore>(
     tappedPlaylist: null,
     podcastId: null,
 
-    setIsOpen: (value) => {
-      set({isOpen: value});
+    openGlobalModal: (type) => {
+      set({isOpen: true});
+      set({type: type});
     },
 
-    setType: (type) => {
-      set({type: type});
+    closeGlobalModal: () => {
+      set({isOpen: false});
     },
 
     setIsAddTo: (value) => set({isAddTo: value}),

@@ -3,6 +3,7 @@ import Playlist from "../model/Playlist.js";
 import PlaylistItem from "../model/PlaylistItem.js";
 import Podcast from "../model/Podcast.js";
 import { fetchPodcast, saveEpisodes } from "../lib/utils.js";
+import cloudinary, { uploadToCloudinary } from "../lib/cloudinary.js";
 
 export const getPlaylists = async (req, res) => {
   try {
@@ -26,27 +27,27 @@ export const lookupPlaylist = async (req, res) => {
   try {
     const id = req.query.id;
 
-    if(!id) {
-      return res.status(401).json({message: "Insufficient data"});
+    if (!id) {
+      return res.status(401).json({ message: "Insufficient data" });
     }
-    const playlist = await Playlist.findOne({_id: id});
+    const playlist = await Playlist.findOne({ _id: id });
 
-    if(!playlist) {
-      return res.status(404).json({message: "Playlist not found."});
+    if (!playlist) {
+      return res.status(404).json({ message: "Playlist not found." });
     }
 
     res.status(200).json(playlist);
 
   } catch (error) {
     console.error("Error getting playlist:", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
 export const createPlaylist = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { title, description, image } = req.body;
+    const { title, description } = req.body;
 
     if (!title) {
       return res.status(401).json({ message: "Please set title" });
@@ -56,14 +57,13 @@ export const createPlaylist = async (req, res) => {
       userId,
       title,
       description,
-      image
     });
 
-    await newPlaylist.save();
+    const savedPlaylist = await newPlaylist.save();
 
     res.status(201).json({
       message: "Playlist created successfully.",
-      playlist: newPlaylist
+      playlist: savedPlaylist
     });
 
   } catch (error) {
@@ -81,8 +81,8 @@ export const addEpisode = async (req, res) => {
 
     const { podcast, episodeId, playlistId } = req.body;
 
-    if(!episodeId || !playlistId || !podcast) {
-      return res.status(404).json({message: "Insufficient data for adding episode."});
+    if (!episodeId || !playlistId || !podcast) {
+      return res.status(404).json({ message: "Insufficient data for adding episode." });
     }
 
     const podInData = await Podcast.findOne({ id: podcast });
@@ -90,7 +90,7 @@ export const addEpisode = async (req, res) => {
     if (!podInData) {
       const podInfo = fetchPodcast(podcast);
       console.log("Adding new podcast in DB:", podcast);
-      
+
       const newPodcast = new Podcast({
         id: podInfo.id,
         title: podInfo.title,
@@ -128,7 +128,7 @@ export const addEpisode = async (req, res) => {
       });
 
       await saveToPlaylist.save();
-      res.status(201).json({message: "Episode added successfully"});
+      res.status(201).json({ message: "Episode added successfully" });
     }
 
     const episode = await Episode.findOne({ episodeId: episodeId, podcastId: podInData._id });
@@ -139,10 +139,10 @@ export const addEpisode = async (req, res) => {
 
     // check if episode is already in playlist
 
-    const episodeExists = await PlaylistItem.findOne({playlistId: playlistId, episodeId: episode._id});
+    const episodeExists = await PlaylistItem.findOne({ playlistId: playlistId, episodeId: episode._id });
 
-    if(episodeExists) {
-      return res.status(400).json({message: "This episode is already in this playlist."});
+    if (episodeExists) {
+      return res.status(400).json({ message: "This episode is already in this playlist." });
     }
 
     const saveToEpisode = new PlaylistItem({
@@ -181,18 +181,123 @@ export const deletePlaylist = async (req, res) => {
   }
 }
 
+export const updateCover = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if(!id) {
+      return res.status(401).json({message: "Playlist Id is not found"});
+    }
+
+    if(!req.file) return res.status(401).json({message: "Cover file is not found"});
+
+    const result = await uploadToCloudinary(req.file.buffer);
+
+    const updatedPlaylist = await Playlist.findByIdAndUpdate({_id: id},
+      {$set: {image: result.secure_url}},
+      {new: true}
+    );
+
+    res.status(200).json({
+      message: "Cover updated succeffully.",
+      playlist: updatedPlaylist
+    });
+
+  } catch (error) {
+    console.error("Error updating cover:", error);
+    res.status(500).json({message: "Internal server error"});
+  }
+};
+
+export const updateText = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+
+    if(!id) return res.status(401).json({message: "Playlist Id is not found"});
+
+    if(!title && !description) {
+      return res.status(401).json({message: "No data to update"});
+    }
+
+    let data = {};
+
+    if(title) {
+      data.title = title;
+    };
+
+    if(description) {
+      data.description = description;
+    };
+
+    const updatedPlaylist = await Playlist.findByIdAndUpdate({_id: id},
+      { $set: data },
+      { new: true }
+    );
+
+    res.status(200).json({message: "Playlist updated successfully"});
+
+  } catch (error) {
+    console.error("Error upading title or description:", error);
+    res.status(500).json({message: "Internal server error"});
+  }
+}
+
 export const updatePlaylist = async (req, res) => {
   try {
-    const playlistId = req.query.id;
-    const { title, image, description } = req.body;
+    const { id } = req.params;
+    const { title, description } = req.body;
 
-    if (!playlistId) {
+    console.log("Title:", title);
+    console.log("file:", req.file);
+
+    if (!id) {
       return res.status(401).json({ message: "PlaylistId is not found" });
     }
 
-    await Playlist.updateOne({ _id: playlistId }, { $set: { title: title, description: description } });
+    let updateData = {};
 
-    res.status(200).json({message: "Playlist updated successfully"});
+    if(title) {
+      updateData.title = title;
+    };
+
+    if(description) {
+      updateData.description = description;
+    };
+
+    if(req.file) {
+      console.log("Updating cover of playlist...");
+
+      const result = await uploadToCloudinary(req.file.buffer);
+
+      updateData.image = result.secure_url;
+    };
+
+    await Playlist.findByIdAndUpdate(id, 
+      { $set: updateData },
+      { new: true }
+    );
+
+    // if (image) {
+    //   try {
+
+    //     console.log("Saving image to database...");
+    //     const uploadToCloud = await cloudinary.uploader.upload(image);
+    //     console.log("Uploaded to cloud:", uploadToCloud.url);
+
+    //     // save to database
+    //     const imageUploaded = await Playlist.findByIdAndUpdate({ _id: playlistId }, {
+    //       image: uploadToCloud.url
+    //     }, { new: true });
+    //     console.log("Updated Image:", imageUploaded);
+
+    //   } catch (error) {
+    //     console.error("Cloudinary upload error:", error);
+    //     return res.status(500).json({ message: "Image upload failed" });
+    //   }
+
+    // };
+
+    res.status(200).json({ message: "Playlist updated successfully" });
     // update this image setting and deleting later
 
   } catch (error) {
@@ -208,8 +313,8 @@ export const removeEpisode = async (req, res) => {
     const id = req.query.id;
     const eId = req.query.eId;
 
-    if(!id || !eId) {
-      return res.status(404).json({message: "Invalid IDs"});
+    if (!id || !eId) {
+      return res.status(404).json({ message: "Invalid IDs" });
     }
 
     await PlaylistItem.deleteOne({ playlistId: id, episodeId: eId });
@@ -217,7 +322,7 @@ export const removeEpisode = async (req, res) => {
     res.status(200).json({ message: "Episode removed successfully" });
   } catch (error) {
     console.error("Error removing episode:", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 
 }
@@ -229,20 +334,21 @@ export const playlistEpisodes = async (req, res) => {
     const playlistId = req.query.id;
 
     const episodes = await PlaylistItem.find({
-      playlistId: playlistId})
+      playlistId: playlistId
+    })
       .select("episodeId")
       .populate("episodeId")
-      .sort({addedAt: -1})
-    
-    if(!episodes) {
-      return res.status(404).json({message: "Playlist is empty"});
+      .sort({ addedAt: -1 })
+
+    if (!episodes) {
+      return res.status(404).json({ message: "Playlist is empty" });
     }
 
     res.status(200).json(episodes);
 
   } catch (error) {
     console.error("Error getting playlist episodes:", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 

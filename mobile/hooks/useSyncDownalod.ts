@@ -4,13 +4,13 @@ import usePlaylistStore from "@/store/usePlaylistStore";
 
 const useSyncDownload = () => {
   const { startDownload, hydrate, downloadEpisodes, activeDownloads } = useDownloadStore();
-  const { downloadPlaylist } = usePlaylistStore();
+  const { DPEpisodes } = usePlaylistStore();
 
   // sync download episodes from the database download playlist
   const performSync = async () => {
     await hydrate();
 
-    const missingEpisodes = downloadPlaylist.filter((episode) => {
+    const missingEpisodes = DPEpisodes.filter((episode: any) => {
       const isDownloaded = !!downloadEpisodes[episode.id];
       const isCurrentlyDownloading = activeDownloads[episode.id] !== undefined;
 

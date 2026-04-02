@@ -26,22 +26,24 @@ export interface SavedEpisode {
 }
 
 interface SubscriptionStore {
-  followingPodcasts: FollowedPod[],
-  feed: SavedEpisode[],
-  subscriptionIds: Set<number>,
-  currentPage: number,
-  hasNextPage: boolean,
-  selectedPodcast: FollowedPod | null,
-  isSelected: boolean
+  followingPodcasts: FollowedPod[];
+  feed: SavedEpisode[];
+  subscriptionIds: Set<number>;
+  currentPage: number;
+  hasNextPage: boolean;
+  selectedPodcast: FollowedPod | null;
+  isSelected: boolean;
+  selectedEpisode: SavedEpisode | null;
 
-  setFollowingPodcasts: () => Promise<void>,
-  fetchFeed: (pageNum: number) => Promise<void>,
-  toggleSubscription: (id: any) => Promise<void>,
-  setSubscriptionIds: (ids: any) => void,
-  singlePodFeed: (pageNum: number) => Promise<void>,
-  setSelectedPodcast: (podcast: FollowedPod) => void,
-  setIsSelected: (value: boolean) => void,
-  clearSubcriptionIds: (ids: any) => void,
+  setFollowingPodcasts: () => Promise<void>;
+  fetchFeed: (pageNum: number) => Promise<void>;
+  toggleSubscription: (id: any) => Promise<void>;
+  setSubscriptionIds: (ids: any) => void;
+  singlePodFeed: (pageNum: number) => Promise<void>;
+  setSelectedPodcast: (podcast: FollowedPod) => void;
+  setIsSelected: (value: boolean) => void;
+  clearSubcriptionIds: (ids: any) => void;
+  setSelectedEpisode: (episodeId: string) => void;
 }
 
 const useSubscriptionStore = create<SubscriptionStore>(
@@ -50,7 +52,10 @@ const useSubscriptionStore = create<SubscriptionStore>(
     feed: [],
     subscriptionIds: new Set(),
     selectedPodcast: null,
+    // this isSelected controlled fetching of episodes based on podcast selection 
     isSelected: false,
+
+    selectedEpisode: null,
 
     currentPage: 1,
     hasNextPage: false,
@@ -195,6 +200,11 @@ const useSubscriptionStore = create<SubscriptionStore>(
     },
 
     setIsSelected: (value) => set({isSelected: value}),
+
+    setSelectedEpisode: (episodeId) => {
+      const episode = get().feed.find((item) => item.episodeId === episodeId);
+      set({selectedEpisode: episode});
+    },
 
     clearSubcriptionIds: () => set({ subscriptionIds: new Set() }),
 

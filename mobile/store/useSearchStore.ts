@@ -2,12 +2,12 @@ import { create } from 'zustand';
 import { Podcast } from './usePodcastStore';
 
 interface SearchStore {
-  isSearching: boolean,
-  results: Podcast[],
-  recent: Podcast[],
+  isSearching: boolean;
+  results: Podcast[];
+  recent: Podcast[];
 
-  setSearching: () => void,
-  setResults: (value: any) => void,
+  setSearching: () => void;
+  setResults: (value: any) => void;
 }
 
 const useSearchStore = create<SearchStore>(
