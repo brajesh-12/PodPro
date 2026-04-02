@@ -1,15 +1,25 @@
 import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native'
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { Image } from 'expo-image';
-import { ArrowDown, CirclePlay, Download, EllipsisVertical } from 'lucide-react-native';
+import { ArrowDown, CirclePlay, Download, EllipsisVertical, SaveIcon } from 'lucide-react-native';
 import { formatDate, formatDuration } from '../lib/utils';
 import { useRouter } from 'expo-router';
 import useModalStore from '@/store/useModalStore';
+import { useEffect } from 'react';
+import usePlaylistStore from '@/store/usePlaylistStore';
+import API from '@/services/api';
 
 const Episodes = () => {
   const router = useRouter();
-  const { episodes, podcast } = usePodcastStore();
-  const { setIsOpen, setType, setTappedEpisode } = useModalStore();
+  const { episodes, podcast, fetchEpisodesData } = usePodcastStore();
+  const { openGlobalModal, setTappedEpisode } = useModalStore();
+  const { savePlaylist, SaveEpisodes, addingEpisode, fetchSavedEpisodes } = usePlaylistStore();
+
+  useEffect(() => {
+    if(podcast) {
+      fetchEpisodesData(podcast.feedUrl)
+    }
+  }, [fetchEpisodesData, podcast]);
 
   return (
     <View>
@@ -74,6 +84,26 @@ const Episodes = () => {
         data={episodes}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
+          const isSaved = SaveEpisodes.some((ep) => item.id === ep.id);
+
+          const handleSave = async () => {
+            if(isSaved) {
+              const epInDB = SaveEpisodes.find((ep) => item.id === ep.id);
+              await API.removeEpisode(savePlaylist?.id, epInDB?.episodeId);
+              fetchSavedEpisodes();
+
+            } else {
+              const body = {
+                podcastId: podcast?.id,
+                episodeId: item.id,
+                playlistId: savePlaylist?.id
+              };
+
+              await addingEpisode(body);
+              fetchSavedEpisodes();
+            }
+          }
+
           return (
             <TouchableOpacity
               onPress={() => router.navigate({
@@ -138,8 +168,7 @@ const Episodes = () => {
 
                   <Pressable
                     onPress={() => {
-                      setIsOpen(true);
-                      setType("episode");
+                      openGlobalModal('episode');
                       setTappedEpisode(item);
                     }}
                   >
@@ -195,7 +224,12 @@ const Episodes = () => {
                     alignItems: "center"
                   }}
                 >
-                  <ArrowDown size={24} strokeWidth={2} />
+                  <Pressable
+                    onPress={handleSave}
+                  >
+                    {isSaved ? <ArrowDown size={24} strokeWidth={2} /> : <SaveIcon size={24} strokeWidth={2}/> }
+                  </Pressable>
+                  
                   <Download size={24} strokeWidth={2} />
                   <CirclePlay size={24} strokeWidth={2} />
 

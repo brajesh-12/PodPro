@@ -165,25 +165,6 @@ const API = {
     }
   },
 
-  updatePlaylist: async (playlistId: any, body: any) => {
-    try {
-      const response = await authApi.patch(`/playlists/update?id=${playlistId}`, {
-        title: body.title,
-        description: body.description,
-        image: body.image
-      });
-
-      const data = response.data?.message;
-      console.log("Update Playlist:", data);
-
-      Alert.alert("Playlist Updated Successfully.");
-
-    } catch (error: any) {
-      console.log("Error updating Playlist:", error.response.data?.message);
-      Alert.alert("Error", "Something went wrong.");
-    }
-  },
-
   deletePlaylist: async (playlistId: string) => {
     try {
       const response = await authApi.delete(`/playlists?id=${playlistId}`);
@@ -222,6 +203,10 @@ const API = {
   },
 
   addEpisodeToPlaylist: async (body: any) => {
+    if(!body.podcastId) return Alert.alert("PodcastId required");
+    if(!body.episodeId) return Alert.alert("EpisodeId is required");
+    if(!body.playlistId) return Alert.alert("PlaylistId is required");
+
     try {
       const response = await authApi.post(`/playlists/episodes`, {
         podcast: body.podcastId,

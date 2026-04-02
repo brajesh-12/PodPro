@@ -2,12 +2,14 @@ import { View, Text, TouchableOpacity, ScrollView, FlatList, Pressable, Modal, A
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import usePlaylistStore from '@/store/usePlaylistStore';
-import { ArrowLeft, EllipsisVertical, Download, Play, X } from 'lucide-react-native';
+import { ArrowLeft, EllipsisVertical, Download, Play, X, Edit } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { formatDate, formatDuration } from '@/lib/utils';
 import SafeArea from '@/components/SafeArea';
 import { SavedEpisode } from '@/store/useSubscriptionStore';
 import API from '@/services/api';
+import * as imagePicker from 'expo-image-picker';
+import UP_API from '@/services/updateAPI';
 
 const SelectedPlaylist = () => {
   const router = useRouter();
@@ -15,6 +17,7 @@ const SelectedPlaylist = () => {
 
   const [tappedEpisode, setTappedEpisode] = useState<SavedEpisode | null>(null);
   const [modalVisibile, setModalVisible] = useState(false);
+  const [image, setImage] = useState<string | null>(null);
 
   const { singlePlaylist, selectedPlaylist, fetchEpisodes, playlistEpisodes } = usePlaylistStore();
 
@@ -29,6 +32,33 @@ const SelectedPlaylist = () => {
     Alert.alert(`${message}`);
     setModalVisible(false);
     fetchEpisodes(id);
+  }
+
+  const handleImageUpdate = async () => {
+    await UP_API.updatePlaylistCover(id, image);
+    singlePlaylist(id);
+  }
+
+  const pickImage = async () => {
+    const permissionResult = await imagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission required", "Permission to access the media is required.");
+      return
+    }
+
+    let result = await imagePicker.launchImageLibraryAsync({
+      mediaTypes: "images",
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1
+    });
+
+    console.log("Image result:", result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      handleImageUpdate();
+    }
   }
 
   useEffect(() => {
@@ -91,12 +121,43 @@ const SelectedPlaylist = () => {
               height: 204,
               width: 204,
               backgroundColor: "grey",
-              borderRadius: 4
+              borderRadius: 4,
+              position: "relative",
             }}
           >
             <Image
+              style={{
+                height: "100%",
+                width: "100%",
+                borderRadius: 6
+              }}
               source={{ uri: selectedPlaylist?.image }}
             />
+
+            {/* edit button */}
+            {
+              selectedPlaylist?.type === "custom" && (
+                <Pressable
+                  onPress={() => {
+                    pickImage();
+                  }}
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: 54,
+                    width: 54,
+                    position: "absolute",
+                    right: -8,
+                    bottom: -8,
+                    backgroundColor: "white",
+                    borderRadius: 64
+                  }}
+                >
+                  <Edit size={22} />
+                </Pressable>
+              )
+            }
+
           </View>
         </View>
 

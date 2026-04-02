@@ -22,30 +22,34 @@ export interface Episode {
 
 interface PodcastState {
   // data
-  trending: Podcast[],
-  history: Podcast[],
-  comedy: Podcast[],
-  health: Podcast[],
-  science: Podcast[],
-  education: Podcast[],
-  news: Podcast[],
+  trending: Podcast[];
+  history: Podcast[];
+  comedy: Podcast[];
+  health: Podcast[];
+  science: Podcast[];
+  education: Podcast[];
+  news: Podcast[];
+
+  filterResult: Podcast[];
 
   // Episodes data
-  episodes: Episode[],
-  selectedEpisode: Episode | null,
+  episodes: Episode[];
+  selectedEpisode: Episode | null;
 
   // singlePodcast
-  podcast: Podcast | null,
+  podcast: Podcast | null;
 
   // states
-  isLoading: boolean,
+  isLoading: boolean;
 
   // Actions
   fetchData: () => Promise<void>;
   fetchPod: (podcastId: string) => Promise<void>;
   fetchEpisodesData: (feedUrl: string) => Promise<void>;
   getEpisodeById: (episodeId: any) => void;
-  setPodcast: (podcast: any) => void,
+  setPodcast: (podcast: any) => void;
+  fetchFilterResult: (category: string) => void;
+  resetPodcast: () => void;
 }
 
 export const usePodcastStore = create<PodcastState>((set, get) => ({
@@ -59,6 +63,7 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
   podcast: null,
   episodes: [],
   selectedEpisode: null,
+  filterResult: [],
 
   isLoading: false,
 
@@ -109,5 +114,15 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
     const episode =  get().episodes.find((ep) => ep.id === episodeId);
     set({selectedEpisode: episode});
   },
+
+  fetchFilterResult: async (category) => {
+    const response = await fetchPodcasts(category, "20");
+    set({filterResult: response});
+  },
+
+  resetPodcast: () => {
+    set({podcast: null});
+    set({episodes: []});
+  }
 
 }));

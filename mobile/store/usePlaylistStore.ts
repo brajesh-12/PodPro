@@ -7,9 +7,11 @@ interface PlaylistStore {
   addToPlaylists: Playlist[];
   selectedPlaylist: Playlist | null;
   playlistEpisodes: SavedEpisode[];
-  downloadPlaylist: SavedEpisode[];
-  savePlaylist: SavedEpisode[];
+  downloadPlaylist: Playlist | null;
+  savePlaylist: Playlist | null;
   isCreating: boolean;
+  DPEpisodes: SavedEpisode[];
+  SaveEpisodes: SavedEpisode[];
 
   fetchPlaylists: () => Promise<void>;
   singlePlaylist: (id: any) => Promise<void>;
@@ -17,16 +19,20 @@ interface PlaylistStore {
   setIsCreating: (value: boolean) => void;
   createAndAddEpisode: (data: any, episodeId: any, podcastId: number) => Promise<void>;
   addingEpisode: (body: any) => Promise<void>;
+  fetchSavedEpisodes: () => Promise<void>;
+  fetchDPEpisodes: () => Promise<void>;
 }
 
 const usePlaylistStore = create<PlaylistStore>(
-  (set) => ({
+  (set, get) => ({
     allPlaylists: [],
     addToPlaylists: [],
     selectedPlaylist: null,
     playlistEpisodes: [],
-    downloadPlaylist: [],
-    savePlaylist: [],
+    downloadPlaylist: null,
+    savePlaylist: null,
+    SaveEpisodes: [],
+    DPEpisodes: [],
 
     // modals visiblity
     isCreating: false,
@@ -42,12 +48,16 @@ const usePlaylistStore = create<PlaylistStore>(
         set({ addToPlaylists: filterDownload });
 
         // set downloadPlaylist
-        const downloadEpisodes = response.filter((item: any) => item.type === "Download");
-        set({ downloadPlaylist: downloadEpisodes });
+        const download = response.filter((item: any) => item.type === "Download");
+        console.log("DownloadPlaylist:", download[0]);
+        set({ downloadPlaylist: download[0] });
 
         // set savePlaylist
-        const saveEpisodes = response.filter((item: any) => item.type === "Save");
-        set({ savePlaylist: saveEpisodes })
+        const save = response.filter((item: any) => item.type === "Save");
+        set({ savePlaylist: save[0] });
+
+        await get().fetchDPEpisodes();
+        await get().fetchSavedEpisodes();
         
       } catch (error) {
         console.log("Error fetching playlists:", error);
@@ -100,6 +110,18 @@ const usePlaylistStore = create<PlaylistStore>(
       } catch (error) {
         console.log("Error adding episode in new playlist:", error);
       }
+    },
+
+    fetchSavedEpisodes: async () => {
+      const id = get().savePlaylist?.id;
+      const response = await API.playlistEpisodes(id);
+      set({SaveEpisodes: response});
+    },
+
+    fetchDPEpisodes: async () => {
+      const id = get().downloadPlaylist?.id;
+      const response = await API.playlistEpisodes(id);
+      set({DPEpisodes: response});
     }
 
   })

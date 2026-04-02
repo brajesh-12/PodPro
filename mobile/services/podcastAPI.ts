@@ -27,6 +27,53 @@ export const CATEGORIES = {
   HISTORY: '1487',
 }
 
+export const categories = [
+  {
+    name: "All",
+    code: "all"
+  },
+  {
+    name: "Technology",
+    code: "1318"
+  },
+  {
+    name: "Business",
+    code: "1321"
+  },
+  {
+    name: "Comedy",
+    code: "1303"
+  },
+  {
+    name: "Health",
+    code: "1512"
+  },
+  {
+    name: "News",
+    code: "1489"
+  },
+  {
+    name: "Science",
+    code: "1533"
+  },
+  {
+    name: "Sports",
+    code: "1316"
+  },
+  {
+    name: "True Crime",
+    code: "1488"
+  },
+  {
+    name: "Education",
+    code: "1304"
+  },
+  {
+    name: "History",
+    code: "1487"
+  }
+]
+
 export const fetchPodcasts = async (query: string, limit: string) => {
 
   try {

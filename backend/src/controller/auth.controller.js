@@ -5,12 +5,13 @@ import RefreshTokens from '../model/RefreshToken.js';
 import jwt from 'jsonwebtoken';
 import ENV from "../lib/env.js";
 import { defaultPlaylists } from "./playlists.controller.js";
+import { uploadToCloudinary } from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
-  const { email, password, userName } = req.body;
+  const { email, password } = req.body;
 
   try {
-    if (!email || !password || !userName) {
+    if (!email || !password ) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -32,7 +33,6 @@ export const signup = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      userName,
       email,
       password: hashPassword
     });
@@ -143,10 +143,84 @@ export const login = async (req, res) => {
 
 };
 
-export const logout = (req, res) => {
-  res.send("This is logout endpoint");
+export const logout = async (req, res) => {
+  try {
+    const id = req.query.id;
 
-  // here we delete tokens from secure storage and database
+    const token = req.headers['authorization']?.split(" ")[1]
+
+    if(!token || !id) return res.status(400).json({message: "Insufficient data."});
+
+    const user = await User.findOne({_id: id});
+    if(!user) return res.status(400).json({message: "User not found."});
+
+    const verify = jwt.verify(token, ENV.REFRESH_JWT_SECRET);
+    if(!verify) return res.status(400).json({message: "Unauthorized: Invalid Token."});
+    
+    // now check in database
+    const savedToken = await RefreshTokens.findOne({token: token});
+    if(token !== savedToken.token) return res.status(400).json({message: "Unauthorized: Invalid Token."});
+    
+    await RefreshTokens.deleteMany({familyId: savedToken.familyId, userId: id});
+
+    res.status(200).json({message: "Logged out successfully."});
+
+  } catch (error) {
+    console.error("Error loging out:", error);
+    res.status(500).json({message: "Internal server error."});
+  }
+}
+
+export const updateUserName = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { userName } = req.body;
+
+    if(!userName) return res.status(400).json({message: "UserName is required."});
+
+    const updateUserName = await User.findByIdAndUpdate(userId, {
+      userName: userName
+    });
+
+    res.status(200).json({
+      message: "UserName updated successfully.",
+      user: updateUserName
+    });
+
+  } catch (error) {
+    console.error("Error updating userName:", error);
+    res.status(500).json({message: "Internal server error"});
+  }
+}
+
+export const updateProfilePic = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    if(!req.file) return res.status(400).json({message: "Profile picture is required"});
+
+    const result = await uploadToCloudinary(req.file.buffer);
+
+    const updateProfilePic = await User.findByIdAndUpdate(userId, 
+      { $set: { profilePic: result.secure_url } },
+      { new: true }
+    );
+
+    // const uploadToCloud = await cloudinary.uploader.upload(profilePic);
+
+    // const updateProfilePic = await User.findByIdAndUpdate(userId, {
+    //   profilePic: uploadToCloud.url
+    // });
+
+    res.status(200).json({
+      message: "ProfilePic updated successfully.",
+      user: updateProfilePic
+    });
+
+  } catch (error) {
+    console.error("Error updating profilePic:", error);
+    res.status(500).json({message: "Internal server error"});
+  }
 }
 
 export const Refresh = async (req, res) => {

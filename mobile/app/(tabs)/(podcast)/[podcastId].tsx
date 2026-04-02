@@ -1,53 +1,28 @@
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, FlatList } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
-import { usePodcastStore } from '@/store/usePodcastStore';
-import API from '@/services/api';
-import { useEffect } from 'react';
-import { ArrowLeft, EllipsisVertical } from 'lucide-react-native';
+import { ArrowLeft, Search } from 'lucide-react-native';
 import PodInfo from '@/components/PodInfo';
-import Episodes from '@/components/Episodes';
+import EpisodeCard from '@/components/EpisodeCard';
 
 const Podcast = () => {
-  const { id } = useLocalSearchParams();
-  const podcastId = Array.isArray(id) ? id[0] : id;
-  const numId = Number(podcastId);
-  
+  const { podcastId } = useLocalSearchParams();
+  const id = Array.isArray(podcastId) ? podcastId[0] : podcastId;
+  const numId = Number(id);
+
   const router = useRouter();
 
-  const { fetchPod, podcast, fetchEpisodesData, setPodcast } = usePodcastStore();
-  const { subscriptionIds } = useSubscriptionStore();
+  const { selectedPodcast, singlePodFeed, feed, hasNextPage, currentPage } = useSubscriptionStore();
 
-  console.log("SubscriptionIds:",subscriptionIds);
-
-  const isSubscribed = subscriptionIds.has(numId);
-  console.log(isSubscribed);
-
-  const fetchingPodcast = async () => {
-    if(isSubscribed) {
-      const podcast = await API.podcast(numId);
-      setPodcast(podcast);
-      console.log("Fetching podcast from database.");
-
-    } else {
-      fetchPod(podcastId);
-    }
-  }
-
-  useEffect(() => {
-    fetchingPodcast();
-    // eslint-disable-next-line
-  }, []);
-
-  useEffect(() => {
-    if(podcast) {
-      fetchEpisodesData(podcast.feedUrl);
-    }
-  }, [fetchEpisodesData, podcast]);
-
+  const handleFeed = () => {
+    if(hasNextPage) {
+      singlePodFeed(currentPage + 1);
+    };
+  };
 
   return (
-    <ScrollView>
+    <ScrollView
+    >
       <View
         style={{
           flexDirection: "row",
@@ -59,7 +34,9 @@ const Podcast = () => {
         }}
       >
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            router.back();
+          }}
           style={{
             alignItems: "center",
             justifyContent: "center",
@@ -68,10 +45,13 @@ const Podcast = () => {
             borderRadius: 72
           }}
         >
-          <ArrowLeft size={24} strokeWidth={2}/>
+          <ArrowLeft size={24} strokeWidth={2} />
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={() => router.navigate({
+            pathname: '/search'
+          })}
           style={{
             alignItems: "center",
             justifyContent: "center",
@@ -80,13 +60,78 @@ const Podcast = () => {
             borderRadius: 72
           }}
         >
-          <EllipsisVertical size={24} strokeWidth={2}/>
+          <Search size={24} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
       {/* Top Section */}
-      <PodInfo/>
-      <Episodes/>
+      <PodInfo podcast={selectedPodcast} />
+      <View>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: '8',
+            paddingLeft: 20,
+            alignItems: "center",
+            height: 44
+          }}
+        >
+          <View
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderRadius: 6,
+              backgroundColor: "black",
+              flexWrap: "wrap",
+              alignItems: "center"
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 14,
+                fontWeight: "500",
+                lineHeight: 16,
+                color: "white"
+              }}
+            >
+              Episodes
+            </Text>
+          </View>
+
+          <View
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderRadius: 6,
+              backgroundColor: "rgb(217, 217, 217)",
+              flexWrap: "wrap",
+              alignItems: "center"
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 14,
+                fontWeight: "400",
+                lineHeight: 16
+              }}
+            >
+              More like this
+            </Text>
+          </View>
+        </View>
+
+        <FlatList
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
+          data={feed}
+          keyExtractor={(item) => item.id}
+          renderItem={({item}) => <EpisodeCard episode={item}/>}
+          onEndReached={handleFeed}
+          onEndReachedThreshold={0.1}
+        />
+      </View>
 
     </ScrollView>
   )

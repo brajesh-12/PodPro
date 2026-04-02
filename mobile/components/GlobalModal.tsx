@@ -8,7 +8,7 @@ import API from '@/services/api';
 
 const GlobalModal = () => {
   // add states like episode, podcast and playlist in useModalStore.
-  const { isOpen, setIsOpen, type, tappedPodcast } = useModalStore();
+  const { isOpen, closeGlobalModal, type, tappedPodcast } = useModalStore();
 
   let podcastId = 0
   if (tappedPodcast) {
@@ -21,7 +21,7 @@ const GlobalModal = () => {
     <Modal
       visible={isOpen}
       transparent={true}
-      onRequestClose={() => setIsOpen(false)}
+      onRequestClose={() => closeGlobalModal()}
     >
       <View
         style={{
@@ -78,7 +78,7 @@ const GlobalModal = () => {
               </View>
 
               <Pressable
-                onPress={() => setIsOpen(false)}
+                onPress={() => closeGlobalModal()}
               >
                 <X size={24} />
               </Pressable>
@@ -148,7 +148,7 @@ const GlobalModal = () => {
 }
 
 const EpisodeModal = () => {
-  const { setIsOpen, setIsAddTo, tappedEpisode } = useModalStore();
+  const { closeGlobalModal, setIsAddTo, tappedEpisode } = useModalStore();
 
   return (
     <View
@@ -169,7 +169,9 @@ const EpisodeModal = () => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "space-between"
+          justifyContent: "space-between",
+          gap: 12,
+          width: "100%"
         }}
       >
         <Text
@@ -184,7 +186,7 @@ const EpisodeModal = () => {
         </Text>
 
         <Pressable
-          onPress={() => setIsOpen(false)}
+          onPress={() => closeGlobalModal()}
         >
           <X size={24} />
         </Pressable>
@@ -194,7 +196,7 @@ const EpisodeModal = () => {
       <View>
         <Pressable
           onPress={() => {
-            setIsOpen(false);
+            closeGlobalModal();
             setIsAddTo(true);
           }}
           style={{
@@ -213,7 +215,7 @@ const EpisodeModal = () => {
 
 const PlaylistModal = () => {
   const router = useRouter();
-  const { tappedPlaylist, setIsOpen } = useModalStore();
+  const { tappedPlaylist, closeGlobalModal} = useModalStore();
   const { fetchPlaylists } = usePlaylistStore();
 
   const handleDelete = async () => {
@@ -258,7 +260,7 @@ const PlaylistModal = () => {
         </Text>
 
         <Pressable
-          onPress={() => setIsOpen(false)}
+          onPress={() => closeGlobalModal()}
         >
           <X size={24} />
         </Pressable>
@@ -271,7 +273,7 @@ const PlaylistModal = () => {
           <Pressable
             onPress={() => {
               handleDelete();
-              setIsOpen(false);
+              closeGlobalModal();
             }}
             style={{
               height: 40,
@@ -285,7 +287,7 @@ const PlaylistModal = () => {
 
           <Pressable
             onPress={() => {
-              setIsOpen(false);
+              closeGlobalModal();
               router.navigate({
                 pathname: "/(tabs)/(library)/edit/[id]",
                 params: { id: `${tappedPlaylist?.id}` }

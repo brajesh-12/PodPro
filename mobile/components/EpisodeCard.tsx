@@ -1,30 +1,80 @@
-import { View, Text, Pressable } from 'react-native';
-import { ArrowDownToLine, CirclePlay, EllipsisVertical, Save } from 'lucide-react-native';
+import { View, Text, Pressable, Alert } from 'react-native';
+import { CirclePlay, EllipsisVertical, RemoveFormatting } from 'lucide-react-native';
 import useSubscriptionStore, { SavedEpisode } from '@/store/useSubscriptionStore';
 import { formatDuration, formatDate } from '@/lib/utils';
 import { Image } from 'expo-image';
 import useModalStore from '@/store/useModalStore';
 import { useRouter } from 'expo-router';
 import usePlayerStore from '@/store/usePlayerStore';
+import useDownloadStore from '@/store/useDownloadStore';
+import API from '@/services/api';
+import usePlaylistStore from '@/store/usePlaylistStore';
+import {Download, Save} from '@/Icons-assets/Icon';
 
 const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
   const router = useRouter();
 
-  const { setIsOpen, setType, setTappedEpisode, setPodcastId } = useModalStore();
+  const { openGlobalModal, setTappedEpisode, setPodcastId } = useModalStore();
   const { setActiveEpisode } = usePlayerStore();
   const { followingPodcasts } = useSubscriptionStore();
+  const { downloadPlaylist, SaveEpisodes, savePlaylist, addingEpisode, fetchDPEpisodes, fetchSavedEpisodes } = usePlaylistStore();
 
-  const podcastId = () => {
+  const { downloadEpisodes, startDownload, removeDownload } = useDownloadStore();
+
+  const findPodcastId = () => {
     const podcast = followingPodcasts.find((pod) => pod.podcastId === episode.podcastId);
-
-    if(podcast) {
+    if (podcast) {
       return podcast.id
-    }
+    };
 
-    return null
+    return null;
   };
+  const podId = findPodcastId();
+  const isSaved = SaveEpisodes.some((ep) => episode.id === ep.id );
 
-  const podId = podcastId();
+  const handleSave = async () => {
+    if(isSaved) {
+      await API.removeEpisode(savePlaylist?.id, episode.episodeId);
+      fetchSavedEpisodes();
+    }
+    else {
+      const body = {
+        podcastId: podId,
+        episodeId: episode.id,
+        playlistId: savePlaylist?.id
+      }
+      await addingEpisode(body);
+      fetchSavedEpisodes();
+    }
+  }
+
+  const updateDownload = async () => {
+    if (!downloadEpisodes[episode.id]) {
+      // this is download condition
+      if (!podId || !downloadPlaylist?.id) {
+        Alert.alert("Error", "Download playlist or podcast not found");
+        return;
+      }
+
+      const body = {
+        podcastId: podId,
+        episodeId: episode.id,
+        playlistId: downloadPlaylist?.id
+      }
+
+      await API.addEpisodeToPlaylist(body);
+
+      // save to device
+      await startDownload(episode);
+      fetchDPEpisodes();
+
+    } else {
+      // this is remove from download condition
+      removeDownload(episode.id);
+      await API.removeEpisode(downloadPlaylist?.id, episode.episodeId);
+      fetchDPEpisodes();
+    }
+  };
 
   return (
     <Pressable
@@ -121,8 +171,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
           {/* Right side */}
           <Pressable
             onPress={() => {
-              setIsOpen(true);
-              setType("episode");
+              openGlobalModal("episode");
               setTappedEpisode(episode);
               setPodcastId(podId)
             }}
@@ -176,8 +225,21 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
             gap: 16
           }}
         >
-          <ArrowDownToLine size={22} strokeWidth={2} />
-          <Save size={22} strokeWidth={2} />
+
+          <Pressable
+            onPress={handleSave}
+          >
+            <Save size={22} fill={isSaved ? 'black' : 'none'}/>
+          </Pressable>
+
+          <Pressable
+            onPress={updateDownload}
+          >
+            {downloadEpisodes[episode.id]
+              ? <RemoveFormatting size={22} />
+              : <Download size={22} />
+            }
+          </Pressable>
 
           <Pressable
             onPress={() => {

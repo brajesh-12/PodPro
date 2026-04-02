@@ -1,6 +1,6 @@
-import { View, ScrollView, TouchableOpacity } from 'react-native'
+import { View, ScrollView, TouchableOpacity, Text } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { ArrowLeft, EllipsisVertical } from 'lucide-react-native';
+import { ArrowLeft, Search } from 'lucide-react-native';
 import PodInfo from '@/components/PodInfo';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { useEffect } from 'react';
@@ -15,13 +15,10 @@ const PodcastDetail = () => {
   
   const router = useRouter();
 
-  const { fetchPod, podcast, fetchEpisodesData, setPodcast } = usePodcastStore();
+  const { fetchPod, podcast, fetchEpisodesData, setPodcast, resetPodcast } = usePodcastStore();
   const { subscriptionIds } = useSubscriptionStore();
 
-  console.log("SubscriptionIds:",subscriptionIds);
-
   const isSubscribed = subscriptionIds.has(numId);
-  console.log(isSubscribed);
 
   const fetchingPodcast = async () => {
     if(isSubscribed) {
@@ -48,6 +45,8 @@ const PodcastDetail = () => {
 
   return (
     <ScrollView>
+
+      {/* navigation header */}
       <View
         style={{
           flexDirection: "row",
@@ -59,7 +58,10 @@ const PodcastDetail = () => {
         }}
       >
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            resetPodcast();
+            router.back();
+          }}
           style={{
             alignItems: "center",
             justifyContent: "center",
@@ -72,6 +74,9 @@ const PodcastDetail = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={() => router.navigate({
+            pathname: '/search'
+          })}
           style={{
             alignItems: "center",
             justifyContent: "center",
@@ -80,13 +85,23 @@ const PodcastDetail = () => {
             borderRadius: 72
           }}
         >
-          <EllipsisVertical size={24} strokeWidth={2}/>
+          <Search size={24}/>
         </TouchableOpacity>
       </View>
 
       {/* Top Section */}
-      <PodInfo/>
-      <Episodes/>
+      <PodInfo podcast={podcast}/>
+
+      { !podcast?.feedUrl 
+        ? (
+          <View>
+            <Text>
+              Premimum members only
+            </Text>
+          </View>
+        )
+        : <Episodes/>
+      }
 
     </ScrollView>
   )

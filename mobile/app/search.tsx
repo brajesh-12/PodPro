@@ -12,7 +12,7 @@ const SearchScreen = () => {
   const router = useRouter();
 
   const { setResults, results } = useSearchStore();
-  const { setTappedPodcast, setType, setIsOpen } = useModalStore();
+  const { setTappedPodcast, openGlobalModal } = useModalStore();
 
   const [ searchQuery, setSearchQuery ] = useState("");
   const debounceQuery = useDebounce(searchQuery, 300);
@@ -188,8 +188,7 @@ const SearchScreen = () => {
             <Pressable
               onPress={() => {
                 setTappedPodcast(item);
-                setType("podcast");
-                setIsOpen(true);
+                openGlobalModal('podcast');
               }}
               style={{
                 height: 30,

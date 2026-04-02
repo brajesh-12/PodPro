@@ -1,17 +1,21 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, Pressable } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Download, EllipsisVertical, Play, Share } from 'lucide-react-native';
+import { ArrowLeft, Download, EllipsisVertical, Play, Search, Share } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useEffect } from 'react';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { formatDate, formatDuration } from '@/lib/utils';
 import usePlayerStore from '@/store/usePlayerStore';
+import useModalStore from '@/store/useModalStore';
 
 const EpisodeDetail = () => {
   const router = useRouter();
   const { id: episodeId } = useLocalSearchParams();
   const { getEpisodeById, selectedEpisode, podcast } = usePodcastStore();
   const { setActiveEpisode } = usePlayerStore()
+  const { openGlobalModal, setTappedEpisode, setPodcastId } = useModalStore();
+
+  const podcastId = podcast?.id ? podcast?.id : null;
 
   useEffect(() => {
     getEpisodeById(episodeId);
@@ -55,6 +59,9 @@ const EpisodeDetail = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={() => router.navigate({
+            pathname: '/search'
+          })}
           style={{
             alignItems: "center",
             justifyContent: "center",
@@ -63,7 +70,7 @@ const EpisodeDetail = () => {
             borderRadius: 72
           }}
         >
-          <EllipsisVertical size={24} strokeWidth={2} />
+          <Search size={24} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
@@ -241,7 +248,12 @@ const EpisodeDetail = () => {
             <Download size={22} strokeWidth={2} />
           </View>
 
-          <View
+          <Pressable
+            onPress={() => {
+              openGlobalModal('episode');
+              setPodcastId(podcastId);
+              setTappedEpisode(selectedEpisode)
+            }}
             style={{
               height: 44,
               width: 44,
@@ -252,7 +264,7 @@ const EpisodeDetail = () => {
             }}
           >
             <EllipsisVertical size={22} strokeWidth={2} />
-          </View>
+          </Pressable>
 
         </View>
       </View>

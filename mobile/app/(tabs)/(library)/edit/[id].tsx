@@ -1,11 +1,11 @@
-import { View, Text, Pressable, TouchableOpacity, ScrollView, TextInput } from 'react-native'
+import { View, Text, Pressable, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { ArrowLeft, Edit2, Plus } from 'lucide-react-native';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import { Image } from 'expo-image';
 import { formatProgress } from '@/lib/utils';
-import API from '@/services/api';
+import UP_API from '@/services/updateAPI';
 
 const EditPlaylist = () => {
   const router = useRouter();
@@ -17,12 +17,16 @@ const EditPlaylist = () => {
   const { selectedPlaylist, singlePlaylist, playlistEpisodes, fetchEpisodes, fetchPlaylists } = usePlaylistStore();
 
   const handleUpdate = async () => {
+    if(title === "" && description === "") {
+      return Alert.alert("Input field is empty");
+    }
+
     const body = {
       title: title,
       description: description
     }
 
-    await API.updatePlaylist(selectedPlaylist?.id, body);
+    await UP_API.updatePlaylistText(selectedPlaylist?.id, body);
     fetchPlaylists();
   }
 

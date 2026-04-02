@@ -1,7 +1,7 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { createJSONStorage, persist, StateStorage } from "zustand/middleware";
 import usePlayerStore from "./usePlayerStore";
+import * as SecureStorage from "expo-secure-store";
 
 interface User {
   id: string,
@@ -18,9 +18,22 @@ interface AuthStore {
 
   setAuth: (user: any, token: string) => void,
   setToken: (token: any) => void,
+  setUser: (user: any) => void,
   logout: () => void,
   setIsHydrated: () => void,
 }
+
+const secureStorage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return (await SecureStorage.getItemAsync(name)) || null;
+  },
+  setItem: async (name: string, value: any): Promise<void> => {
+    await SecureStorage.setItemAsync(name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await SecureStorage.deleteItemAsync(name);
+  },
+};
 
 const useAuthStore = create<AuthStore>()(
   persist(
@@ -35,9 +48,13 @@ const useAuthStore = create<AuthStore>()(
         set({token: token});
         set({isAuthorized: true});
       },
+
+      setUser: (user) => set({user: user}),
+
       setToken: (value) => {
         set({token: value})
       },
+
       logout: () => {
         set({user: null});
         set({token: null});
@@ -53,7 +70,7 @@ const useAuthStore = create<AuthStore>()(
       // here we same this in secure-storage
       // also run onRehydrated function for setting hydration
       name: 'auth-store',
-      storage: createJSONStorage(() => AsyncStorage)
+      storage: createJSONStorage(() => secureStorage)
     }
   )
 );
