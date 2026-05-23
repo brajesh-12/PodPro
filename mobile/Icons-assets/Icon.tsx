@@ -2,7 +2,7 @@ import Svg, { Line, Path } from 'react-native-svg';
 
 export const Save = ({ color = "black", size = 24, fill = "none", strokeWidth = 1.6 }) => {
   return (
-    <Svg fill={fill} width={size} height={size}>
+    <Svg fill={fill} width={size} height={size} viewBox="0 0 24 24">
       <Path
         stroke={color}
         strokeWidth={strokeWidth}
@@ -50,7 +50,7 @@ export const SleepTimer = ({ size = 24, color = "black", strokeWidth = 2 }) => {
       <Path d="M18.7083 6C19.9244 7.35878 20.7338 9.08925 20.9451 11" stroke={color} strokeWidth={strokeWidth} />
     </Svg>
   );
-}
+};
 
 export const Share = ({size=24, color="black", strokeWidth=2}) => {
   return (
@@ -61,8 +61,8 @@ export const Share = ({size=24, color="black", strokeWidth=2}) => {
       <Path d="M8.59 13.51L15.42 17.49" stroke="black" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M15.41 6.51001L8.59 10.49" stroke="black" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
-  )
-}
+  );
+};
 
 export const SpeedControl = ({ size = 24, color = "black", strokeWidth = 2 }) => {
   return (
@@ -71,7 +71,7 @@ export const SpeedControl = ({ size = 24, color = "black", strokeWidth = 2 }) =>
       <Path d="M13.25 11.3L15.0114 14.5216L16.8011 11.3H18.9773L16.3466 15.6636L19.0227 20.0273H16.858L15.0114 16.8852L13.1818 20.0273H11L13.6591 15.6636L11.0682 11.3H13.25Z" fill="black" />
     </Svg>
   );
-}
+};
 
 export const Bell = ({ size = 24, color = "black", strokeWidth = 2 }) => {
   return (

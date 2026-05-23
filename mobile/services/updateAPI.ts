@@ -10,7 +10,9 @@ const UP_API = {
         userName: name,
       });
 
+      const user = response.data.user;
       console.log(response.data?.message);
+      return user;
 
     } catch (error) {
       console.log("Error updating userName:", error);
@@ -21,15 +23,19 @@ const UP_API = {
     try {
       const formFile = new FormData();
 
-      if(!file) {
+      if (!file) {
         return Alert.alert("Please choose the image.");
       }
 
-      formFile.append("profilePic", {
-        uri: file,
-        name: 'profilePic.jpg',
-        type: 'image/jpeg'
-      } as any);
+      if (file?.startsWith('http')) {
+        formFile.append("profilePic", file);
+      } else if (file) {
+        formFile.append("profilePic", {
+          uri: file,
+          name: 'profilePic.jpg',
+          type: 'image/jpeg'
+        } as any);
+      }
 
       const response = await multipartAPI.put('/auth/update/image', formFile);
 
@@ -64,7 +70,7 @@ const UP_API = {
     try {
       const formData = new FormData();
 
-      if(!file) {
+      if (!file) {
         return Alert.alert("Please choose the image");
       }
 

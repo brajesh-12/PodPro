@@ -5,8 +5,11 @@ interface SearchStore {
   isSearching: boolean;
   results: Podcast[];
   recent: Podcast[];
+  searchQuery: string;
 
   setSearching: () => void;
+  resetSearch: () => void;
+  setSearchQuery: (query: string) => void;
   setResults: (value: any) => void;
 }
 
@@ -15,14 +18,23 @@ const useSearchStore = create<SearchStore>(
     isSearching: false,
     results: [],
     recent: [],
+    searchQuery: "",
 
     setSearching: () => {
       set({isSearching: !get().isSearching});
     },
 
+    setSearchQuery: (query) => {
+      set({searchQuery: query})
+    },
+
     setResults: (value) => {
       set({results: value});
-    }
+    },
+
+    resetSearch() {
+      set({searchQuery: "", results: []});
+    },
   })
 );
 

@@ -1,9 +1,12 @@
 import { View, Text, TouchableOpacity, Pressable, ScrollView } from 'react-native';
-import { Cast, Bell, Search, ChevronDown, ArrowLeft } from 'lucide-react-native';
+import { Cast, Search, ChevronDown, ArrowLeft } from 'lucide-react-native';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { filter } from '@/constants/filter';
+import { Bell } from '@/Icons-assets/Icon';
+import Animated from 'react-native-reanimated';
+// import useSearchStore from '@/store/useSearchStore';
 
 interface Screen {
   screen: string
@@ -11,6 +14,7 @@ interface Screen {
 
 const Header: React.FC<Screen> = ({ screen }) => {
   const router = useRouter();
+  // const { setSearching } = useSearchStore();
 
   return (
     // this is main container
@@ -166,22 +170,31 @@ const Header: React.FC<Screen> = ({ screen }) => {
         </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export const SubscriptionHeader = () => {
+export const SubscriptionHeader = ({style}: {style: any}) => {
   const router = useRouter();
 
   const { isSelected, setIsSelected, followingPodcasts, selectedPodcast, setSelectedPodcast, singlePodFeed, fetchFeed } = useSubscriptionStore();
 
   return (
-    <View>
+    <Animated.View
+      style={[{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        left: 0,
+        zIndex: 30,
+        backgroundColor: "rgb(242, 242, 242)"
+      },style]}
+    >
       {/* top */}
       <View
         style={{
           height: 48,
           flexDirection: 'row',
-          paddingLeft: 20,
+          paddingLeft: isSelected ? 8 : 16,
           paddingRight: 12,
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -189,7 +202,7 @@ export const SubscriptionHeader = () => {
         }}
       >
 
-        {/* left side */}
+        {/* Left container */}
         <View>
           {
             !isSelected
@@ -224,7 +237,7 @@ export const SubscriptionHeader = () => {
           }
         </View>
 
-        {/* Left container */}
+        {/* Right container */}
         <View
           style={{
             flexDirection: 'row',
@@ -280,7 +293,7 @@ export const SubscriptionHeader = () => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingLeft: 20,
+          paddingLeft: 12,
         }}
       >
         {followingPodcasts.map((pod) => (
@@ -407,7 +420,7 @@ export const SubscriptionHeader = () => {
           )
       }
 
-    </View>
+    </Animated.View>
 
 
   )

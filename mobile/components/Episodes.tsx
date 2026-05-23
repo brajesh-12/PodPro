@@ -1,83 +1,31 @@
-import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Pressable, Alert } from 'react-native'
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { Image } from 'expo-image';
-import { ArrowDown, CirclePlay, Download, EllipsisVertical, SaveIcon } from 'lucide-react-native';
+import { CirclePlay, EllipsisVertical, RemoveFormatting } from 'lucide-react-native';
 import { formatDate, formatDuration } from '../lib/utils';
 import { useRouter } from 'expo-router';
 import useModalStore from '@/store/useModalStore';
 import { useEffect } from 'react';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
+import { Save, Download } from '@/Icons-assets/Icon';
+import useDownloadStore from '@/store/useDownloadStore';
 
 const Episodes = () => {
   const router = useRouter();
   const { episodes, podcast, fetchEpisodesData } = usePodcastStore();
   const { openGlobalModal, setTappedEpisode } = useModalStore();
-  const { savePlaylist, SaveEpisodes, addingEpisode, fetchSavedEpisodes } = usePlaylistStore();
+  const { savePlaylist, SaveEpisodes, addingEpisode, fetchSavedEpisodes, downloadPlaylist, DPEpisodes } = usePlaylistStore();
+  const { startDownload, removeDownload, downloadEpisodes } = useDownloadStore();
 
   useEffect(() => {
-    if(podcast) {
+    if (podcast) {
       fetchEpisodesData(podcast.feedUrl)
     }
   }, [fetchEpisodesData, podcast]);
 
   return (
     <View>
-      {/* Filter */}
-      <View
-        style={{
-          flexDirection: "row",
-          gap: '8',
-          paddingLeft: 20,
-          alignItems: "center",
-          height: 44
-        }}
-      >
-        <View
-          style={{
-            paddingHorizontal: 10,
-            paddingVertical: 6,
-            borderRadius: 6,
-            backgroundColor: "black",
-            flexWrap: "wrap",
-            alignItems: "center"
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 14,
-              fontWeight: "500",
-              lineHeight: 16,
-              color: "white"
-            }}
-          >
-            Episodes
-          </Text>
-        </View>
-
-        <View
-          style={{
-            paddingHorizontal: 10,
-            paddingVertical: 6,
-            borderRadius: 6,
-            backgroundColor: "rgb(217, 217, 217)",
-            flexWrap: "wrap",
-            alignItems: "center"
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 14,
-              fontWeight: "400",
-              lineHeight: 16
-            }}
-          >
-            More like this
-          </Text>
-        </View>
-      </View>
 
       <FlatList
         scrollEnabled={false}
@@ -87,7 +35,7 @@ const Episodes = () => {
           const isSaved = SaveEpisodes.some((ep) => item.id === ep.id);
 
           const handleSave = async () => {
-            if(isSaved) {
+            if (isSaved) {
               const epInDB = SaveEpisodes.find((ep) => item.id === ep.id);
               await API.removeEpisode(savePlaylist?.id, epInDB?.episodeId);
               fetchSavedEpisodes();
@@ -102,7 +50,21 @@ const Episodes = () => {
               await addingEpisode(body);
               fetchSavedEpisodes();
             }
-          }
+          };
+
+          const updateDownload = async () => {
+            if (!downloadEpisodes[item.id]) {
+              if (!podcast?.id || !downloadPlaylist?.id) {
+                return Alert.alert("Error", "Download playlist or podcast not found.");
+              }
+
+              await startDownload(item, podcast.id);
+
+            } else {
+              const epInDB = DPEpisodes.find((ep) => item.id === ep.id);
+              await removeDownload(item.id, epInDB?.episodeId);
+            }
+          };
 
           return (
             <TouchableOpacity
@@ -142,7 +104,7 @@ const Episodes = () => {
                     }}
                   >
                     <Image
-                      source={{ uri: podcast?.thumbnail }}
+                      source={{ uri: item.image }}
                       style={{
                         width: "100%",
                         height: "100%",
@@ -227,10 +189,17 @@ const Episodes = () => {
                   <Pressable
                     onPress={handleSave}
                   >
-                    {isSaved ? <ArrowDown size={24} strokeWidth={2} /> : <SaveIcon size={24} strokeWidth={2}/> }
+                    <Save size={22} fill={isSaved ? 'black' : 'none'} />
                   </Pressable>
-                  
-                  <Download size={24} strokeWidth={2} />
+
+                  <Pressable
+                    onPress={updateDownload}
+                  >
+                    {downloadEpisodes[item.id]
+                      ? <RemoveFormatting size={22} />
+                      : <Download size={22} />
+                    }
+                  </Pressable>
                   <CirclePlay size={24} strokeWidth={2} />
 
                 </View>

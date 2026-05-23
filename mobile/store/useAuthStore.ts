@@ -4,23 +4,24 @@ import usePlayerStore from "./usePlayerStore";
 import * as SecureStorage from "expo-secure-store";
 
 interface User {
-  id: string,
-  userName: string,
-  email: string,
-  profilePic: string
+  id: string;
+  userName: string;
+  email: string;
+  profilePic: string;
 }
 
 interface AuthStore {
-  user: User | null,
-  token: string | null,
-  isAuthorized: boolean,
-  isHydrated: boolean,
+  user: User | null;
+  token: string | null;
+  isAuthorized: boolean;
+  isHydrated: boolean;
 
-  setAuth: (user: any, token: string) => void,
-  setToken: (token: any) => void,
-  setUser: (user: any) => void,
-  logout: () => void,
-  setIsHydrated: () => void,
+  setAuth: (user: any, token: string) => void;
+  setToken: (token: any) => void;
+  setUser: (user: any) => void;
+  logout: () => void;
+  setIsHydrated: () => void;
+  toggleAuthorization: () => void;
 }
 
 const secureStorage: StateStorage = {
@@ -46,21 +47,25 @@ const useAuthStore = create<AuthStore>()(
       setAuth: (user, token) => {
         set({user: user});
         set({token: token});
+      },
+
+      toggleAuthorization() {
         set({isAuthorized: true});
       },
 
       setUser: (user) => set({user: user}),
 
       setToken: (value) => {
-        set({token: value})
+        set({token: value});
       },
 
-      logout: () => {
+      logout: async () => {
         set({user: null});
         set({token: null});
         set({isAuthorized: false});
 
         usePlayerStore.getState().resetPlayer();
+        await SecureStorage.deleteItemAsync('refreshToken');
       },
       setIsHydrated: () => {
         set({isHydrated: true})

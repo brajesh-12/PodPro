@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { fetchPodcasts, CATEGORIES, fetchPodcast, fetchEpisodes } from '@/services/podcastAPI';
+import { SavedEpisode } from './useSubscriptionStore';
 
 export interface Podcast {
   id: number,
@@ -33,8 +34,8 @@ interface PodcastState {
   filterResult: Podcast[];
 
   // Episodes data
-  episodes: Episode[];
-  selectedEpisode: Episode | null;
+  episodes: SavedEpisode[];
+  selectedEpisode: SavedEpisode | null;
 
   // singlePodcast
   podcast: Podcast | null;

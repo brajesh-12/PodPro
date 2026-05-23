@@ -9,7 +9,7 @@ import usePlayerStore from '@/store/usePlayerStore';
 import useDownloadStore from '@/store/useDownloadStore';
 import API from '@/services/api';
 import usePlaylistStore from '@/store/usePlaylistStore';
-import {Download, Save} from '@/Icons-assets/Icon';
+import { Download, Save } from '@/Icons-assets/Icon';
 
 const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
   const router = useRouter();
@@ -17,7 +17,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
   const { openGlobalModal, setTappedEpisode, setPodcastId } = useModalStore();
   const { setActiveEpisode } = usePlayerStore();
   const { followingPodcasts } = useSubscriptionStore();
-  const { downloadPlaylist, SaveEpisodes, savePlaylist, addingEpisode, fetchDPEpisodes, fetchSavedEpisodes } = usePlaylistStore();
+  const { downloadPlaylist, SaveEpisodes, savePlaylist, addingEpisode, fetchSavedEpisodes } = usePlaylistStore();
 
   const { downloadEpisodes, startDownload, removeDownload } = useDownloadStore();
 
@@ -56,23 +56,11 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
         return;
       }
 
-      const body = {
-        podcastId: podId,
-        episodeId: episode.id,
-        playlistId: downloadPlaylist?.id
-      }
-
-      await API.addEpisodeToPlaylist(body);
-
-      // save to device
-      await startDownload(episode);
-      fetchDPEpisodes();
+      await startDownload(episode, podId);
 
     } else {
       // this is remove from download condition
-      removeDownload(episode.id);
-      await API.removeEpisode(downloadPlaylist?.id, episode.episodeId);
-      fetchDPEpisodes();
+      removeDownload(episode.id, episode.episodeId);
     }
   };
 

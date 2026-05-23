@@ -113,7 +113,7 @@ export const fetchPodcast = async (podcastId: string) => {
       thumbnail: result.artworkUrl600,
       feedUrl: result.feedUrl,
       genres: result.genres
-    }
+    };
 
     console.log("Podcast Data:", tranformedData);
 
@@ -124,7 +124,7 @@ export const fetchPodcast = async (podcastId: string) => {
   }
 }
 
-export const fetchEpisodes = async (feedUrl: string) => {
+export const fetchEpisodes = async (feedUrl: string, ) => {
   try {
     if (!feedUrl) {
       throw new Error('Feed URL is empty');
@@ -144,7 +144,7 @@ export const fetchEpisodes = async (feedUrl: string) => {
       publishDate: ep.pubDate,
       audioUrl: ep.enclosure?.url || ep.enclosure?.['@_url'] || '',
       duration: ep['itunes:duration'],
-      image: ep['itunes:image']?.['@_href'] || channel['itunes:image']?.['@_href'],
+      image: ep['itunes:image']?.['href'] || channel['image']?.['url'],
       episodeType: ep['itunes:episodeType']
     }));
 
