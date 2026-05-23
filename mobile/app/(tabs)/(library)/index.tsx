@@ -11,7 +11,7 @@ import { formatDuration } from '@/lib/utils';
 import { Image } from 'expo-image';
 import usePlayerStore from '@/store/usePlayerStore';
 
-const Library = () => {
+const LibraryScreen = () => {
   const [layout, setLayout] = useState(true);
   // const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
@@ -57,7 +57,7 @@ const Library = () => {
           backgroundColor: "black",
           position: "absolute",
           right: 20,
-          bottom: 72,
+          bottom: 190,
           borderRadius: 32,
           height: 48
         }}
@@ -434,4 +434,4 @@ const Library = () => {
   );
 }
 
-export default Library;
+export default LibraryScreen;

@@ -1,10 +1,13 @@
-import { View, FlatList } from 'react-native'
+import { View } from 'react-native';
 import React, { useEffect } from 'react';
 import { SubscriptionHeader } from '@/components/Header';
 import EpisodeCard from '@/components/EpisodeCard';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
+import Animated, { clamp, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
-const Podcasts = () => {
+const HEADER_HEIGHT = 178;
+
+const PodcastsScreen = () => {
   
   const { setFollowingPodcasts, fetchFeed, feed, currentPage, hasNextPage, isSelected, singlePodFeed, } = useSubscriptionStore();
 
@@ -71,26 +74,59 @@ const Podcasts = () => {
     // eslint-disable-next-line
   }, []);
 
+  const translateY = useSharedValue(0);
+  const lastTranslateY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      const currentScrollY = event.contentOffset.y;
+      const diff = currentScrollY - lastTranslateY.value;
+
+      if(currentScrollY <= 0) {
+        translateY.value = 0;
+      } else {
+        translateY.value = clamp(translateY.value - diff, -HEADER_HEIGHT, 0);
+      }
+
+      lastTranslateY.value = currentScrollY;
+    }
+  });
+
+  const headerStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: translateY.value}]
+    };
+  });
+
   return (
     <View
       style={{
         position: "relative"
       }}
     >
+      {/* Header */}
+      <SubscriptionHeader style={headerStyle}/>
+
       {/* This is feed */}
-      <FlatList
+      <Animated.FlatList
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}
         data={feed}
         onEndReached={ !isSelected ? handleFeed : handleSinglePod}
         onEndReachedThreshold={0.1}
-        ListHeaderComponent={SubscriptionHeader}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <EpisodeCard episode={item} />}
+        onScroll={scrollHandler}
+        bounces={false}
+        scrollEventThrottle={16}
+        overScrollMode="never"
+        style={{
+          paddingTop: 190
+        }}
       />
 
     </View>
   )
 }
 
-export default Podcasts;
+export default PodcastsScreen;

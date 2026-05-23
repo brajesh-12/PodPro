@@ -1,113 +1,115 @@
-import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import useAuthStore from '@/store/useAuthStore';
-import axios from 'axios';
-import * as secureStorage from 'expo-secure-store';
-// import { handleAxiosErrorWithAlert } from '@/axios/handleError';
+import { View, Text, Pressable } from 'react-native';
 
-const Login = () => {
+const WelcomeScreen = () => {
   const router = useRouter();
-
-  const [ email, setEmail ] = useState("");
-  const [ password, setPassword ] = useState("");
-
-  const {setAuth} = useAuthStore();
-
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post("http://localhost:3000/api/auth/login", {
-        email,
-        password
-      });
-      const data = response.data;
-
-      setAuth(data.user, data.tokens.accessToken);
-      await secureStorage.setItemAsync('refreshToken', data.tokens.refreshToken);
-
-    } catch (error:any) {
-      console.log(error.response.data?.message)
-      if(error.response.status === 400) {
-        Alert.alert("Error", error.response.data?.message);
-      } 
-      else {
-        Alert.alert("Error", "An unexpected system error occurred.");
-      }
-    }
-  }
 
   return (
     <View
       style={{
         flex: 1,
-        justifyContent: "center"
+        justifyContent: "flex-end",
+        paddingBottom: 32,
+        backgroundColor: "black"
       }}
     >
-
-      <View
-        style={{
-          paddingHorizontal: 16,
-          marginBottom: 20,
-          gap: 12
-        }}
-      >
-        <TextInput
-          placeholder='Email Address'
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
+      {/* container */}
+      <View>
+        <View
           style={{
-            height: 50,
-            width: "100%",
-            borderWidth: 1,
-            paddingLeft: 12
+            marginBottom: 32
           }}
-        />
-
-        <TextInput
-          placeholder='Password'
-          autoCapitalize="none"
-          value={password}
-          onChangeText={setPassword}
-          style={{
-            height: 50,
-            width: "100%",
-            borderWidth: 1,
-            paddingLeft: 12
-          }}
-        />
-
-        <TouchableOpacity
-          style={{
-            height: 40,
-            width: 353,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "black",
-            borderRadius: 4
-          }}
-          onPress={handleLogin}
         >
           <Text
             style={{
-              color: "white"
+              fontFamily: "SF Pro",
+              fontSize: 34,
+              fontWeight: "700",
+              lineHeight: 38,
+              textAlign: "center",
+              color: 'white'
             }}
           >
-            Login
+            Science, fiction and many more in just a few taps
           </Text>
-        </TouchableOpacity>
+        </View>
 
+        <View
+          style={{
+            paddingHorizontal: 16,
+            gap: 12
+          }}
+        >
+          <Pressable
+            style={{
+              paddingVertical: 14,
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              backgroundColor: "rgb(248, 216, 73)",
+              borderRadius: 32,
+            }}
+            onPress={() => {
+              router.navigate({
+                pathname: '/(auth)/acess/signup'
+              });
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "black",
+                fontSize: 14
+              }}
+            >
+              GET STARTED
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={{
+              paddingVertical: 14,
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              borderWidth: 1,
+              borderRadius: 32,
+              borderColor: "white"
+            }}
+            onPress={() => {
+              router.navigate({
+                pathname: '/(auth)/acess/signin'
+              });
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "white",
+                fontSize: 14
+              }}
+            >
+              SIGN IN
+            </Text>
+          </Pressable>
+
+          {/* <Pressable
+            onPress={() => router.navigate({
+              pathname: '/(auth)/setup/PickProfileImage'
+            })}
+          >
+            <Text>
+              PickProfile
+            </Text>
+          </Pressable> */}
+        </View>
       </View>
-      <TouchableOpacity
-        onPress={() => router.navigate('/(auth)/signup')}
-      >
-        <Text>
-          Signup
-        </Text>
-      </TouchableOpacity>
     </View>
   )
 }
 
-export default Login;
+export default WelcomeScreen;

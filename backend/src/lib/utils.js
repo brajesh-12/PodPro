@@ -1,4 +1,5 @@
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
+import Episode from '../model/Episode.js';
 
 const parserConfig = {
   ignoreAttributes: false,
@@ -9,11 +10,11 @@ const parserConfig = {
 
 const parser = new XMLParser(parserConfig);
 
-export const saveEpisodes = async(podcast) => {
+export const saveEpisodes = async (podcast) => {
   try {
     const feedUrl = podcast.feedUrl;
-    
-    if(!feedUrl) {
+
+    if (!feedUrl) {
       console.error("FeedUrl is not true.");
       return [];
     }
@@ -22,13 +23,13 @@ export const saveEpisodes = async(podcast) => {
     const responseText = await response.text();
     const validation = XMLValidator.validate(responseText);
 
-    if(!validation) {
+    if (!validation) {
       console.error("Invalid XML formate");
       return [];
     }
 
     const jsonObj = parser.parse(responseText);
-    if(!jsonObj.rss || !jsonObj.rss.channel) {
+    if (!jsonObj.rss || !jsonObj.rss.channel) {
       console.error("RSS or channel node missing in feed");
       return [];
     }
@@ -44,7 +45,7 @@ export const saveEpisodes = async(podcast) => {
       audioUrl: ep.enclosure?.url || ep.enclosure?.['@_url'] || '',
       duration: ep['itunes:duration'],
       episodeType: ep['itunes:episodeType'],
-      image: podcast.thumbnail,
+      image: ep['itunes:image']?.['href'] || channel['image']?.['url'],
       podcastTitle: podcast.title,
       podcastId: podcast._id,
     }));
@@ -62,7 +63,7 @@ export const fetchPodcast = async (id) => {
     const result = jsonResponse.results[0];
     console.log("fetch result:", result);
 
-    if(!response.ok) {
+    if (!response.ok) {
       throw new Error(`API error: ${response.status} - ${response.statusText}`);
     }
 
@@ -79,5 +80,57 @@ export const fetchPodcast = async (id) => {
 
   } catch (error) {
     console.error("Error fetching podcast from itunes:", error);
+  }
+}
+
+export const syncEpisodes = async (podcast) => {
+  const feedUrl = podcast.feedUrl;
+  if(!feedUrl) {
+    throw new Error("FeedUrl is not founc");
+  }
+
+  try {
+    const response = await fetch(podcast.feedUrl);
+    const responseText = await response.text();
+
+    const jsonObj = parser.parse(responseText);
+    if (!jsonObj.rss || !jsonObj.rss.channel) {
+      console.error("RSS or channel node is missing in feed");
+      throw new Error("RSS or channel node is missing in feed");
+    }
+
+    const channel = jsonObj.rss.channel;
+    const episodes = Array.isArray(channel.item) ? channel.item : [channel.item];
+
+    const operations = episodes.map((ep) => {
+      const episodeId = ep.guid?.["#text"] || ep.guid;
+
+      return {
+        updateOne: {
+          filter: { episodeId },
+          update: {
+            $set: {
+              title: ep.title,
+              description: ep.description?.replace(/<[^>]*>?/gm, '') || '',
+              publishDate: ep.pubDate,
+              audioUrl: ep.enclosure?.url || ep.enclosure?.['@_url'] || '',
+              duration: ep['itunes:duration'],
+              episodeType: ep['itunes:episodeType'],
+              image: ep['itunes:image']?.['href'] || channel['image']?.['url'],
+              podcastTitle: podcast.title,
+              podcastId: podcast._id,
+            }
+          },
+          upsert: true
+        }
+      }
+    });
+
+    const result = await Episode.bulkWrite(operations, { ordered: false });
+    console.log(`[Sync] ${podcast.title}: ${result.upsertedCount} new episodes`);
+
+  } catch (error) {
+    console.error("Erros syncing episodes:", error);
+    throw new Error(error);
   }
 }

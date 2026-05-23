@@ -11,11 +11,11 @@ const SafeArea:React.FC<SafeAreaProps> = ({children, backgroundColor}) => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View 
+    <View
       style={{
         paddingTop: insets.top,
         flex: 1,
-        backgroundColor: backgroundColor ||'rgb(242, 242, 242)'
+        backgroundColor: "tranparent",
       }}
     >
       {children}

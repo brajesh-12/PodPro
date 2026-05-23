@@ -4,6 +4,8 @@ import { Playlist } from '@/services/api';
 
 interface ModalStore {
   isOpen: boolean;
+  cutsomModal: boolean;
+  setCustomModal: (type: boolean) => void;
   openGlobalModal: (type: string) => void;
   type: string;
   closeGlobalModal: () => void;
@@ -25,12 +27,17 @@ interface ModalStore {
 const useModalStore = create<ModalStore>(
   (set, ) => ({
     isOpen: false,
+    cutsomModal: false,
     type: "",
     isAddTo: false,
     tappedEpisode: null,
     tappedPodcast: null,
     tappedPlaylist: null,
     podcastId: null,
+
+    setCustomModal(type) {
+      set({cutsomModal: type});
+    },
 
     openGlobalModal: (type) => {
       set({isOpen: true});

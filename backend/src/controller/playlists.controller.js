@@ -2,7 +2,7 @@ import Episode from "../model/Episode.js";
 import Playlist from "../model/Playlist.js";
 import PlaylistItem from "../model/PlaylistItem.js";
 import Podcast from "../model/Podcast.js";
-import { fetchPodcast, saveEpisodes } from "../lib/utils.js";
+import { fetchPodcast, saveEpisodes, syncEpisodes } from "../lib/utils.js";
 import cloudinary, { uploadToCloudinary } from "../lib/cloudinary.js";
 
 export const getPlaylists = async (req, res) => {
@@ -88,7 +88,7 @@ export const addEpisode = async (req, res) => {
     const podInData = await Podcast.findOne({ id: podcast });
 
     if (!podInData) {
-      const podInfo = fetchPodcast(podcast);
+      const podInfo = await fetchPodcast(podcast);
       console.log("Adding new podcast in DB:", podcast);
 
       const newPodcast = new Podcast({
@@ -102,7 +102,7 @@ export const addEpisode = async (req, res) => {
 
       const savedPodcast = await newPodcast.save();
 
-      const episodes = await saveEpisodes(podInfo.feedUrl, savedPodcast._id);
+      const episodes = await saveEpisodes(savedPodcast, savedPodcast._id);
 
       if (episodes && episodes.length > 0) {
         console.log("Episodes to insert:", episodes.length);
@@ -116,7 +116,7 @@ export const addEpisode = async (req, res) => {
         console.log("No episodes to insert");
       }
 
-      const saveToEpisode = await Episode.findOne({ episodeId: episodeId, podcastId: newPodcast._id });
+      const saveToEpisode = await Episode.findOne({ episodeId: episodeId, podcastId: savedPodcast._id });
 
       if (!saveToEpisode) {
         return res.status(404).json({ message: "Epsiode not found" });
@@ -128,13 +128,19 @@ export const addEpisode = async (req, res) => {
       });
 
       await saveToPlaylist.save();
-      res.status(201).json({ message: "Episode added successfully" });
+      return res.status(201).json({ message: "Episode added successfully" });
     }
 
-    const episode = await Episode.findOne({ episodeId: episodeId, podcastId: podInData._id });
+    let episode = await Episode.findOne({ episodeId: episodeId, podcastId: podInData._id });
 
+    // Syncing episode in database is if not present in database
     if (!episode) {
-      return res.status(404).json({ message: "Episode doesn't found" });
+      if(!podInData.feedUrl) {
+        console.error("FeedUrl is not found");
+        throw new Error("Podcast without feedUrl");
+      }
+      await syncEpisodes(podInData);
+      episode = await Episode.findOne({ episodeId: episodeId, podcastId: podInData._id});
     }
 
     // check if episode is already in playlist
@@ -355,7 +361,7 @@ export const playlistEpisodes = async (req, res) => {
 // Run this function with signup 
 export const defaultPlaylists = async (userId) => {
   await Playlist.insertMany([
-    { userId, title: 'Downloads', type: 'Download' },
-    { userId, title: "Save", type: 'Save' }
+    { userId, title: 'Downloads', type: 'Download', image: 'https://res.cloudinary.com/dglyfeqwv/image/upload/v1776842940/download-cover_pxagvi.png' },
+    { userId, title: "Save", type: 'Save', image: 'https://res.cloudinary.com/dglyfeqwv/image/upload/v1776842941/save-cover_n5mt9i.png' }
   ]);
 };

@@ -24,6 +24,9 @@ const DownloadManager = {
       epidoseFolder.create();
     }
 
+    console.log("audioUrl:", episode.audioUrl);
+    console.log("coverImage:", episode.image);
+
     // file inside the folder
     const audioFile = new File(epidoseFolder, "audio.mp3");
     const imageFile = new File(epidoseFolder, "cover.jpg");

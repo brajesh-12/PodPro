@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, TextInput, Pressable, FlatList } from 'react-native';
-import { ArrowLeft, Settings, EllipsisVertical, X } from 'lucide-react-native';
+import { ArrowLeft, EllipsisVertical, X, Search } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useSearchStore from '@/store/useSearchStore';
 import { searchPodcast } from '@/services/podcastAPI';
 import useDebounce from '@/hooks/useDebounce';
@@ -11,10 +11,10 @@ import useModalStore from '@/store/useModalStore';
 const SearchScreen = () => {
   const router = useRouter();
 
-  const { setResults, results } = useSearchStore();
+  const { setResults, results, searchQuery, setSearchQuery, resetSearch } = useSearchStore();
   const { setTappedPodcast, openGlobalModal } = useModalStore();
 
-  const [ searchQuery, setSearchQuery ] = useState("");
+  // const [ searchQuery, setSearchQuery ] = useState("");
   const debounceQuery = useDebounce(searchQuery, 300);
 
   const performSearch = async (query: string) => {
@@ -41,6 +41,7 @@ const SearchScreen = () => {
         flex: 1
       }}
     >
+      {/* Search Bar */}
       <View
         style={{
           flexDirection: "row",
@@ -49,12 +50,22 @@ const SearchScreen = () => {
           paddingHorizontal: 16,
           gap: 8,
           alignItems: "center",
-          marginBottom: 12
+          marginBottom: 12,
+          marginTop: 12
         }}
       >
         <TouchableOpacity
           onPress={() => {
             router.back();
+            resetSearch();
+          }}
+          style={{
+            height: 48,
+            width: 48,
+            borderRadius: 24,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgb(218, 218, 218)"
           }}
         >
           <ArrowLeft size={24} />
@@ -66,12 +77,13 @@ const SearchScreen = () => {
             gap: 4,
             alignItems: "center",
             flexGrow: 1,
-            height: 36,
+            height: 48,
             backgroundColor: "rgb(218, 218, 218)",
             borderRadius: 32,
             paddingHorizontal: 12
           }}
         >
+          <Search size={22} strokeWidth={1.8} />
           <TextInput
             placeholder='Search Podcast'
             value={searchQuery}
@@ -80,6 +92,9 @@ const SearchScreen = () => {
               flexGrow: 1,
               height: 36,
             }}
+            keyboardAppearance="default"
+            keyboardType="ascii-capable"
+            autoFocus={true}
           />
           {
             searchQuery.trim().length > 0 && (
@@ -93,7 +108,7 @@ const SearchScreen = () => {
 
         </View>
 
-        {searchQuery.length === 0 && (
+        {/* {searchQuery.length === 0 && (
           <TouchableOpacity
             style={{
               height: 36,
@@ -104,7 +119,7 @@ const SearchScreen = () => {
           >
             <Settings size={24} />
           </TouchableOpacity>
-        )}
+        )} */}
 
       </View>
 
@@ -117,7 +132,7 @@ const SearchScreen = () => {
           <Pressable
             onPress={() => {
               router.navigate({
-                pathname: "/(tabs)/(home)/podcast/[id]",
+                pathname: "/(tabs)/(search)/podcast/[id]",
                 params: { id: `${item.id}` }
               })
             }}

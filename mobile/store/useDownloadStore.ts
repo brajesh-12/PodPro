@@ -1,14 +1,16 @@
 import DownloadManager from '@/lib/DownloadManager';
 import { create } from 'zustand';
 import { SavedEpisode } from './useSubscriptionStore';
+import API from '@/services/api';
+import usePlaylistStore from './usePlaylistStore';
 
 interface DownloadState {
   downloadEpisodes: Record<string, any>;
   activeDownloads: Record<string, number>;
 
   hydrate: () => Promise<void>;
-  startDownload: (episode: SavedEpisode) => Promise<void>;
-  removeDownload: (episodeId: string) => void;
+  startDownload: (episode: SavedEpisode, podcastId: number) => Promise<void>;
+  removeDownload: (episodeId: string, eId: string | undefined) => Promise<void>;
   getAudioSource: (episode: SavedEpisode) => string;
   getImageSource: (episode: SavedEpisode) => string;
 
@@ -25,7 +27,7 @@ const useDownloadStore = create<DownloadState>(
       set({downloadEpisodes: episodesOnDisk});
     },
 
-    startDownload: async (episode) => {
+    startDownload: async (episode, podcastId) => {
       // Prevent duplicate download
       if(get().downloadEpisodes[episode.id] || get().activeDownloads[episode.id]) return;
 
@@ -48,7 +50,18 @@ const useDownloadStore = create<DownloadState>(
             activeDownloads: newActive,
             downloadEpisodes: { ...state.downloadEpisodes, [episode.id]: result }
           };
-        })
+        });
+
+        // as episode is downloaded successfully add it to database
+        const { downloadPlaylist, fetchDPEpisodes } = usePlaylistStore.getState();
+
+        const body = {
+          podcastId: podcastId,
+          episodeId: episode.id,
+          playlistId: downloadPlaylist?.id
+        }
+        await API.addEpisodeToPlaylist(body);
+        fetchDPEpisodes();
 
       } else {
         set((state) => {
@@ -60,7 +73,7 @@ const useDownloadStore = create<DownloadState>(
       }
     },
 
-    removeDownload: (episodeId) => {
+    removeDownload: async (episodeId, eId) => {
       DownloadManager.deleteEpisode(episodeId);
       // update UI
       set((state) => {
@@ -69,6 +82,12 @@ const useDownloadStore = create<DownloadState>(
 
         return { downloadEpisodes: newDownloads };
       });
+
+      // after removing it from storage update the database
+      const { downloadPlaylist, fetchDPEpisodes } = usePlaylistStore.getState();
+
+      await API.removeEpisode(downloadPlaylist?.id, eId);
+      fetchDPEpisodes();
     },
 
     clearAllOnLogout: () => {

@@ -1,12 +1,19 @@
-import { View, Text, TouchableOpacity, ScrollView, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Download, EllipsisVertical, Play, Search, Share } from 'lucide-react-native';
+import { ArrowLeft, EllipsisVertical, Play, RemoveFormatting, Search } from 'lucide-react-native';
 import { Image } from 'expo-image';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDate, formatDuration } from '@/lib/utils';
 import usePlayerStore from '@/store/usePlayerStore';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import useModalStore from '@/store/useModalStore';
+import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { Download, Save, Share } from '@/Icons-assets/Icon';
+import usePlaylistStore from '@/store/usePlaylistStore';
+import API from '@/services/api';
+import useDownloadStore from '@/store/useDownloadStore';
+
+const HEADER_HEIGHT = 48;
 
 const EpisodeDetail = () => {
   const router = useRouter();
@@ -15,10 +22,15 @@ const EpisodeDetail = () => {
   const { selectedEpisode, setSelectedEpisode, followingPodcasts } = useSubscriptionStore();
   const { setActiveEpisode } = usePlayerStore()
   const { setTappedEpisode, setPodcastId, openGlobalModal } = useModalStore();
+  const { SaveEpisodes, savePlaylist, fetchSavedEpisodes } = usePlaylistStore();
+  const { downloadEpisodes, startDownload, removeDownload } = useDownloadStore();
+
+  const [containerHeight, setContainerHeight] = useState(0);
+  console.log("containerHeight:", containerHeight);
 
   const getPodcastId = (docId: any) => {
     const podcast = followingPodcasts.find((pod) => pod.podcastId === docId);
-    if(podcast) {
+    if (podcast) {
       return podcast.id;
     }
     return null;
@@ -42,112 +54,347 @@ const EpisodeDetail = () => {
       image: selectedEpisode?.image,
       podcastTitle: selectedEpisode?.podcastTitle
     });
-  }
+  };
 
-  return (
-    <ScrollView>
+  const isSaved = SaveEpisodes.some((ep) => selectedEpisode?.id === ep.id);
+  const handleSave = async () => {
+    if (isSaved) {
+      await API.removeEpisode(savePlaylist?.id, selectedEpisode?.episodeId);
+      fetchSavedEpisodes();
+    } else {
+      const body = {
+        podcastId: podId,
+        episodeId: selectedEpisode?.id,
+        playlistId: savePlaylist?.id
+      }
+      await API.addEpisodeToPlaylist(body);
+      fetchSavedEpisodes();
+    };
+  };
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: 48,
-          paddingLeft: 12,
-          paddingRight: 8
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={{
+  const updateDownload = async () => {
+    if (selectedEpisode?.id) {
+      if (downloadEpisodes[selectedEpisode.id]) {
+        await removeDownload(selectedEpisode.id, selectedEpisode.episodeId);
+      } else {
+        if (podId) {
+          await startDownload(selectedEpisode, podId);
+        }
+      }
+    };
+  };
+
+  const scrollY = useSharedValue(0);
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    }
+  });
+
+  const headerStyle = useAnimatedStyle(() => {
+    const scrolled = scrollY.value >= containerHeight;
+
+    return {
+      backgroundColor: scrolled ? 'rgb(242, 242, 242)' : 'none',
+      borderBottomWidth: scrolled ? 0.8 : 0,
+      borderBottomColor: scrolled ? 'grey' : "none",
+    }
+  });
+
+  const textStyle = useAnimatedStyle(() => {
+    const isScrolled = scrollY.value >= containerHeight;
+
+    return {
+      opacity: isScrolled ? 1 : 0
+    }
+  });
+
+  if (selectedEpisode) {
+    return (
+      <View>
+
+        {/* Header */}
+        <Animated.View
+          style={[{
+            flexDirection: "row",
+            justifyContent: "space-between",
             alignItems: "center",
-            justifyContent: "center",
-            height: 36,
-            width: 36,
-            borderRadius: 72
-          }}
+            height: 48,
+            paddingLeft: 12,
+            paddingRight: 8,
+            position: "absolute",
+            right: 0,
+            left: 0,
+            top: 0,
+            zIndex: 15
+          }, headerStyle]}
         >
-          <ArrowLeft size={24} strokeWidth={2} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => router.navigate({
-            pathname: '/search'
-          })}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            height: 36,
-            width: 36,
-            borderRadius: 72
-          }}
-        >
-          <Search size={24} strokeWidth={2} />
-        </TouchableOpacity>
-      </View>
-
-      {/* top container */}
-      <View
-        style={{
-          borderBottomWidth: 0.6,
-          borderBottomColor: "grey"
-        }}
-      >
-
-        {/* Podcast Title */}
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            height: 20,
-            marginBottom: 16
-          }}
-        >
-          <Text
+          <TouchableOpacity
+            onPress={() => router.back()}
             style={{
-              fontFamily: "SF Pro",
-              fontSize: 14,
-              fontWeight: "400",
-              lineHeight: 16,
+              alignItems: "center",
+              justifyContent: "center",
+              height: 36,
+              width: 36,
+              borderRadius: 72
             }}
           >
-            {selectedEpisode?.podcastTitle}
-          </Text>
-        </View>
+            <ArrowLeft size={24} strokeWidth={2} />
+          </TouchableOpacity>
 
-        {/* Thumnail and duration */}
-        <View
-          style={{
-            gap: 8,
-            paddingTop: 8,
-            paddingBottom: 12,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-
-          <View
-            style={{
-              height: 180,
-              width: 180,
-              backgroundColor: "grey",
-              borderRadius: 4
-            }}
+          <Animated.View
+            style={textStyle}
           >
-            <Image
-              source={{ uri: selectedEpisode?.image }}
+            <Text
+              numberOfLines={1}
+              ellipsizeMode='tail'
               style={{
-                height: "100%",
-                width: "100%",
-                borderRadius: 4
+                fontFamily: "SF Pro",
+                fontWeight: "600",
+                fontSize: 16,
+                lineHeight: 24,
+                color: "black",
+                width: 297
               }}
-            />
+            >
+              {selectedEpisode?.title}
+            </Text>
+          </Animated.View>
+
+          <TouchableOpacity
+            onPress={() => router.navigate({
+              pathname: '/search'
+            })}
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              height: 36,
+              width: 36,
+              borderRadius: 72
+            }}
+          >
+            <Search size={24} strokeWidth={2} />
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{
+            paddingTop: HEADER_HEIGHT,
+          }}
+          bounces={false}
+          onScroll={onScroll}
+        >
+          {/* top container */}
+          <View
+            onLayout={(event) => {
+              const { height } = event.nativeEvent.layout;
+              setContainerHeight(height);
+            }}
+            style={{
+              borderBottomWidth: 0.6,
+              borderBottomColor: "grey"
+            }}
+          >
+
+            {/* Podcast Title */}
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                height: 20,
+                marginBottom: 16
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "SF Pro",
+                  fontSize: 14,
+                  fontWeight: "400",
+                  lineHeight: 16,
+                }}
+              >
+                {selectedEpisode?.podcastTitle}
+              </Text>
+            </View>
+
+            {/* Thumnail and duration */}
+            <View
+              style={{
+                gap: 8,
+                paddingTop: 8,
+                paddingBottom: 12,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+
+              <View
+                style={{
+                  height: 180,
+                  width: 180,
+                  backgroundColor: "grey",
+                  borderRadius: 4
+                }}
+              >
+                <Image
+                  source={{ uri: selectedEpisode?.image }}
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                    borderRadius: 4
+                  }}
+                />
+              </View>
+
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "SF Pro",
+                    fontSize: 14,
+                    fontWeight: "400",
+                    lineHeight: 16,
+                    textAlign: "center"
+                  }}
+                >
+                  {formatDate(selectedEpisode?.publishDate)} &#8226; {formatDuration(selectedEpisode?.duration)}
+                </Text>
+              </View>
+
+            </View>
+
+            {/* Episode Title */}
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 16
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  width: 288,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "SF Pro",
+                    fontSize: 24,
+                    fontWeight: "700",
+                    lineHeight: 32,
+                    width: 288,
+                    textAlign: "center"
+                  }}
+                >
+                  {selectedEpisode?.title}
+                </Text>
+
+              </View>
+            </View>
+
+            {/* CTAs buttons */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 12,
+                gap: 12
+              }}
+            >
+
+              <Pressable
+                onPress={updateDownload}
+                style={{
+                  height: 44,
+                  width: 44,
+                  borderRadius: 88,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgb(217, 217, 217)"
+                }}
+              >
+                {
+                  downloadEpisodes[selectedEpisode.id] 
+                  ? <RemoveFormatting size={22} strokeWidth={2}/>
+                  : <Download size={22} strokeWidth={2} />
+                }
+              </Pressable>
+
+              <Pressable
+                onPress={handleSave}
+                style={{
+                  height: 44,
+                  width: 44,
+                  borderRadius: 88,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgb(217, 217, 217)"
+                }}
+              >
+                <Save size={22} strokeWidth={2} fill={isSaved ? 'black' : 'none'} />
+              </Pressable>
+
+              <TouchableOpacity
+                onPress={() => handlePlay()}
+                style={{
+                  height: 64,
+                  width: 64,
+                  borderRadius: 128,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgb(217, 217, 217)"
+                }}
+              >
+                <Play size={22} strokeWidth={2} fill={"black"} />
+              </TouchableOpacity>
+
+              <Pressable
+                style={{
+                  height: 44,
+                  width: 44,
+                  borderRadius: 88,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgb(217, 217, 217)"
+                }}
+              >
+                <Share size={22} strokeWidth={2} />
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  openGlobalModal('episode')
+                  setTappedEpisode(selectedEpisode);
+                  setPodcastId(podId);
+                }}
+                style={{
+                  height: 44,
+                  width: 44,
+                  borderRadius: 88,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgb(217, 217, 217)"
+                }}
+              >
+                <EllipsisVertical size={22} strokeWidth={2} />
+              </Pressable>
+
+            </View>
           </View>
 
           <View
             style={{
-              alignItems: "center",
-              justifyContent: "center"
+              paddingHorizontal: 20,
+              paddingTop: 16
             }}
           >
             <Text
@@ -155,152 +402,17 @@ const EpisodeDetail = () => {
                 fontFamily: "SF Pro",
                 fontSize: 14,
                 fontWeight: "400",
-                lineHeight: 16,
-                textAlign: "center"
+                lineHeight: 20
               }}
             >
-              {formatDate(selectedEpisode?.publishDate)} &#8226; {formatDuration(selectedEpisode?.duration)}
+              {selectedEpisode?.description}
             </Text>
           </View>
+        </Animated.ScrollView>
 
-        </View>
-
-        {/* Episode Title */}
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 16
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              width: 288,
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "SF Pro",
-                fontSize: 24,
-                fontWeight: "700",
-                lineHeight: 32,
-                width: 288,
-                textAlign: "center"
-              }}
-            >
-              {selectedEpisode?.title}
-            </Text>
-
-          </View>
-        </View>
-
-        {/* CTAs buttons */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 12,
-            gap: 12
-          }}
-        >
-
-          <View
-            style={{
-              height: 44,
-              width: 44,
-              borderRadius: 88,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgb(217, 217, 217)"
-            }}
-          >
-            <Download size={22} strokeWidth={2} />
-          </View>
-
-          <View
-            style={{
-              height: 44,
-              width: 44,
-              borderRadius: 88,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgb(217, 217, 217)"
-            }}
-          >
-            <Share size={22} strokeWidth={2} />
-          </View>
-
-          <TouchableOpacity
-            onPress={() => handlePlay()}
-            style={{
-              height: 64,
-              width: 64,
-              borderRadius: 128,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgb(217, 217, 217)"
-            }}
-          >
-            <Play size={22} strokeWidth={2} fill={"black"} />
-          </TouchableOpacity>
-
-          <View
-            style={{
-              height: 44,
-              width: 44,
-              borderRadius: 88,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgb(217, 217, 217)"
-            }}
-          >
-            <Download size={22} strokeWidth={2} />
-          </View>
-
-          <Pressable
-            onPress={() => {
-              openGlobalModal('episode')
-              setTappedEpisode(selectedEpisode);
-              setPodcastId(podId);
-            }}
-            style={{
-              height: 44,
-              width: 44,
-              borderRadius: 88,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgb(217, 217, 217)"
-            }}
-          >
-            <EllipsisVertical size={22} strokeWidth={2} />
-          </Pressable>
-
-        </View>
       </View>
-
-      <View
-        style={{
-          paddingHorizontal: 20,
-          paddingTop: 16
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "SF Pro",
-            fontSize: 14,
-            fontWeight: "400",
-            lineHeight: 20
-          }}
-        >
-          {selectedEpisode?.description}
-        </Text>
-      </View>
-
-    </ScrollView>
-  )
-}
+    )
+  }
+};
 
 export default EpisodeDetail;

@@ -65,8 +65,8 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
               {/* Thumbail container */}
               <View
                 style={{
-                  height: 146,
-                  width: 146
+                  height: 160,
+                  width: 160
                 }}
               >
                 <Image 
@@ -74,7 +74,7 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
                   style={{
                     height: '100%',
                     width: '100%',
-                    borderRadius: 4
+                    borderRadius: 8
                   }}
                   contentFit='cover'
                 />

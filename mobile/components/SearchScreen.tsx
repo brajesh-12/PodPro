@@ -42,7 +42,7 @@ const SearchScreen = () => {
 
   return (
     <Modal
-      visible={isSearching} animationType="fade"
+      visible={isSearching} animationType="slide"
     >
       <SafeArea
         backgroundColor='null'

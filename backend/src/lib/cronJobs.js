@@ -56,7 +56,7 @@ export const syncSubscribedPodcasts = async () => {
                   audioUrl: ep.enclosure?.url || ep.enclosure?.['@_url'] || '',
                   duration: ep['itunes:duration'],
                   episodeType: ep['itunes:episodeType'],
-                  image: podcast.thumbnail,
+                  image: ep['itunes:image']?.['href'] || channel['image']?.['url'],
                   podcastTitle: podcast.title,
                   podcastId: podcast._id
                 }

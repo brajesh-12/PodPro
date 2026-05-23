@@ -1,41 +1,42 @@
-import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, Alert, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import useAuthStore from '@/store/useAuthStore';
 import axios from 'axios';
 import * as secureStorage from 'expo-secure-store';
+import { ArrowLeft } from 'lucide-react-native';
+// import { handleAxiosErrorWithAlert } from '@/axios/handleError';
 
-const Signup = () => {
+const Login = () => {
   const router = useRouter();
 
-  const [ email, setEmail ] = useState("");
-  const [ password, setPassword ] = useState("");
-  const [ userName, setUserName ] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const {setAuth} = useAuthStore();
+  const { setAuth, toggleAuthorization } = useAuthStore();
 
-  const handleSignup = async() => {
+  const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/signup', {
+      const response = await axios.post("http://localhost:3000/api/auth/login", {
         email,
-        password,
-        userName
+        password
       });
-
       const data = response.data;
 
       setAuth(data.user, data.tokens.accessToken);
       await secureStorage.setItemAsync('refreshToken', data.tokens.refreshToken);
+      toggleAuthorization();
 
     } catch (error: any) {
-      console.log("Error signing up:", error);
-      if(error.response.status === 400) {
+      console.log(error.response.data?.message)
+      if (error.response.status === 400) {
         Alert.alert("Error", error.response.data?.message);
-      } else {
-        Alert.alert("Error", "An unexpected system error occurred");
+      }
+      else {
+        Alert.alert("Error", "An unexpected system error occurred.");
       }
     }
-  };
+  }
 
   return (
     <View
@@ -44,6 +45,28 @@ const Signup = () => {
         justifyContent: "center"
       }}
     >
+      {/* header */}
+      <View
+        style={{
+          height: 48,
+          paddingHorizontal: 16,
+          marginBottom: 32,
+          justifyContent: "center"
+        }}
+      >
+        <Pressable
+          onPress={() => router.back()}
+          style={{
+            height: 32,
+            width: 32,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <ArrowLeft size={22} />
+        </Pressable>
+
+      </View>
 
       <View
         style={{
@@ -52,21 +75,6 @@ const Signup = () => {
           gap: 12
         }}
       >
-
-        {/* userName */}
-        <TextInput
-          placeholder='User name'
-          value={userName}
-          onChangeText={setUserName}
-          style={{
-            height: 50,
-            width: "100%",
-            borderWidth: 1,
-            paddingLeft: 12
-          }}
-        />
-
-        {/* Email Address */}
         <TextInput
           placeholder='Email Address'
           value={email}
@@ -103,27 +111,20 @@ const Signup = () => {
             backgroundColor: "black",
             borderRadius: 4
           }}
-          onPress={handleSignup}
+          onPress={handleLogin}
         >
           <Text
             style={{
               color: "white"
             }}
           >
-            Signup
+            Login
           </Text>
         </TouchableOpacity>
 
       </View>
-      <TouchableOpacity
-        onPress={() => router.navigate('/(auth)/signup')}
-      >
-        <Text>
-          Signup
-        </Text>
-      </TouchableOpacity>
     </View>
   )
 }
 
-export default Signup;
+export default Login;

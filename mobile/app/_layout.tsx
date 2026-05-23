@@ -4,15 +4,16 @@ import AudioController from "@/components/AudioController";
 import FullPlayer from "@/components/FullPlayer";
 import MiniPlayer from "@/components/MiniPlayer";
 import useAuthStore from "@/store/useAuthStore";
-import useSubscriptionStore from "@/store/useSubscriptionStore";
 import { useEffect } from "react";
 import SearchScreen from "@/components/SearchScreen";
 import GlobalModal from "@/components/GlobalModal";
 import CreatePlaylistModal from "@/components/CreatePlaylistModal";
 import PlaylistSelection from "@/components/PlaylistSelectionModal";
-import usePlaylistStore from "@/store/usePlaylistStore";
 import { initNetworkListener, useNetworkStore } from "@/store/useNetworkStore";
 import useDownloadStore from "@/store/useDownloadStore";
+import CustomModal from "@/components/CustomModal";
+// import { StatusBar } from "react-native";
+import { StatusBar } from 'expo-status-bar';
 // import { Text, View } from "react-native";
 
 export default function RootLayout() {
@@ -32,16 +33,8 @@ export default function RootLayout() {
   // }
 
   const { isAuthorized, isHydrated } = useAuthStore();
-  const { setSubscriptionIds, setFollowingPodcasts, followingPodcasts, fetchFeed } = useSubscriptionStore();
-  const { fetchPlaylists } = usePlaylistStore();
   const { isOnline } = useNetworkStore();
   const { hydrate } = useDownloadStore();
-
-  useEffect(() => {
-    setFollowingPodcasts();
-    fetchPlaylists();
-    // eslint-disable-next-line
-  }, []);
 
   useEffect(() => {
     hydrate();
@@ -51,19 +44,18 @@ export default function RootLayout() {
       unsubscribeNetwork();
     }
     // eslint-disable-next-line
-  }, [])
-
-  useEffect(() => {
-    const subsIds = followingPodcasts.map((item: any) => item.id);
-    setSubscriptionIds(subsIds);
-    fetchFeed(1);
-    //eslint-disable-next-line
-  }, [followingPodcasts]);
+  }, []);
 
   return (
     <SafeArea
       backgroundColor="null"
     >
+      <StatusBar
+        translucent={true}
+        backgroundColor={"transparent"}
+        style="auto"
+      />
+
       <AudioController />
 
       {/* {
@@ -90,9 +82,10 @@ export default function RootLayout() {
         </Stack.Protected>
       </Stack>
 
-      <FullPlayer />
-      <MiniPlayer />
+      <FullPlayer/>
+      <MiniPlayer/>
       <SearchScreen/>
+      <CustomModal/>
 
       <GlobalModal/>
       <CreatePlaylistModal/>

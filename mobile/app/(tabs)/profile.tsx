@@ -4,7 +4,6 @@ import useAuthStore from '@/store/useAuthStore'
 import { useNetworkStore } from '@/store/useNetworkStore';
 import { Image } from 'expo-image';
 import * as imagePicker from 'expo-image-picker';
-import API from '@/services/api';
 import UP_API from '@/services/updateAPI';
 
 const ProfileScreen = () => {

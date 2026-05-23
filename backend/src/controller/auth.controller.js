@@ -11,7 +11,7 @@ export const signup = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    if (!email || !password ) {
+    if (!email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -149,25 +149,25 @@ export const logout = async (req, res) => {
 
     const token = req.headers['authorization']?.split(" ")[1]
 
-    if(!token || !id) return res.status(400).json({message: "Insufficient data."});
+    if (!token || !id) return res.status(400).json({ message: "Insufficient data." });
 
-    const user = await User.findOne({_id: id});
-    if(!user) return res.status(400).json({message: "User not found."});
+    const user = await User.findOne({ _id: id });
+    if (!user) return res.status(400).json({ message: "User not found." });
 
     const verify = jwt.verify(token, ENV.REFRESH_JWT_SECRET);
-    if(!verify) return res.status(400).json({message: "Unauthorized: Invalid Token."});
-    
-    // now check in database
-    const savedToken = await RefreshTokens.findOne({token: token});
-    if(token !== savedToken.token) return res.status(400).json({message: "Unauthorized: Invalid Token."});
-    
-    await RefreshTokens.deleteMany({familyId: savedToken.familyId, userId: id});
+    if (!verify) return res.status(400).json({ message: "Unauthorized: Invalid Token." });
 
-    res.status(200).json({message: "Logged out successfully."});
+    // now check in database
+    const savedToken = await RefreshTokens.findOne({ token: token });
+    if (token !== savedToken.token) return res.status(400).json({ message: "Unauthorized: Invalid Token." });
+
+    await RefreshTokens.deleteMany({ familyId: savedToken.familyId, userId: id });
+
+    res.status(200).json({ message: "Logged out successfully." });
 
   } catch (error) {
     console.error("Error loging out:", error);
-    res.status(500).json({message: "Internal server error."});
+    res.status(500).json({ message: "Internal server error." });
   }
 }
 
@@ -176,7 +176,7 @@ export const updateUserName = async (req, res) => {
     const userId = req.user._id;
     const { userName } = req.body;
 
-    if(!userName) return res.status(400).json({message: "UserName is required."});
+    if (!userName) return res.status(400).json({ message: "UserName is required." });
 
     const updateUserName = await User.findByIdAndUpdate(userId, {
       userName: userName
@@ -189,37 +189,50 @@ export const updateUserName = async (req, res) => {
 
   } catch (error) {
     console.error("Error updating userName:", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
 export const updateProfilePic = async (req, res) => {
   try {
     const userId = req.user._id;
+    const { profilePic } = req.body;
 
-    if(!req.file) return res.status(400).json({message: "Profile picture is required"});
+    if (!profilePic && !req.file) return res.status(400).json({ message: "Insufficient data" });
 
-    const result = await uploadToCloudinary(req.file.buffer);
+    if (profilePic) {
+      const updateProfilePic = await User.findByIdAndUpdate(userId,
+        { $set: { profilePic: profilePic } },
+        { new: true }
+      );
 
-    const updateProfilePic = await User.findByIdAndUpdate(userId, 
-      { $set: { profilePic: result.secure_url } },
-      { new: true }
-    );
+      return res.status(200).json({
+        message: "Profile Picture updated successfully",
+        user: updateProfilePic
+      });
 
+    } else if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+
+      const updateProfilePic = await User.findByIdAndUpdate(userId,
+        { $set: { profilePic: result.secure_url } },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        message: "ProfilePic updated successfully.",
+        user: updateProfilePic
+      });
+    }
     // const uploadToCloud = await cloudinary.uploader.upload(profilePic);
 
     // const updateProfilePic = await User.findByIdAndUpdate(userId, {
     //   profilePic: uploadToCloud.url
     // });
 
-    res.status(200).json({
-      message: "ProfilePic updated successfully.",
-      user: updateProfilePic
-    });
-
   } catch (error) {
     console.error("Error updating profilePic:", error);
-    res.status(500).json({message: "Internal server error"});
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
