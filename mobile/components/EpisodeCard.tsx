@@ -14,7 +14,7 @@ import { Download, Save } from '@/Icons-assets/Icon';
 const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
   const router = useRouter();
 
-  const { openGlobalModal, setTappedEpisode, setPodcastId } = useModalStore();
+  const { openModal, setTappedEpisode, setPodcastId } = useModalStore();
   const { setActiveEpisode } = usePlayerStore();
   const { followingPodcasts } = useSubscriptionStore();
   const { downloadPlaylist, SaveEpisodes, savePlaylist, addingEpisode, fetchSavedEpisodes } = usePlaylistStore();
@@ -159,9 +159,9 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
           {/* Right side */}
           <Pressable
             onPress={() => {
-              openGlobalModal("episode");
               setTappedEpisode(episode);
-              setPodcastId(podId)
+              setPodcastId(podId);
+              openModal("episode");
             }}
           >
             <EllipsisVertical size={20} strokeWidth={2} />

@@ -1,44 +1,31 @@
 import Header from '@/components/Header';
 import { ChevronDown, LayoutGrid, List } from 'lucide-react-native';
-import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, Pressable } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
 import { BoardLayout, ListLayout } from '@/components/Playlist';
-import API from '@/services/api';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import { useNetworkStore } from '@/store/useNetworkStore';
 import useDownloadStore from '@/store/useDownloadStore';
 import { formatDuration } from '@/lib/utils';
 import { Image } from 'expo-image';
 import usePlayerStore from '@/store/usePlayerStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useModalStore from '@/store/useModalStore';
 
 const LibraryScreen = () => {
+  const insets = useSafeAreaInsets();
   const [layout, setLayout] = useState(true);
-  // const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
   const { allPlaylists, fetchPlaylists } = usePlaylistStore();
   const { isOnline } = useNetworkStore();
   const { downloadEpisodes } = useDownloadStore();
   const downloadEpisodesArr = Object.values(downloadEpisodes);
   const { setActiveEpisode } = usePlayerStore();
-
-  const [modalVisibile, setModalVisible] = useState(false);
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const { createPlaylist } = useModalStore();
 
   const handleLayout = () => {
     setLayout(!layout);
-  }
-
-  // const fetchPlaylists = async () => {
-  //   try {
-  //     const playlists = await API.getPlaylists();
-  //     setPlaylists(playlists);
-  //   } catch (error: any) {
-  //     console.log(error.response.data?.message);
-  //     Alert.alert("Server Error", "Could not fetch playlists.");
-  //   }
-  // }
+  };
 
   useEffect(() => {
     fetchPlaylists();
@@ -48,7 +35,9 @@ const LibraryScreen = () => {
   const AddButton = () => {
     return (
       <TouchableOpacity
-        onPress={() => setModalVisible(true)}
+        onPress={() => {
+          createPlaylist();
+        }}
         style={{
           paddingVertical: 12,
           paddingHorizontal: 24,
@@ -162,7 +151,8 @@ const LibraryScreen = () => {
     return (
       <View
         style={{
-          flex: 1
+          flex: 1,
+          paddingTop: insets.top
         }}
       >
         <FlatList
@@ -258,7 +248,8 @@ const LibraryScreen = () => {
     <View
       style={{
         position: "relative",
-        flex: 1
+        flex: 1,
+        paddingTop: insets.top
       }}
     >
 
@@ -271,167 +262,17 @@ const LibraryScreen = () => {
         keyExtractor={(item) => item.id}
         numColumns={layout ? 1 : 2}
         ListHeaderComponent={LibraryHeader}
+        bounces={false}
         columnWrapperStyle={!layout && {
           gap: 16,
           paddingHorizontal: 20
         }}
         renderItem={({ item }) => layout ? <ListLayout playlist={item} /> : <BoardLayout playlist={item} />}
-
       />
 
       <AddButton />
-
-      {/* Modal for creating playlist */}
-      <Modal
-        transparent={true}
-        visible={modalVisibile}
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        {/* screen */}
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          {/* <View/> this is background */}
-          {/* main modal */}
-          <View
-            style={{
-              width: 300,
-              height: 200,
-              backgroundColor: "white",
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderRadius: 12
-            }}
-          >
-
-            <Text
-              style={{
-                fontFamily: "SF Pro",
-                fontWeight: "600",
-                fontSize: 16
-              }}
-            >
-              New Playlist
-            </Text>
-
-            {/* Input fields */}
-            <View
-              style={{
-                marginBottom: 12,
-                marginTop: 12,
-                gap: 8
-              }}
-            >
-              {/* title */}
-              <View
-                style={{
-                  marginBottom: 8,
-                  gap: 8
-                }}
-              >
-                <Text>
-                  Title
-                </Text>
-                <TextInput
-                  value={title}
-                  onChangeText={setTitle}
-                  style={{
-                    borderBottomWidth: 1
-                  }}
-                />
-              </View>
-
-              {/* description */}
-              <View
-                style={{
-                  gap: 8
-                }}
-              >
-                <Text>
-                  Description
-                </Text>
-                <TextInput
-                  value={description}
-                  onChangeText={setDescription}
-                  style={{
-                    borderBottomWidth: 1
-                  }}
-                />
-              </View>
-            </View>
-
-            {/* Buttons */}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between"
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                style={{
-                  height: 40,
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "black",
-                  borderRadius: 6
-                }}
-              >
-                <Text
-                  style={{
-                    color: "white"
-                  }}
-                >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={async () => {
-                  const inputData = {
-                    title,
-                    description
-                  };
-
-                  const response = await API.createPlaylist(inputData);
-                  console.log("New Playlist:", response);
-
-                  fetchPlaylists();
-                  setTitle("");
-                  setDescription("");
-                  setModalVisible(false);
-                }}
-                style={{
-                  height: 40,
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "black",
-                  borderRadius: 6
-                }}
-              >
-                <Text
-                  style={{
-                    color: "white"
-                  }}
-                >
-                  Save
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
-}
+};
 
 export default LibraryScreen;

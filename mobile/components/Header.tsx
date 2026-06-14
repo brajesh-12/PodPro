@@ -6,6 +6,7 @@ import { Image } from 'expo-image';
 import { filter } from '@/constants/filter';
 import { Bell } from '@/Icons-assets/Icon';
 import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import useSearchStore from '@/store/useSearchStore';
 
 interface Screen {
@@ -175,8 +176,13 @@ const Header: React.FC<Screen> = ({ screen }) => {
 
 export const SubscriptionHeader = ({style}: {style: any}) => {
   const router = useRouter();
+  const insets = useSafeAreaInsets()
 
   const { isSelected, setIsSelected, followingPodcasts, selectedPodcast, setSelectedPodcast, singlePodFeed, fetchFeed } = useSubscriptionStore();
+
+  const handleSelect = () => {
+
+  }
 
   return (
     <Animated.View
@@ -185,8 +191,9 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
         top: 0,
         right: 0,
         left: 0,
-        zIndex: 30,
-        backgroundColor: "rgb(242, 242, 242)"
+        zIndex: 2,
+        backgroundColor: "rgb(242, 242, 242)",
+        paddingTop: insets.top
       },style]}
     >
       {/* top */}
@@ -209,9 +216,9 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
               ? (<Text
                 style={{
                   fontFamily: "SF Pro",
-                  fontSize: 18,
-                  fontWeight: 600,
-                  lineHeight: 28
+                  fontSize: 24,
+                  fontWeight: "700",
+                  lineHeight: 32
                 }}
               >
                 Podcasts
@@ -237,55 +244,6 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
           }
         </View>
 
-        {/* Right container */}
-        <View
-          style={{
-            flexDirection: 'row',
-            gap: 2
-          }}
-        >
-          <View
-            style={{
-              height: 36,
-              width: 36,
-              borderRadius: 72,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <Cast size={22} strokeWidth={2} />
-          </View>
-
-          <View
-            style={{
-              height: 36,
-              width: 36,
-              borderRadius: 72,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <Bell size={22} strokeWidth={2} />
-          </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              router.navigate({
-                pathname: "/search"
-              })
-            }}
-            style={{
-              height: 36,
-              width: 36,
-              borderRadius: 72,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <Search size={22} strokeWidth={2} />
-          </TouchableOpacity>
-        </View>
-
       </View>
 
       {/* followed podcasts */}
@@ -309,7 +267,7 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
               flexWrap: 'wrap',
               paddingHorizontal: 6,
               height: 90,
-              alignItems: 'center'
+              alignItems: 'center',
             }}
           >
             <View
@@ -317,7 +275,9 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
                 height: 56,
                 width: 56,
                 borderRadius: 112,
-                backgroundColor: 'grey'
+                padding: 2,
+                borderWidth: 2,
+                borderColor: "grey"
               }}
             >
               <Image

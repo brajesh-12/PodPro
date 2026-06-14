@@ -3,18 +3,34 @@ import React from 'react'
 import { ChevronRight } from 'lucide-react-native';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
+import usePlayerStore from '@/store/usePlayerStore';
+import useModalStore from '@/store/useModalStore';
 
 const NewEpisodes = () => {
   const { feed } = useSubscriptionStore();
+  const { setActiveEpisode } = usePlayerStore();
+  const { openModal, setTappedEpisode, setPodcastId } = useModalStore();
+
+  const { followingPodcasts } = useSubscriptionStore();
+
+  const router = useRouter();
+
+  if (feed.length === 0) return;
 
   return (
     <View
       style={{
-        marginBottom: 32
+        marginBottom: 24
       }}
     >
       {/* title */}
       <Pressable
+        onPress={() => {
+          router.navigate({
+            pathname: "/(tabs)/(podcast)"
+          });
+        }}
         style={{
           flexDirection: "row",
           alignItems: "center",
@@ -25,7 +41,7 @@ const NewEpisodes = () => {
       >
         <Text
           style={{
-            fontFamily:  "SF Pro",
+            fontFamily: "SF Pro",
             fontWeight: "700",
             fontSize: 18,
             lineHeight: 28
@@ -35,7 +51,7 @@ const NewEpisodes = () => {
         </Text>
 
         <View>
-          <ChevronRight size={22} strokeWidth={1.5}/>
+          <ChevronRight size={22} strokeWidth={1.8} />
         </View>
       </Pressable>
 
@@ -44,21 +60,41 @@ const NewEpisodes = () => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        renderItem={({item}) => {
+        bounces={false}
+        renderItem={({ item }) => {
+
+          const findPodcastId = () => {
+            const podcast = followingPodcasts.find((pod) => pod.podcastId === item.podcastId);
+            if (podcast) {
+              return podcast.id;
+            };
+
+            return null;
+          };
+          const podId = findPodcastId();
+
           return (
-            <View
+            <Pressable
+              onPress={() => {
+                setActiveEpisode(item);
+              }}
+              onLongPress={() => {
+                openModal("episode");
+                setPodcastId(podId);
+                setTappedEpisode(item);
+              }}
               style={{
                 marginRight: 16
               }}
             >
               <View
                 style={{
-                  height: 220,
-                  width: 220,
+                  height: 240,
+                  width: 240,
                 }}
               >
                 <Image
-                  source={{uri: item.image}}
+                  source={{ uri: item.image }}
                   style={{
                     height: "100%",
                     width: "100%",
@@ -82,7 +118,7 @@ const NewEpisodes = () => {
                     color: "black",
                     width: 220
                   }}
-                  numberOfLines={2}
+                  numberOfLines={1}
                   ellipsizeMode='tail'
                 >
                   {item.title}
@@ -96,10 +132,10 @@ const NewEpisodes = () => {
                     color: "grey"
                   }}
                 >
-                  PodcastTitle
+                  {item.podcastTitle}
                 </Text>
               </View>
-            </View>
+            </Pressable>
           )
         }}
         style={{

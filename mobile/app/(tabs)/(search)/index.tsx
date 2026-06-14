@@ -4,9 +4,11 @@ import { useRouter } from 'expo-router';
 import { Search } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { categories } from '@/services/podcastAPI';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SearchIndex = () => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const GenreCard = ({name}: {name: string}) => {
     return (
@@ -41,7 +43,11 @@ const SearchIndex = () => {
   };
 
   return (
-    <View>
+    <View
+      style={{
+        paddingTop: insets.top
+      }}
+    >
       {/* Search Bar */}
       <Pressable
         onPress={() => 
@@ -81,6 +87,7 @@ const SearchIndex = () => {
       {/* Categories */}
       <FlatList
         data={categories}
+        bounces={false}
         ListHeaderComponent={() => {
           return(
             <View

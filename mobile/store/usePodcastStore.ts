@@ -18,7 +18,8 @@ export interface Episode {
   publishDate: string,
   audioUrl: string,
   duration: string,
-  image: string
+  image: string,
+  podcastTitle: string
 }
 
 interface PodcastState {

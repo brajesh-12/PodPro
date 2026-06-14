@@ -5,6 +5,7 @@ import { ArrowLeft, Search } from 'lucide-react-native';
 import PodInfo from '@/components/PodInfo';
 import EpisodeCard from '@/components/EpisodeCard';
 import Animated, { interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const HEADER_HEIGHT = 48
 const TRIGGER_POINT = 320;
@@ -126,8 +127,12 @@ const Podcast = () => {
     )
   }
 
+  const insets = useSafeAreaInsets()
+
   return (
-    <View>
+    <View
+      style={{paddingTop: insets.top}}
+    >
       {/* Header section */}
       <Animated.View
         style={[{
@@ -138,7 +143,7 @@ const Podcast = () => {
           paddingLeft: 12,
           paddingRight: 8,
           position: "absolute",
-          top: 0,
+          top: insets.top,
           right: 0,
           left: 0,
           zIndex: 10

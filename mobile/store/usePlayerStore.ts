@@ -13,14 +13,12 @@ interface Episode {
 
 interface PlayerState {
   activeEpisode: Episode | null,
-  minimized: boolean,
   isPlaying: boolean,
   progress: {position: number, duration: number},
   seekTarget: number | null,
 
   setActiveEpisode: (episode: any) => void,
   togglePlay: () => void,
-  minimizedPlayer: (value: any) => void,
   setProgress: (progress: any) => void,
   seekTo: (time: any) => void,
   resetPlayer: () => void,
@@ -30,14 +28,13 @@ const usePlayerStore = create<PlayerState>()(
   persist(
     (set, get) => ({
       activeEpisode: null,
-      minimized: true,
       isPlaying: false,
       progress: {position: 0, duration: 0},
       seekTarget: null,
 
       setActiveEpisode: (episode) => {
+        get().resetPlayer();
         set({activeEpisode: episode});
-        set({minimized: false});
         set({isPlaying: true});
       },
 
@@ -45,13 +42,8 @@ const usePlayerStore = create<PlayerState>()(
         set({isPlaying: !get().isPlaying});
       },
 
-      minimizedPlayer: (value) => {
-        set({minimized: value});
-      },
-
       setProgress: (progress) => {
         set({progress});
-        console.log(progress);
       },
       seekTo: (time) => set({seekTarget: time}),
 

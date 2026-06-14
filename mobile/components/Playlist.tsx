@@ -11,7 +11,7 @@ import { Image } from "expo-image";
 export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
   const router = useRouter();
 
-  const { setTappedPlaylist, openGlobalModal } = useModalStore();
+  const { setTappedPlaylist, openPlaylistOptions } = useModalStore();
 
   return (
     <Pressable
@@ -88,26 +88,29 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
       </View>
 
       {/* Right conatiner */}
-      <Pressable
-        onPress={() => {
-          openGlobalModal('playlist');
-          setTappedPlaylist(playlist);
-        }}
-        style={{
-          height: 30,
-          width: 30,
-          borderRadius: 60
-        }}
-      >
-        <EllipsisVertical size={20} strokeWidth={2} />
-      </Pressable>
+      {
+        playlist.type === "custom" &&
+        <Pressable
+          onPress={() => {
+            setTappedPlaylist(playlist);
+            openPlaylistOptions();
+          }}
+          style={{
+            height: 30,
+            width: 30,
+            borderRadius: 60
+          }}
+        >
+          <EllipsisVertical size={20} strokeWidth={2} />
+        </Pressable>
+      }
     </Pressable>
-  )
-}
+  );
+};
 
 export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
   const router = useRouter();
-  const { setTappedPlaylist, openGlobalModal } = useModalStore();
+  const { setTappedPlaylist } = useModalStore();
 
   return (
     <Pressable
@@ -116,8 +119,10 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
         params: { id: `${playlist.id}` }
       })}
       onLongPress={() => {
-        openGlobalModal('playlist')
-        setTappedPlaylist(playlist);
+        if(playlist.type === "custom") {
+          setTappedPlaylist(playlist);
+        }
+        return;
       }}
       style={{
         flexDirection: 'column',

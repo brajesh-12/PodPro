@@ -10,13 +10,21 @@ import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
 import { Save, Download } from '@/Icons-assets/Icon';
 import useDownloadStore from '@/store/useDownloadStore';
+import usePlayerStore from '@/store/usePlayerStore';
 
 const Episodes = () => {
   const router = useRouter();
   const { episodes, podcast, fetchEpisodesData } = usePodcastStore();
-  const { openGlobalModal, setTappedEpisode } = useModalStore();
+  const { openModal, setTappedEpisode, setPodcastId } = useModalStore();
   const { savePlaylist, SaveEpisodes, addingEpisode, fetchSavedEpisodes, downloadPlaylist, DPEpisodes } = usePlaylistStore();
   const { startDownload, removeDownload, downloadEpisodes } = useDownloadStore();
+  const { setActiveEpisode } = usePlayerStore();
+
+  let podcastId = 0;
+
+  if(podcast) {
+    podcastId = podcast.id;
+  };
 
   useEffect(() => {
     if (podcast) {
@@ -130,7 +138,8 @@ const Episodes = () => {
 
                   <Pressable
                     onPress={() => {
-                      openGlobalModal('episode');
+                      openModal('episode');
+                      setPodcastId(podcastId);
                       setTappedEpisode(item);
                     }}
                   >
@@ -200,7 +209,11 @@ const Episodes = () => {
                       : <Download size={22} />
                     }
                   </Pressable>
-                  <CirclePlay size={24} strokeWidth={2} />
+                  <Pressable
+                    onPress={() => setActiveEpisode(item)}
+                  >
+                    <CirclePlay size={24} strokeWidth={2} />
+                  </Pressable>
 
                 </View>
               </View>

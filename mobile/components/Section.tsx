@@ -1,13 +1,15 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
-import { Image } from 'expo-image'
+import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Podcast } from '@/store/usePodcastStore';
 import useModalStore from '@/store/useModalStore';
+import { ChevronRight } from 'lucide-react-native';
 
 const Section = ({title, data}: { title: string; data: Podcast[] }) => {
   const router = useRouter();
 
-  const { openGlobalModal, setTappedPodcast } = useModalStore();
+  const { setTappedPodcast, openModal } = useModalStore();
+  const topFive = data.slice(1, 5);
 
   return (
     <View
@@ -15,13 +17,14 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
         marginBottom: 32
       }}
     >
-      <View
+      <Pressable
         style={{
           flexDirection: 'row',
           paddingLeft: 20,
           height: 40,
           alignItems: 'center',
-          marginBottom: 8
+          marginBottom: 8,
+          gap: 4
         }}
       >
         <Text
@@ -34,13 +37,16 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
         >
           {title}
         </Text>
-      </View>
+
+        <ChevronRight size={22} strokeWidth={1.8}/>
+      </Pressable>
 
       <FlatList
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        data={data}
+        data={topFive}
         keyExtractor={(item) => item.id.toString()}
+        bounces={false}
         contentContainerStyle={{
           paddingLeft: 20
         }}
@@ -52,7 +58,7 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
                 params: {id: item.id}
               })}
               onLongPress={() => {
-                openGlobalModal('podcast');
+                openModal('podcast');
                 setTappedPodcast(item);
               }}
               style={{

@@ -4,51 +4,13 @@ import { SubscriptionHeader } from '@/components/Header';
 import EpisodeCard from '@/components/EpisodeCard';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import Animated, { clamp, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const HEADER_HEIGHT = 178;
+const HEADER_HEIGHT = 182;
 
 const PodcastsScreen = () => {
-  
+
   const { setFollowingPodcasts, fetchFeed, feed, currentPage, hasNextPage, isSelected, singlePodFeed, } = useSubscriptionStore();
-
-  // const [feed, setFeed] = useState<SavedEpisode[]>([]);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [hasNextPage, setHasNextPage] = useState(false);
-
-  // const fetchFeed = async (pageNum: number) => {
-  //   try {
-  //     const response = await API.followingFeed(pageNum);
-  //     const episodes = response.episodes.map((ep: any) => ({
-  //       podcastId: ep.podcastId,
-  //       episodeId: ep._id,
-  //       id: ep.episodeId,
-  //       title: ep.title,
-  //       description: ep.description,
-  //       publishDate: ep.publishDate,
-  //       audioUrl: ep.audioUrl,
-  //       duration: ep.duration,
-  //       image: ep.image,
-  //       podcastTitle: ep.podcastTitle
-  //     }));
-
-  //     if (pageNum > 1) {
-  //       const newFeed = [...feed, ...episodes];
-  //       setFeed(newFeed);
-
-  //     } else {
-  //       setFeed(episodes);
-  //     }
-
-  //     const currentPage = response.currentPage;
-  //     const nextPage = response.hasNextPage;
-  //     console.log(nextPage);
-
-  //     setCurrentPage(currentPage);
-  //     setHasNextPage(nextPage);
-  //   } catch (error) {
-  //     console.log("Error fetching feed:", error);
-  //   }
-  // };
 
   const handleFeed = async () => {
     console.log("Running handleFeed");
@@ -59,7 +21,7 @@ const PodcastsScreen = () => {
 
   const handleSinglePod = async () => {
     console.log("Setting SinglePod Feed.");
-    if(hasNextPage) {
+    if (hasNextPage) {
       await singlePodFeed(currentPage + 1);
     }
   }
@@ -82,7 +44,7 @@ const PodcastsScreen = () => {
       const currentScrollY = event.contentOffset.y;
       const diff = currentScrollY - lastTranslateY.value;
 
-      if(currentScrollY <= 0) {
+      if (currentScrollY <= 0) {
         translateY.value = 0;
       } else {
         translateY.value = clamp(translateY.value - diff, -HEADER_HEIGHT, 0);
@@ -94,25 +56,39 @@ const PodcastsScreen = () => {
 
   const headerStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateY: translateY.value}]
+      transform: [{ translateY: translateY.value }]
     };
   });
 
+  const insets = useSafeAreaInsets();
+
   return (
     <View
+      collapsable={false}
       style={{
-        position: "relative"
+        flex: 1,
       }}
     >
+      <View
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          left: 0,
+          paddingTop: insets.top,
+          backgroundColor: "rgb(242, 242, 242)",
+          zIndex: 30
+        }}
+      />
       {/* Header */}
-      <SubscriptionHeader style={headerStyle}/>
+      <SubscriptionHeader style={headerStyle} />
 
       {/* This is feed */}
       <Animated.FlatList
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}
         data={feed}
-        onEndReached={ !isSelected ? handleFeed : handleSinglePod}
+        onEndReached={!isSelected ? handleFeed : handleSinglePod}
         onEndReachedThreshold={0.1}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <EpisodeCard episode={item} />}
@@ -120,13 +96,14 @@ const PodcastsScreen = () => {
         bounces={false}
         scrollEventThrottle={16}
         overScrollMode="never"
-        style={{
-          paddingTop: 190
+        contentContainerStyle={{
+          paddingTop: 190 + insets.top,
+          paddingBottom: 120
         }}
       />
 
     </View>
-  )
-}
+  );
+};
 
 export default PodcastsScreen;

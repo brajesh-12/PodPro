@@ -1,20 +1,19 @@
 import { Stack } from "expo-router";
-import SafeArea from "@/components/SafeArea";
 import AudioController from "@/components/AudioController";
-import FullPlayer from "@/components/FullPlayer";
-import MiniPlayer from "@/components/MiniPlayer";
 import useAuthStore from "@/store/useAuthStore";
 import { useEffect } from "react";
-import SearchScreen from "@/components/SearchScreen";
-import GlobalModal from "@/components/GlobalModal";
 import CreatePlaylistModal from "@/components/CreatePlaylistModal";
-import PlaylistSelection from "@/components/PlaylistSelectionModal";
+// import PlaylistSelection from "@/components/PlaylistSelectionModal";
 import { initNetworkListener, useNetworkStore } from "@/store/useNetworkStore";
 import useDownloadStore from "@/store/useDownloadStore";
 import CustomModal from "@/components/CustomModal";
 // import { StatusBar } from "react-native";
 import { StatusBar } from 'expo-status-bar';
 // import { Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import PlaylistSelection from "@/components/PlaylistSelection";
+import PlaylistBottomSheet from "@/components/PlaylistBottomSheet";
+import GlobalPlaylistCreation from "@/components/GlobalPlaylistCreation";
 
 export default function RootLayout() {
   // here we use isHydration for loading splash screen
@@ -33,7 +32,7 @@ export default function RootLayout() {
   // }
 
   const { isAuthorized, isHydrated } = useAuthStore();
-  const { isOnline } = useNetworkStore();
+  // const { isOnline } = useNetworkStore();
   const { hydrate } = useDownloadStore();
 
   useEffect(() => {
@@ -47,18 +46,17 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <SafeArea
-      backgroundColor="null"
-    >
-      <StatusBar
-        translucent={true}
-        backgroundColor={"transparent"}
-        style="auto"
-      />
+    <>
+      <GestureHandlerRootView>
+        <StatusBar
+          translucent={true}
+          backgroundColor={"transparent"}
+          style="auto"
+        />
 
-      <AudioController />
+        <AudioController />
 
-      {/* {
+        {/* {
         !isOnline && (
           <View
             style={{
@@ -72,24 +70,24 @@ export default function RootLayout() {
         )
       } */}
 
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={isAuthorized}>
-          <Stack.Screen name="(tabs)" />
-        </Stack.Protected>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={isAuthorized}>
+            <Stack.Screen name="(tabs)" />
+          </Stack.Protected>
 
-        <Stack.Protected guard={!isAuthorized}>
-          <Stack.Screen name="(auth)" />
-        </Stack.Protected>
-      </Stack>
+          <Stack.Protected guard={!isAuthorized}>
+            <Stack.Screen name="(auth)" />
+          </Stack.Protected>
+        </Stack>
 
-      <FullPlayer/>
-      <MiniPlayer/>
-      <SearchScreen/>
-      <CustomModal/>
+        <CustomModal />
+        <CreatePlaylistModal />
+        <PlaylistSelection/>
+        <PlaylistBottomSheet/>
+        <GlobalPlaylistCreation/>
+        
+      </GestureHandlerRootView>
 
-      <GlobalModal/>
-      <CreatePlaylistModal/>
-      <PlaylistSelection/>
-    </SafeArea>
+    </>
   );
 };

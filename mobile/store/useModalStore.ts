@@ -1,19 +1,26 @@
 import { create } from 'zustand';
-import { Episode, Podcast } from './usePodcastStore';
+import { Podcast } from './usePodcastStore';
 import { Playlist } from '@/services/api';
+import { SavedEpisode } from './useSubscriptionStore';
 
 interface ModalStore {
-  isOpen: boolean;
-  cutsomModal: boolean;
-  setCustomModal: (type: boolean) => void;
-  openGlobalModal: (type: string) => void;
+  isVisible: boolean;
   type: string;
-  closeGlobalModal: () => void;
+  openModal: (type: string) => void;
+  closeModal: () => void;
+  openPlaylistSelection: () => void;
+  closePlaylistSelection: () => void;
 
+  // for creating saving episode in new playlist
+  savingInNewPlaylist: boolean,
+  saveToNewPlaylist: () => void,
+  cancelSavingToNewPlaylist: () => void,
+
+  playlistOpen: boolean;
   isAddTo: boolean;
-  setIsAddTo: (value: boolean) => void;
+  isCreating: boolean;
 
-  tappedEpisode: Episode | null;
+  tappedEpisode: SavedEpisode | null;
   tappedPodcast: Podcast | null;
   tappedPlaylist: Playlist | null;
   podcastId: number | null;
@@ -22,36 +29,68 @@ interface ModalStore {
   setTappedPodcast: (podcast: any | null) => void;
   setTappedPlaylist: (playlist: any) => void;
   setPodcastId: (id: number | null) => void;
+  openPlaylistOptions: () => void;
+  closePlaylistOptions: () => void;
+  createPlaylist: () => void;
+  cancelCreate: () => void;
 }
 
 const useModalStore = create<ModalStore>(
-  (set, ) => ({
+  (set, get ) => ({
     isOpen: false,
-    cutsomModal: false,
+    isVisible: false,
     type: "",
     isAddTo: false,
     tappedEpisode: null,
     tappedPodcast: null,
     tappedPlaylist: null,
     podcastId: null,
+    playlistOpen: false,
+    isCreating: false,
 
-    setCustomModal(type) {
-      set({cutsomModal: type});
+    savingInNewPlaylist: false,
+    saveToNewPlaylist() {
+      set({savingInNewPlaylist: true});
+    },
+    cancelSavingToNewPlaylist() {
+      set({savingInNewPlaylist: false})
     },
 
-    openGlobalModal: (type) => {
-      set({isOpen: true});
+    createPlaylist() {
+      set({isCreating: true})
+    },
+
+    cancelCreate() {
+      set({isCreating: false})
+    },
+
+    openPlaylistOptions: () => {
+      set({playlistOpen: true})
+    },
+
+    closePlaylistOptions: () => {
+      set({playlistOpen: false})
+    },
+
+    openModal(type) {
+      set({isVisible: true});
       set({type: type});
     },
 
-    closeGlobalModal: () => {
-      set({isOpen: false});
+    closeModal() {
+      set({isVisible: false});
+      set({type: ""});
     },
 
-    setIsAddTo: (value) => set({isAddTo: value}),
+    openPlaylistSelection: () => {
+      set({isAddTo: true});
+    },
+
+    closePlaylistSelection: () => {
+      set({isAddTo: false});
+    },
 
     setTappedEpisode(episode) {
-      console.log("TappedEpisode:",episode);
       set({tappedEpisode: episode});
     },
 

@@ -1,17 +1,15 @@
-import { View, Text, TouchableOpacity, TextInput, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import { useCallback, useState } from 'react';
 import API from '@/services/api';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import Animated from 'react-native-reanimated';
 import useModalStore from '@/store/useModalStore';
-import { useRouter } from 'expo-router';
 
-const CreatePlaylistModal = () => {
-  const router = useRouter();
+const GlobalPlaylistCreation = () => {
 
   const [title, setTitle] = useState("");
   const { fetchPlaylists } = usePlaylistStore();
-  const { isCreating, cancelCreate } = useModalStore();
+  const { savingInNewPlaylist, cancelSavingToNewPlaylist, tappedEpisode, podcastId } = useModalStore();
 
   const handleTextChange = useCallback((text: string) => {
     setTitle(text);
@@ -22,12 +20,19 @@ const CreatePlaylistModal = () => {
       const body = {
         title: title
       };
-      const newPlaylist = await API.createPlaylist(body);
 
-      router.navigate({
-        pathname: "/(tabs)/(library)/playlist/[id]",
-        params: {id: `${newPlaylist.playlist._id}`}
-      });
+      const newPlaylist = await API.createPlaylist(body);
+      const savedPlaylist = newPlaylist.playlist;
+
+      const requestBody = {
+        podcastId: podcastId,
+        episodeId: tappedEpisode?.id,
+        playlistId: savedPlaylist._id
+      };
+
+      await API.addEpisodeToPlaylist(requestBody);
+      console.log("Episode saved successfully.");
+
       fetchPlaylists();
       handleClose();
     } catch (error) {
@@ -37,13 +42,13 @@ const CreatePlaylistModal = () => {
   };
 
   const handleClose = () => {
-    cancelCreate();
+    cancelSavingToNewPlaylist();
     setTitle("");
   };
 
   const isInputEmpty = title.trim().length === 0;
 
-  if (!isCreating) return;
+  if (!savingInNewPlaylist) return;
 
   return (
     <View
@@ -116,7 +121,7 @@ const CreatePlaylistModal = () => {
             gap: 16
           }}
         >
-          <Pressable
+          <TouchableOpacity
             onPress={handleClose}
             style={{
               flex: 1,
@@ -138,7 +143,7 @@ const CreatePlaylistModal = () => {
             >
               Cancel
             </Text>
-          </Pressable>
+          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => {
@@ -171,6 +176,6 @@ const CreatePlaylistModal = () => {
       </Animated.View>
     </View>
   );
-};
+}
 
-export default CreatePlaylistModal;
+export default GlobalPlaylistCreation;
