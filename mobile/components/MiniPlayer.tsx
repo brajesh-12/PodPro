@@ -38,6 +38,7 @@ const MiniPlayer = () => {
             alignItems: "center"
           }}
         >
+          {/* cover */}
           <View
             style={{
               height: 48,

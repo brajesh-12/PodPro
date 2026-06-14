@@ -12,6 +12,7 @@ import { Download, Save, Share } from '@/Icons-assets/Icon';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
 import useDownloadStore from '@/store/useDownloadStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const HEADER_HEIGHT = 48;
 
@@ -22,7 +23,7 @@ const EpisodeDetail = () => {
   const { setActiveEpisode } = usePlayerStore()
   const { SaveEpisodes, fetchSavedEpisodes, savePlaylist, DPEpisodes } = usePlaylistStore();
   const { downloadEpisodes, startDownload, removeDownload } = useDownloadStore();
-  const { openGlobalModal, setTappedEpisode, setPodcastId } = useModalStore();
+  const { openModal, setTappedEpisode, setPodcastId } = useModalStore();
   const [containerHeight, setContainerHeight] = useState(0);
 
   const podcastId = podcast?.id ? podcast?.id : null;
@@ -98,9 +99,15 @@ const EpisodeDetail = () => {
     };
   });
 
+  const insets = useSafeAreaInsets();
+
   if (selectedEpisode) {
     return (
-      <View>
+      <View
+        style={{
+          paddingTop: insets.top,
+        }}
+      >
 
         {/* Header */}
         <Animated.View
@@ -112,7 +119,7 @@ const EpisodeDetail = () => {
             paddingLeft: 12,
             paddingRight: 8,
             position: "absolute",
-            top: 0,
+            top: insets.top,
             right: 0,
             left: 0,
             zIndex: 20
@@ -175,6 +182,7 @@ const EpisodeDetail = () => {
           onScroll={onScroll}
           bounces={false}
           scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
         >
           {/* top container */}
           <View
@@ -361,9 +369,9 @@ const EpisodeDetail = () => {
 
               <Pressable
                 onPress={() => {
-                  openGlobalModal('episode');
                   setPodcastId(podcastId);
-                  setTappedEpisode(selectedEpisode)
+                  setTappedEpisode(selectedEpisode);
+                  openModal("episode");
                 }}
                 style={{
                   height: 44,
@@ -397,10 +405,17 @@ const EpisodeDetail = () => {
               {selectedEpisode?.description}
             </Text>
           </View>
+
+          <View
+            style={{
+              height: 180,
+              width: "100%"
+            }}
+          />
         </Animated.ScrollView>
 
       </View>
-    )
+    );
   };
 };
 

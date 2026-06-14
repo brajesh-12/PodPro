@@ -60,7 +60,6 @@ const useSubscriptionStore = create<SubscriptionStore>(
     currentPage: 1,
     hasNextPage: false,
 
-
     setFollowingPodcasts: async () => {
       try {
         const podcasts = await API.followedPods();

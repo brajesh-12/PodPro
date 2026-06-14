@@ -4,10 +4,9 @@ import React from 'react';
 
 interface SafeAreaProps {
   children: React.ReactNode;
-  backgroundColor: string
 }
 
-const SafeArea:React.FC<SafeAreaProps> = ({children, backgroundColor}) => {
+const SafeArea:React.FC<SafeAreaProps> = ({children}) => {
   const insets = useSafeAreaInsets();
 
   return (
@@ -15,7 +14,7 @@ const SafeArea:React.FC<SafeAreaProps> = ({children, backgroundColor}) => {
       style={{
         paddingTop: insets.top,
         flex: 1,
-        backgroundColor: "tranparent",
+        backgroundColor: "null",
       }}
     >
       {children}

@@ -12,16 +12,20 @@ import { Download, Save, Share } from '@/Icons-assets/Icon';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
 import useDownloadStore from '@/store/useDownloadStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const HEADER_HEIGHT = 48;
 
 const EpisodeDetail = () => {
   const router = useRouter();
+
+  const insets = useSafeAreaInsets();
+
   const { id: episodeId } = useLocalSearchParams();
   // const { getEpisodeById, selectedEpisode, podcast } = usePodcastStore();
   const { selectedEpisode, setSelectedEpisode, followingPodcasts } = useSubscriptionStore();
   const { setActiveEpisode } = usePlayerStore()
-  const { setTappedEpisode, setPodcastId, openGlobalModal } = useModalStore();
+  const { setTappedEpisode, setPodcastId, openModal } = useModalStore();
   const { SaveEpisodes, savePlaylist, fetchSavedEpisodes } = usePlaylistStore();
   const { downloadEpisodes, startDownload, removeDownload } = useDownloadStore();
 
@@ -112,7 +116,9 @@ const EpisodeDetail = () => {
 
   if (selectedEpisode) {
     return (
-      <View>
+      <View
+        style={{paddingTop: insets.top}}
+      >
 
         {/* Header */}
         <Animated.View
@@ -126,7 +132,7 @@ const EpisodeDetail = () => {
             position: "absolute",
             right: 0,
             left: 0,
-            top: 0,
+            top: insets.top,
             zIndex: 15
           }, headerStyle]}
         >
@@ -372,9 +378,9 @@ const EpisodeDetail = () => {
 
               <Pressable
                 onPress={() => {
-                  openGlobalModal('episode')
                   setTappedEpisode(selectedEpisode);
                   setPodcastId(podId);
+                  openModal("episode");
                 }}
                 style={{
                   height: 44,
@@ -408,6 +414,13 @@ const EpisodeDetail = () => {
               {selectedEpisode?.description}
             </Text>
           </View>
+
+          <View
+            style={{
+              height: 180,
+              width: "100%"
+            }}
+          />
         </Animated.ScrollView>
 
       </View>

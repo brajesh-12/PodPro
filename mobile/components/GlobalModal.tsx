@@ -5,10 +5,15 @@ import useSubscriptionStore from '@/store/useSubscriptionStore';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import { useRouter } from 'expo-router';
 import API from '@/services/api';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, interpolate, withTiming } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { scheduleOnRN } from 'react-native-worklets';
+import { useState } from 'react';
 
 const GlobalModal = () => {
   // add states like episode, podcast and playlist in useModalStore.
   const { isOpen, closeGlobalModal, type, tappedPodcast } = useModalStore();
+  const [modalHeight, setModalHeight] = useState(0);
 
   let podcastId = 0
   if (tappedPodcast) {
@@ -29,123 +34,134 @@ const GlobalModal = () => {
           position: "relative",
         }}
       >
+        <Animated.View
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            setModalHeight(height);
+          }}
+          style={[{
+            position: "absolute",
+            backgroundColor: "yellow",
+            right: 0,
+            left: 0,
+            bottom: 32,
+          }]}
+        >
 
-        {/* Podcast Modal */}
-        {type === "podcast" && (
-          <View
-            style={{
-              position: "absolute",
-              left: 12,
-              right: 12,
-              bottom: 32,
-              backgroundColor: "white",
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              height: "auto",
-              borderRadius: 12
-            }}
-          >
-
-            {/* title and close button */}
-            <View
+          {/* Podcast Modal */}
+          {type === "podcast" && (
+            <Animated.View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 12
+                // position: "absolute",
+                backgroundColor: "white",
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                height: "auto",
+                borderRadius: 12
               }}
             >
-              <View>
-                <Text
-                  style={{
-                    fontFamily: "SF Pro",
-                    fontSize: 18,
-                    fontWeight: "600",
-                    lineHeight: 28
-                  }}
-                >{tappedPodcast?.title}</Text>
 
-                <Text
-                  style={{
-                    fontFamily: "SF Pro",
-                    fontSize: 12,
-                    fontWeight: "400",
-                    lineHeight: 16
-                  }}
+              {/* title and close button */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 12
+                }}
+              >
+                <View>
+                  <Text
+                    style={{
+                      fontFamily: "SF Pro",
+                      fontSize: 18,
+                      fontWeight: "600",
+                      lineHeight: 28
+                    }}
+                  >{tappedPodcast?.title}</Text>
+
+                  <Text
+                    style={{
+                      fontFamily: "SF Pro",
+                      fontSize: 12,
+                      fontWeight: "400",
+                      lineHeight: 16
+                    }}
+                  >
+                    {tappedPodcast?.artist}
+                  </Text>
+                </View>
+
+                <Pressable
+                  onPress={() => closeGlobalModal()}
                 >
-                  {tappedPodcast?.artist}
-                </Text>
+                  <X size={24} />
+                </Pressable>
               </View>
 
-              <Pressable
-                onPress={() => closeGlobalModal()}
-              >
-                <X size={24} />
-              </Pressable>
-            </View>
-
-            {/* options */}
-            <View
-              style={{
-                flexDirection: "column",
-                gap: 8
-              }}
-            >
-
-              <Pressable
+              {/* options */}
+              <View
                 style={{
-                  flexDirection: "row",
-                  gap: 8,
-                  alignItems: "center",
-                  height: 40
+                  flexDirection: "column",
+                  gap: 8
                 }}
               >
-                <Share size={22} />
 
-                <Text>
-                  Share
-                </Text>
-              </Pressable>
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    gap: 8,
+                    alignItems: "center",
+                    height: 40
+                  }}
+                >
+                  <Share size={22} />
 
-              <Pressable
-                onPress={() => toggleSubscription(podcastId)}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 40
-                }}
-              >
-                <Text>
-                  {isSubscribed ? 'Unfollow' : "Follow"}
-                </Text>
-              </Pressable>
+                  <Text>
+                    Share
+                  </Text>
+                </Pressable>
 
-              <Pressable
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 40
-                }}
-              >
-                <Text>
-                  Turn on auto-download
-                </Text>
-              </Pressable>
-            </View>
+                <Pressable
+                  onPress={() => toggleSubscription(podcastId)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    height: 40
+                  }}
+                >
+                  <Text>
+                    {isSubscribed ? 'Unfollow' : "Follow"}
+                  </Text>
+                </Pressable>
 
-          </View>
-        )}
+                <Pressable
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    height: 40
+                  }}
+                >
+                  <Text>
+                    Turn on auto-download
+                  </Text>
+                </Pressable>
+              </View>
 
-        {/* Episode Modal */}
-        {type === "episode" && (<EpisodeModal />)}
+            </Animated.View>
+          )}
 
-        {/* Playlist Modal */}
-        {type === "playlist" && (<PlaylistModal />)}
+          {/* Episode Modal */}
+          {type === "episode" && (<EpisodeModal />)}
+
+          {/* Playlist Modal */}
+          {type === "playlist" && (<PlaylistModal />)}
+        </Animated.View>
 
       </View>
     </Modal>
-  )
-}
+  );
+};
 
 const EpisodeModal = () => {
   const { closeGlobalModal, setIsAddTo, tappedEpisode } = useModalStore();
@@ -210,12 +226,12 @@ const EpisodeModal = () => {
         </Pressable>
       </View>
     </View>
-  )
-}
+  );
+};
 
 const PlaylistModal = () => {
   const router = useRouter();
-  const { tappedPlaylist, closeGlobalModal} = useModalStore();
+  const { tappedPlaylist, closeGlobalModal } = useModalStore();
   const { fetchPlaylists } = usePlaylistStore();
 
   const handleDelete = async () => {

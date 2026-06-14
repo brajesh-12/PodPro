@@ -7,12 +7,14 @@ import useSearchStore from '@/store/useSearchStore';
 import { searchPodcast } from '@/services/podcastAPI';
 import useDebounce from '@/hooks/useDebounce';
 import useModalStore from '@/store/useModalStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SearchScreen = () => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const { setResults, results, searchQuery, setSearchQuery, resetSearch } = useSearchStore();
-  const { setTappedPodcast, openGlobalModal } = useModalStore();
+  const { setTappedPodcast, openModal } = useModalStore();
 
   // const [ searchQuery, setSearchQuery ] = useState("");
   const debounceQuery = useDebounce(searchQuery, 300);
@@ -38,7 +40,8 @@ const SearchScreen = () => {
   return (
     <View
       style={{
-        flex: 1
+        flex: 1,
+        paddingTop: insets.top
       }}
     >
       {/* Search Bar */}
@@ -76,11 +79,11 @@ const SearchScreen = () => {
             flexDirection: "row",
             gap: 4,
             alignItems: "center",
-            flexGrow: 1,
+            flex: 1,
             height: 48,
             backgroundColor: "rgb(218, 218, 218)",
             borderRadius: 32,
-            paddingHorizontal: 12
+            paddingHorizontal: 12,
           }}
         >
           <Search size={22} strokeWidth={1.8} />
@@ -89,8 +92,11 @@ const SearchScreen = () => {
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={{
-              flexGrow: 1,
+              flex: 1,
               height: 36,
+              fontFamily: "SF Pro",
+              fontSize: 16,
+              fontWeight: "400",
             }}
             keyboardAppearance="default"
             keyboardType="ascii-capable"
@@ -203,7 +209,7 @@ const SearchScreen = () => {
             <Pressable
               onPress={() => {
                 setTappedPodcast(item);
-                openGlobalModal('podcast');
+                openModal('podcast');
               }}
               style={{
                 height: 30,

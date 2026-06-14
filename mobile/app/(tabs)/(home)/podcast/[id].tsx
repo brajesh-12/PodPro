@@ -8,6 +8,7 @@ import Episodes from '@/components/Episodes';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import API from '@/services/api';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolateColor } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const HEADER_HEIGHT = 48;
 const TRIGGER_POINT = 320;
@@ -70,11 +71,13 @@ const PodcastDetail = () => {
     return { backgroundColor }
   });
 
+  const insets = useSafeAreaInsets()
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: "rgb(242, 242, 242)"
+        backgroundColor: "rgb(242, 242, 242)",
+        paddingTop: insets.top
       }}
     >
       {/* navigation header */}
@@ -89,7 +92,7 @@ const PodcastDetail = () => {
           position: "absolute",
           right: 0,
           left: 0,
-          top: 0,
+          top: insets.top,
           zIndex: 10
         }, backgroundStyle]}
       >

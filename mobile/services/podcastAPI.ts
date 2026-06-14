@@ -145,7 +145,8 @@ export const fetchEpisodes = async (feedUrl: string, ) => {
       audioUrl: ep.enclosure?.url || ep.enclosure?.['@_url'] || '',
       duration: ep['itunes:duration'],
       image: ep['itunes:image']?.['href'] || channel['image']?.['url'],
-      episodeType: ep['itunes:episodeType']
+      episodeType: ep['itunes:episodeType'],
+      podcastTitle: channel.title
     }));
 
     const trailers = allMappedEpisodes.filter((ep:any) => ep.episodeType === 'trailer');
