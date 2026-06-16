@@ -10,38 +10,6 @@ const SearchIndex = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const GenreCard = ({name}: {name: string}) => {
-    return (
-      <View
-        style={{
-          height: 100,
-          width: 160,
-          backgroundColor: "grey",
-          borderRadius: 8,
-        }}
-      >
-        <Image/>
-        <View
-          style={{
-            position: "absolute",
-            bottom: 8,
-            left: 8
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 16,
-              fontWeight: "600"
-            }}
-          >
-            {name}
-          </Text>
-        </View>
-      </View>
-    );
-  };
-
   return (
     <View
       style={{
@@ -92,7 +60,7 @@ const SearchIndex = () => {
           return(
             <View
               style={{
-                height: 48,
+                height: 24,
                 justifyContent: "center"
               }}
             >
@@ -113,19 +81,55 @@ const SearchIndex = () => {
         renderItem={({item}) => <GenreCard name={item.name}/>}
         numColumns={2}
         style={{
-          paddingHorizontal: 16,
-          paddingTop: 16
+          paddingHorizontal: 20,
+          paddingTop: 20
         }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 16
+          gap: 16,
+          paddingBottom: 250,
         }}
         columnWrapperStyle={{
-          justifyContent: "space-between"
+          justifyContent: "space-between",
+          gap: 12
         }}
       />
     </View>
   );
 };
+
+  const GenreCard = ({name}: {name: string}) => {
+    
+
+    return (
+      <View
+        style={{
+          height: 120,
+          flex: 1,
+          backgroundColor: "grey",
+          borderRadius: 8,
+        }}
+      >
+        <Image/>
+        <View
+          style={{
+            position: "absolute",
+            bottom: 8,
+            left: 8
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "SF Pro",
+              fontSize: 16,
+              fontWeight: "600"
+            }}
+          >
+            {name}
+          </Text>
+        </View>
+      </View>
+    );
+  };
 
 export default SearchIndex;

@@ -178,11 +178,7 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
   const router = useRouter();
   const insets = useSafeAreaInsets()
 
-  const { isSelected, setIsSelected, followingPodcasts, selectedPodcast, setSelectedPodcast, singlePodFeed, fetchFeed } = useSubscriptionStore();
-
-  const handleSelect = () => {
-
-  }
+  const { isSelected, setIsSelected, followingPodcasts, selectedPodcast, setSelectedPodcast, singlePodFeed, fetchFeed, clearSelectedPodcast } = useSubscriptionStore();
 
   return (
     <Animated.View
@@ -228,6 +224,7 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
                 <Pressable
                   onPress={() => {
                     setIsSelected(false);
+                    clearSelectedPodcast();
                     fetchFeed(1);
                   }}
                   style={{
@@ -257,8 +254,15 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
         {followingPodcasts.map((pod) => (
           <TouchableOpacity
             onPress={() => {
-              setSelectedPodcast(pod);
-              singlePodFeed(1);
+              if(selectedPodcast?.id === pod.id) {
+                setIsSelected(false);
+                clearSelectedPodcast();
+                fetchFeed(1);
+              }
+              else {
+                setSelectedPodcast(pod);
+                singlePodFeed(1);
+              }
             }}
             key={pod.id}
             style={{
@@ -277,7 +281,7 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
                 borderRadius: 112,
                 padding: 2,
                 borderWidth: 2,
-                borderColor: "grey"
+                borderColor: selectedPodcast?.id === pod.id ?  "grey" : "rgb(242, 242, 242)"
               }}
             >
               <Image

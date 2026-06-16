@@ -130,22 +130,23 @@ const LibraryScreen = () => {
           width: "auto",
           alignItems: "flex-start",
           paddingHorizontal: 16,
-          justifyContent: "center"
+          justifyContent: "center",
+          marginBottom: 16
         }}
       >
         <Text
           style={{
             fontFamily: "SF Pro",
-            fontSize: 18,
-            fontWeight: "600",
-            lineHeight: 28
+            fontSize: 24,
+            fontWeight: "700",
+            lineHeight: 32,
           }}
         >
           Downloads
         </Text>
       </View>
-    )
-  }
+    );
+  };
 
   if (!isOnline) {
     return (
@@ -242,7 +243,7 @@ const LibraryScreen = () => {
         />
       </View>
     )
-  }
+  };
 
   return (
     <View

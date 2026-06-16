@@ -44,6 +44,7 @@ interface SubscriptionStore {
   setIsSelected: (value: boolean) => void;
   clearSubcriptionIds: (ids: any) => void;
   setSelectedEpisode: (episodeId: string) => void;
+  clearSelectedPodcast: () => void;
 }
 
 const useSubscriptionStore = create<SubscriptionStore>(
@@ -203,6 +204,10 @@ const useSubscriptionStore = create<SubscriptionStore>(
     setSelectedEpisode: (episodeId) => {
       const episode = get().feed.find((item) => item.episodeId === episodeId);
       set({selectedEpisode: episode});
+    },
+
+    clearSelectedPodcast() {
+      set({selectedPodcast: null});
     },
 
     clearSubcriptionIds: () => set({ subscriptionIds: new Set() }),

@@ -164,7 +164,6 @@ const SearchScreen = () => {
                 style={{
                   height: 54,
                   width: 54,
-                  borderRadius: 4
                 }}
               >
                 <Image
@@ -174,6 +173,7 @@ const SearchScreen = () => {
                   style={{
                     height: "100%",
                     width: "100%",
+                    borderRadius: 6
                   }}
                 />
               </View>
@@ -220,6 +220,7 @@ const SearchScreen = () => {
             </Pressable>
           </Pressable>
         )}
+        bounces={false}
       />
     </View>
   )

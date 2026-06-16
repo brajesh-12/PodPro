@@ -28,10 +28,10 @@ export const CATEGORIES = {
 }
 
 export const categories = [
-  {
-    name: "All",
-    code: "all"
-  },
+  // {
+  //   name: "All",
+  //   code: "all"
+  // },
   {
     name: "Technology",
     code: "1318"

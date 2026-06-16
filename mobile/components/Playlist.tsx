@@ -110,7 +110,7 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
 
 export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
   const router = useRouter();
-  const { setTappedPlaylist } = useModalStore();
+  const { setTappedPlaylist, openPlaylistOptions } = useModalStore();
 
   return (
     <Pressable
@@ -121,6 +121,7 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
       onLongPress={() => {
         if(playlist.type === "custom") {
           setTappedPlaylist(playlist);
+          openPlaylistOptions();
         }
         return;
       }}

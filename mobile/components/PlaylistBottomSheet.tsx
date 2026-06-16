@@ -12,7 +12,8 @@ import API from '@/services/api';
 const PlaylistBottomSheet = () => {
   const translateY = useSharedValue(0);
   const current = useSharedValue(0);
-  const [sheetHeight, setSheetHeight] = useState(0);
+  
+  const sheetHeight = 236;
 
   const { playlistOpen, closePlaylistOptions, tappedPlaylist } = useModalStore();
   const { fetchPlaylists } = usePlaylistStore();
@@ -85,10 +86,6 @@ const PlaylistBottomSheet = () => {
         gesture={pan}
       >
         <Animated.View
-          onLayout={(event) => {
-            const { height } = event.nativeEvent.layout;
-            setSheetHeight(height);
-          }}
           style={[{
             width: "100%",
             backgroundColor: "white",
