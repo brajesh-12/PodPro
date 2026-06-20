@@ -106,7 +106,8 @@ const NewEpisodes = () => {
 
               <View
                 style={{
-                  marginTop: 8
+                  marginTop: 12,
+                  width: 230
                 }}
               >
                 <Text
@@ -116,20 +117,24 @@ const NewEpisodes = () => {
                     fontWeight: "500",
                     lineHeight: 20,
                     color: "black",
-                    width: 220
+                    // width: 220
                   }}
                   numberOfLines={1}
                   ellipsizeMode='tail'
                 >
                   {item.title}
                 </Text>
+
                 <Text
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
                   style={{
                     fontFamily: "SF Pro",
                     fontSize: 14,
                     fontWeight: "500",
                     lineHeight: 20,
-                    color: "grey"
+                    color: "grey",
+                    // width: 220
                   }}
                 >
                   {item.podcastTitle}

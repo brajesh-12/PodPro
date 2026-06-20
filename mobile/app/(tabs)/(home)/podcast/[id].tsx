@@ -20,7 +20,7 @@ const PodcastDetail = () => {
 
   const router = useRouter();
 
-  const { fetchPod, podcast, fetchEpisodesData, setPodcast, resetPodcast } = usePodcastStore();
+  const { fetchPod, podcast, fetchEpisodesData, setPodcast, resetPodcast, episodes } = usePodcastStore();
   const { subscriptionIds } = useSubscriptionStore();
 
   const isSubscribed = subscriptionIds.has(numId);
@@ -237,7 +237,7 @@ const PodcastDetail = () => {
               </Text>
             </View>
           )
-          : <Episodes />
+          : <Episodes episodes={episodes}/>
         }
       </Animated.ScrollView>
     </View>

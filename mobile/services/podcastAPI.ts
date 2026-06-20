@@ -27,57 +27,10 @@ export const CATEGORIES = {
   HISTORY: '1487',
 }
 
-export const categories = [
-  // {
-  //   name: "All",
-  //   code: "all"
-  // },
-  {
-    name: "Technology",
-    code: "1318"
-  },
-  {
-    name: "Business",
-    code: "1321"
-  },
-  {
-    name: "Comedy",
-    code: "1303"
-  },
-  {
-    name: "Health",
-    code: "1512"
-  },
-  {
-    name: "News",
-    code: "1489"
-  },
-  {
-    name: "Science",
-    code: "1533"
-  },
-  {
-    name: "Sports",
-    code: "1316"
-  },
-  {
-    name: "True Crime",
-    code: "1488"
-  },
-  {
-    name: "Education",
-    code: "1304"
-  },
-  {
-    name: "History",
-    code: "1487"
-  }
-]
-
-export const fetchPodcasts = async (query: string, limit: string) => {
+export const fetchPodcasts = async (genreId: string, limit: number) => {
 
   try {
-    const response = await fetch(`${BASE_API}/us/rss/toppodcasts/limit=${limit}/genre=${query}/json`);
+    const response = await fetch(`${BASE_API}/us/rss/toppodcasts/limit=${limit}/genre=${genreId}/json`);
 
     const data = await response.json();
     const entries = data.feed.entry;
@@ -122,7 +75,7 @@ export const fetchPodcast = async (podcastId: string) => {
   } catch (error) {
     console.error("Error fetching single podcast:", error);
   }
-}
+};
 
 export const fetchEpisodes = async (feedUrl: string, ) => {
   try {
@@ -158,7 +111,7 @@ export const fetchEpisodes = async (feedUrl: string, ) => {
   } catch (error) {
     console.error("Error fetching episodes:", error);
   }
-}
+};
 
 export const searchPodcast = async (query: string, limit: number) => {
   try {
@@ -187,4 +140,29 @@ export const searchPodcast = async (query: string, limit: number) => {
   } catch (error) {
     console.log("Error searching podcast:", error);
   }
-}
+};
+
+export const newPodcastFromCategory = async (genreId: string, limit: number) => {
+  try {
+    const response = await axios.get(`${BASE_API}/search`, {
+      params: { 
+        term: 'podcast',
+        genreId: genreId,
+        limit,
+        sort: 'recent'
+      }
+    });
+
+    const results = response.data.results;
+
+    return results.map((result: any) => ({
+      id: result.collectionId,
+      title: result.collectionName,
+      thumbnail: result.artworkUrl60,
+      artist: result.artistName 
+    }));
+
+  } catch (error) {
+    console.error("Error fetching popular podcasts:", error);
+  }
+};

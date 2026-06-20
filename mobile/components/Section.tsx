@@ -9,7 +9,6 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
   const router = useRouter();
 
   const { setTappedPodcast, openModal } = useModalStore();
-  const topFive = data.slice(1, 5);
 
   return (
     <View
@@ -44,7 +43,7 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
       <FlatList
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        data={topFive}
+        data={data}
         keyExtractor={(item) => item.id.toString()}
         bounces={false}
         contentContainerStyle={{
@@ -63,7 +62,7 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
               }}
               style={{
                 flexDirection: 'column',
-                gap: 8,
+                gap: 12,
                 marginRight: 16
               }}
             >

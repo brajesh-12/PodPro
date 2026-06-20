@@ -1,8 +1,20 @@
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 
 const SearchLayout = () => {
   return (
-    <Slot/>
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false
+        }}
+      >
+        <Stack.Screen name="index" options={{animation: "none"}}/>
+        <Stack.Screen name="category"/>
+        <Stack.Screen name="podcast"/>
+        
+        <Stack.Screen name="search" options={{animation: "none"}}/>
+      </Stack>
+    </>
   );
 };
 
