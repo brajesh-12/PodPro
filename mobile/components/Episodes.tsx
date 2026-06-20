@@ -11,10 +11,11 @@ import API from '@/services/api';
 import { Save, Download } from '@/Icons-assets/Icon';
 import useDownloadStore from '@/store/useDownloadStore';
 import usePlayerStore from '@/store/usePlayerStore';
+import { SavedEpisode } from '@/store/useSubscriptionStore';
 
-const Episodes = () => {
+const Episodes = ({episodes}: {episodes: SavedEpisode[]}) => {
   const router = useRouter();
-  const { episodes, podcast, fetchEpisodesData } = usePodcastStore();
+  const { podcast, fetchEpisodesData } = usePodcastStore();
   const { openModal, setTappedEpisode, setPodcastId } = useModalStore();
   const { savePlaylist, SaveEpisodes, addingEpisode, fetchSavedEpisodes, downloadPlaylist, DPEpisodes } = usePlaylistStore();
   const { startDownload, removeDownload, downloadEpisodes } = useDownloadStore();
@@ -223,6 +224,6 @@ const Episodes = () => {
       />
     </View>
   )
-}
+};
 
 export default Episodes;

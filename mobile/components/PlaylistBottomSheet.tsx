@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { scheduleOnRN } from 'react-native-worklets';
 import useModalStore from '@/store/useModalStore';
 import { style } from './CustomModal';

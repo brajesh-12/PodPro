@@ -8,6 +8,8 @@ import Episodes from '@/components/Episodes';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import API from '@/services/api';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolateColor } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useSearchStore from '@/store/useSearchStore';
 
 const HEADER_HEIGHT = 48;
 const TRIGGER_POINT = 320;
@@ -17,9 +19,11 @@ const PodcastDetail = () => {
   const podcastId = Array.isArray(id) ? id[0] : id;
   const numId = Number(podcastId);
 
+  const insets = useSafeAreaInsets();
+
   const router = useRouter();
 
-  const { fetchPod, podcast, fetchEpisodesData, setPodcast, resetPodcast } = usePodcastStore();
+  const { searchedPodcast, setSearchedPodcast, episodes, setEpisodes, fetchSearchedPodcast} = useSearchStore();
   const { subscriptionIds } = useSubscriptionStore();
 
   const isSubscribed = subscriptionIds.has(numId);
@@ -27,13 +31,13 @@ const PodcastDetail = () => {
   const fetchingPodcast = async () => {
     if (isSubscribed) {
       const podcast = await API.podcast(numId);
-      setPodcast(podcast);
+      setSearchedPodcast(podcast);
       console.log("Fetching podcast from database.");
 
     } else {
-      fetchPod(podcastId);
+      fetchSearchedPodcast(podcastId);
     }
-  }
+  };
 
   useEffect(() => {
     fetchingPodcast();
@@ -41,10 +45,10 @@ const PodcastDetail = () => {
   }, []);
 
   useEffect(() => {
-    if (podcast) {
-      fetchEpisodesData(podcast.feedUrl);
+    if (searchedPodcast) {
+      setEpisodes(searchedPodcast.feedUrl);
     }
-  }, [fetchEpisodesData, podcast]);
+  }, [setEpisodes, searchedPodcast]);
 
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler({
@@ -74,7 +78,8 @@ const PodcastDetail = () => {
     <View
       style={{
         flex: 1,
-        backgroundColor: "rgb(242, 242, 242)"
+        backgroundColor: "rgb(242, 242, 242)",
+        paddingTop: insets.top
       }}
     >
       {/* navigation header */}
@@ -89,7 +94,7 @@ const PodcastDetail = () => {
           position: "absolute",
           right: 0,
           left: 0,
-          top: 0,
+          top: insets.top,
           zIndex: 10
         }, backgroundStyle]}
       >
@@ -102,7 +107,6 @@ const PodcastDetail = () => {
         >
           <TouchableOpacity
             onPress={() => {
-              resetPodcast();
               router.back();
             }}
             style={{
@@ -128,7 +132,7 @@ const PodcastDetail = () => {
                 color: "black"
               }}
             >
-              {podcast?.title}
+              {searchedPodcast?.title}
             </Text>
           </Animated.View>
 
@@ -162,7 +166,7 @@ const PodcastDetail = () => {
         stickyHeaderIndices={[1]}
         scrollEventThrottle={16}
       >
-        <PodInfo podcast={podcast} />
+        <PodInfo podcast={searchedPodcast} />
 
         {/* Filter */}
         <Animated.View
@@ -226,7 +230,7 @@ const PodcastDetail = () => {
           </View>
         </Animated.View>
 
-        {!podcast?.feedUrl
+        {!searchedPodcast?.feedUrl
           ? (
             <View>
               <Text>
@@ -234,7 +238,7 @@ const PodcastDetail = () => {
               </Text>
             </View>
           )
-          : <Episodes />
+          : <Episodes episodes={episodes} />
         }
       </Animated.ScrollView>
     </View>

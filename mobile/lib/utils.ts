@@ -72,7 +72,7 @@ export const formatProgress = (duration: any) => {
   const s = Math.floor((totalSeconds % 60));
 
   if(h > 0) {
-    return `${pad(h)}:${pad(m)}`;
+    return `${pad(h)}:${pad(m)}:${s}`;
   }
 
   return `${pad(m)}:${pad(s)}`;

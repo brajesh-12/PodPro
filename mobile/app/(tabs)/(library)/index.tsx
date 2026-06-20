@@ -1,4 +1,3 @@
-import Header from '@/components/Header';
 import { ChevronDown, LayoutGrid, List } from 'lucide-react-native';
 import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
@@ -65,7 +64,26 @@ const LibraryScreen = () => {
   const LibraryHeader = () => {
     return (
       <View>
-        <Header screen='library' />
+        <View
+          style={{
+            height: 48,
+            flex: 1,
+            justifyContent: "center",
+            paddingHorizontal: 20
+          }}
+        >
+          <View>
+            <Text
+              style={{
+              fontFamily: "SF Pro",
+              fontSize: 24,
+              fontWeight: "800",
+            }}
+            >
+              Library
+            </Text>
+          </View>
+        </View>
 
         {/* filter section */}
         <View

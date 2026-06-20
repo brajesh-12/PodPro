@@ -74,11 +74,11 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
   fetchData: async () => {
     try {
       set({isLoading: true});
-      const trendingData = await fetchPodcasts(CATEGORIES.ALL, '12');
-      const historyData = await fetchPodcasts(CATEGORIES.HISTORY, '5');
-      const comedyData = await fetchPodcasts(CATEGORIES.COMEDY, '5');
-      const scienceData = await fetchPodcasts(CATEGORIES.SCIENCE, '5');
-      const educationData = await fetchPodcasts(CATEGORIES.EDUCATION, '5');
+      const trendingData = await fetchPodcasts(CATEGORIES.ALL, 12);
+      const historyData = await fetchPodcasts(CATEGORIES.HISTORY, 5);
+      const comedyData = await fetchPodcasts(CATEGORIES.COMEDY, 5);
+      const scienceData = await fetchPodcasts(CATEGORIES.SCIENCE, 5);
+      const educationData = await fetchPodcasts(CATEGORIES.EDUCATION, 5);
 
       set({ trending: trendingData });
       set({ history: historyData.sort(() => Math.random() - 0.5) });
@@ -118,7 +118,7 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
   },
 
   fetchFilterResult: async (category) => {
-    const response = await fetchPodcasts(category, "20");
+    const response = await fetchPodcasts(category, 5);
     set({filterResult: response});
   },
 
