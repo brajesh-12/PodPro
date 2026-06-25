@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist, StateStorage } from "zustand/middleware";
 import usePlayerStore from "./usePlayerStore";
 import * as SecureStorage from "expo-secure-store";
+import { Alert } from "react-native";
+import authApi from "@/axios/interceptors";
 
 interface User {
   id: string;
@@ -19,9 +21,11 @@ interface AuthStore {
   setAuth: (user: any, token: string) => void;
   setToken: (token: any) => void;
   setUser: (user: any) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   setIsHydrated: () => void;
   toggleAuthorization: () => void;
+  clearLocalStore: () => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
 }
 
 const secureStorage: StateStorage = {
@@ -38,37 +42,111 @@ const secureStorage: StateStorage = {
 
 const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthorized: false,
       isHydrated: false,
 
       setAuth: (user, token) => {
-        set({user: user});
-        set({token: token});
+        set({ user: user });
+        set({ token: token });
       },
 
       toggleAuthorization() {
-        set({isAuthorized: true});
+        set({ isAuthorized: true });
       },
 
-      setUser: (user) => set({user: user}),
+      setUser: (user) => set({ user: user }),
 
       setToken: (value) => {
-        set({token: value});
+        set({ token: value });
       },
 
       logout: async () => {
-        set({user: null});
-        set({token: null});
-        set({isAuthorized: false});
+        try {
+          const refreshToken = await SecureStorage.getItemAsync('refreshToken');
+          console.log("refreshToken:", refreshToken);
+
+          if (!refreshToken) {
+            await get().clearLocalStore();
+            return;
+          }
+
+          await authApi.post('/auth/logout', {
+            refreshToken: refreshToken
+          });
+          await get().clearLocalStore();
+
+        } catch (error: any) {
+          console.error("Error logging out:", error);
+
+          if (!error.response) {
+            Alert.alert(
+              "Network Error",
+              "Could not connect to the server. Please check your internet and try logging out again."
+            );
+            return;
+          };
+
+          if (error.response.status === 500) {
+            Alert.alert(
+              "Server Error",
+              "Our servers are currently experiencing issues. Please try logging out later."
+            );
+            return;
+          };
+        };
+      },
+
+      clearLocalStore: async () => {
+        set({ user: null });
+        set({ token: null });
+        set({ isAuthorized: false });
 
         usePlayerStore.getState().resetPlayer();
         await SecureStorage.deleteItemAsync('refreshToken');
       },
+
       setIsHydrated: () => {
-        set({isHydrated: true})
+        set({ isHydrated: true })
+      },
+
+      deleteAccount: async (password) => {
+        try {
+          await authApi.post('/auth/delete', {
+            password: password
+          });
+
+          await get().clearLocalStore();
+        } catch (error: any) {
+          console.log("Error deleting account:", error);
+
+          if (!error.response) {
+            Alert.alert(
+              "Network Error",
+              "Could not connect to the server. Please check your internet and try logging out again."
+            );
+            return;
+          };
+
+          if(error.response.status === 401) {
+            Alert.alert(
+              "Incorrect Password",
+              "Password entered by you was incorrect. Please try again."
+            );
+            return;
+          };
+
+          if (error.response.status === 500) {
+            Alert.alert(
+              "Server error",
+              "Our servers are currently experiencing issues. Please try logging out later."
+            );
+            return;
+          };
+
+        };
       }
     }),
     {

@@ -1,4 +1,4 @@
-import useAuthStore from "@/store/useAuthStore";
+// import useAuthStore from "@/store/useAuthStore";
 import axios from "axios";
 import * as secureStorage from 'expo-secure-store';
 import tokenRefreshLock from "./tokenRefreshLock";
@@ -11,7 +11,8 @@ const authApi = axios.create({
 });
 
 authApi.interceptors.request.use(
-  (request) => {
+  async (request) => {
+    const { default: useAuthStore } = await import('../store/useAuthStore');
     const token = useAuthStore.getState().token;
 
     console.log("Request headers:", JSON.stringify(request.headers, null, 2));
@@ -29,6 +30,8 @@ authApi.interceptors.response.use(
     return response;
   },
   async (error) => {
+
+    const { default: useAuthStore } = await import('../store/useAuthStore');
     const { setToken, logout } = useAuthStore.getState();
 
     const originalRequest = error.config;

@@ -54,7 +54,7 @@ export const saveEpisodes = async (podcast) => {
     console.error("Error saving episodes:", error);
     return [];
   }
-}
+};
 
 export const fetchPodcast = async (id) => {
   try {
@@ -81,7 +81,7 @@ export const fetchPodcast = async (id) => {
   } catch (error) {
     console.error("Error fetching podcast from itunes:", error);
   }
-}
+};
 
 export const syncEpisodes = async (podcast) => {
   const feedUrl = podcast.feedUrl;
@@ -133,4 +133,11 @@ export const syncEpisodes = async (podcast) => {
     console.error("Erros syncing episodes:", error);
     throw new Error(error);
   }
-}
+};
+
+export const getPublicIdFromUrl = (url) => {
+  if(!url || !url.includes('/upload/')) return null;
+  const parts = url.split('upload');
+  const pathWithoutVersion = part[1].replace(/^v\d+\//, '');
+  return pathWithoutversion.replace(/\.[^/.]+$/, "");
+};

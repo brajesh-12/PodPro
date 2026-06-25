@@ -130,6 +130,7 @@ const SubGenre = ({ item }: { item: any }) => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line
   }, []);
 
   return (

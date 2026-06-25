@@ -5,7 +5,12 @@ import RefreshTokens from '../model/RefreshToken.js';
 import jwt from 'jsonwebtoken';
 import ENV from "../lib/env.js";
 import { defaultPlaylists } from "./playlists.controller.js";
-import { uploadToCloudinary } from "../lib/cloudinary.js";
+import cloudinary, { uploadToCloudinary } from "../lib/cloudinary.js";
+import mongoose from "mongoose";
+import Playlist from "../model/Playlist.js";
+import PlaylistItem from "../model/PlaylistItem.js";
+import Subscription from "../model/Subscription.js";
+import { getPublicIdFromUrl } from "../lib/utils.js";
 
 export const signup = async (req, res) => {
   const { email, password } = req.body;
@@ -143,33 +148,50 @@ export const login = async (req, res) => {
 
 };
 
-export const logout = async (req, res) => {
+export const globalLogOut = async (req, res) => {
+  const userId = req.user._id;
   try {
-    const id = req.query.id;
-
-    const token = req.headers['authorization']?.split(" ")[1]
-
-    if (!token || !id) return res.status(400).json({ message: "Insufficient data." });
-
-    const user = await User.findOne({ _id: id });
-    if (!user) return res.status(400).json({ message: "User not found." });
-
-    const verify = jwt.verify(token, ENV.REFRESH_JWT_SECRET);
-    if (!verify) return res.status(400).json({ message: "Unauthorized: Invalid Token." });
-
-    // now check in database
-    const savedToken = await RefreshTokens.findOne({ token: token });
-    if (token !== savedToken.token) return res.status(400).json({ message: "Unauthorized: Invalid Token." });
-
-    await RefreshTokens.deleteMany({ familyId: savedToken.familyId, userId: id });
+    await RefreshTokens.deleteMany({ userId: userId });
+    console.log("Logged out successfully");
 
     res.status(200).json({ message: "Logged out successfully." });
 
   } catch (error) {
-    console.error("Error loging out:", error);
+    console.error("Error in global logout:", error);
+    console.log("Global Logout failed");
     res.status(500).json({ message: "Internal server error." });
   }
-}
+};
+
+export const logout = async (req, res) => {
+  const userId = req.user._id;
+  const { refreshToken } = req.body;
+
+  if(!refreshToken) {
+    return res.status(400).json({
+      message: "Token not founc"
+    });
+  };
+
+  try {
+    const tokenDoc = await RefreshTokens.findOne({token: refreshToken});
+    if(tokenDoc) {
+      await RefreshTokens.deleteMany({familyId: tokenDoc.familyId, userId: userId});
+    };
+
+    console.log("Logged out successfully");
+    res.status(200).json({
+      message: "Logged out successfully"
+    });
+
+  } catch (error) {
+    console.error("Error logging out:", error);
+
+    res.status(500).json({
+      message: "Internal server error"
+    });
+  }
+};
 
 export const updateUserName = async (req, res) => {
   try {
@@ -191,7 +213,7 @@ export const updateUserName = async (req, res) => {
     console.error("Error updating userName:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const updateProfilePic = async (req, res) => {
   try {
@@ -234,7 +256,83 @@ export const updateProfilePic = async (req, res) => {
     console.error("Error updating profilePic:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
+export const deleteAccount = async (req, res) => {
+  const userId = req.user._id;
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({
+      message: "Password is required to confirm account deletion"
+    });
+  };
+
+  const session = await mongoose.startSession();
+
+  try {
+    const user = await User.findById({ _id: userId }).select('+password').session(session);
+    if (!user) {
+      throw new Error("User not found");
+    };
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      console.log(`[Transaction] Aborted: Incorrect password provided for user: ${user._id}`);
+
+      res.status(401).json({
+        message: "Incorrect password"
+      });
+      await session.abortTransaction();
+      session.endSession();
+      return;
+    };
+
+    const profileImageUrl = user.profilePic;
+
+    const userPlaylists = await Playlist.find({ userId: user._id }).session(session);
+    const playlistIds = userPlaylists.map((p) => p._id);
+
+    if (playlistIds.length > 0) {
+      await PlaylistItem.deleteMany({ playlistId: { $in: playlistIds } }, { session });
+    };
+
+    // delete dependencies
+    await Playlist.deleteMany({ userId: userId }, { session });
+    await Subscription.deleteMany({ userId: userId }, { session });
+    await RefreshTokens.deleteMany({ userId: userId }, { session });
+
+    await User.findByIdAndDelete({ _id: userId }, { session });
+    console.log(`[Transaction] Successfully commited`);
+
+    if (profileImageUrl && profileImageUrl.includes('cloudinary.com')) {
+      const publicId = getPublicIdFromUrl(profileImageUrl);
+      if (publicId) {
+        cloudinary.uploader.destroy(publicId, (error, result) => {
+          if (error) console.error(`[Cloudinary] Failed to delete:`, error);
+          else console.log(`[Cloudinary] Image deleted:`, result);
+        });
+      }
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Account deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    await session.abortTransaction();
+
+    res.status(500).json({ message: "Internal server error" });
+  } finally {
+    // CLEANUP: Always end the session
+    if (session.inTransaction()) {
+      session.endSession();
+    }
+  }
+};
 
 export const Refresh = async (req, res) => {
   // here we get refresh token send by app and then decode and verify token and match it with database then generate new access token and refresh token and send new access token
@@ -305,4 +403,4 @@ export const Refresh = async (req, res) => {
     console.error("Error refreshing token:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};

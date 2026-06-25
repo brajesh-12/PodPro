@@ -20,6 +20,11 @@ interface ModalStore {
   isAddTo: boolean;
   isCreating: boolean;
 
+  // profile screen
+  isDeleting: boolean;
+  startDelete: () => void;
+  stopDeleting: () => void;
+
   tappedEpisode: SavedEpisode | null;
   tappedPodcast: Podcast | null;
   tappedPlaylist: Playlist | null;
@@ -101,7 +106,15 @@ const useModalStore = create<ModalStore>(
     setTappedPlaylist: (playlist) => {
       set({tappedPlaylist: playlist});
     },
-    setPodcastId: (id) => set({podcastId: id})
+    setPodcastId: (id) => set({podcastId: id}),
+
+    isDeleting: false,
+    startDelete: () => {
+      set({isDeleting: true});
+    },
+    stopDeleting: () => {
+      set({isDeleting: false});
+    }
   })
 );
 

@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PlaylistSelection from "@/components/PlaylistSelection";
 import PlaylistBottomSheet from "@/components/PlaylistBottomSheet";
 import GlobalPlaylistCreation from "@/components/GlobalPlaylistCreation";
+import ProfileScreenModal from "@/components/ProfileScreenModal";
 
 export default function RootLayout() {
   // here we use isHydration for loading splash screen
@@ -85,6 +86,7 @@ export default function RootLayout() {
         <PlaylistSelection/>
         <PlaylistBottomSheet/>
         <GlobalPlaylistCreation/>
+        <ProfileScreenModal/>
         
       </GestureHandlerRootView>
 

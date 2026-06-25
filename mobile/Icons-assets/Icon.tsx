@@ -52,7 +52,7 @@ export const SleepTimer = ({ size = 24, color = "black", strokeWidth = 2 }) => {
   );
 };
 
-export const Share = ({size=24, color="black", strokeWidth=2}) => {
+export const Share = ({ size = 24, color = "black", strokeWidth = 2 }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
@@ -77,7 +77,7 @@ export const Bell = ({ size = 24, color = "black", strokeWidth = 2 }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M3.262 16.326C3.13137 16.4692 3.04516 16.6472 3.01386 16.8385C2.98256 17.0298 3.00752 17.226 3.08571 17.4034C3.1639 17.5807 3.29194 17.7316 3.45426 17.8375C3.61658 17.9434 3.80618 17.9999 4 18H20C20.1938 18.0001 20.3834 17.9438 20.5459 17.8381C20.7083 17.7324 20.8365 17.5817 20.9149 17.4045C20.9933 17.2273 21.0185 17.0311 20.9874 16.8398C20.9564 16.6485 20.8704 16.4703 20.74 16.327C19.41 14.956 18 13.499 18 9C18 7.4087 17.3679 5.88258 16.2426 4.75736C15.1174 3.63214 13.5913 3 12 3C10.4087 3 8.88258 3.63214 7.75736 4.75736C6.63214 5.88258 6 7.4087 6 9C6 13.499 4.589 14.956 3.262 16.326Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M15 18C15 19.6569 13.6569 21 12 21C10.3431 21 9 19.6569 9 18" stroke={color} strokeWidth={strokeWidth}/>
+      <Path d="M15 18C15 19.6569 13.6569 21 12 21C10.3431 21 9 19.6569 9 18" stroke={color} strokeWidth={strokeWidth} />
     </Svg>
   );
 };
@@ -99,12 +99,12 @@ export const Podcasts = ({ size = 24, color = "black", strokeWidth = 2 }) => {
       <Path d="M13 17C13 16.7348 12.8946 16.4804 12.7071 16.2929C12.5196 16.1054 12.2652 16 12 16C11.7348 16 11.4804 16.1054 11.2929 16.2929C11.1054 16.4804 11 16.7348 11 17L11.5 21.5C11.5 21.6326 11.5527 21.7598 11.6464 21.8536C11.7402 21.9473 11.8674 22 12 22C12.1326 22 12.2598 21.9473 12.3536 21.8536C12.4473 21.7598 12.5 21.6326 12.5 21.5L13 17Z" fill={color} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M16.85 18.58C18.4894 17.5312 19.7447 15.9793 20.4276 14.1569C21.1106 12.3345 21.1844 10.3399 20.6381 8.47199C20.0917 6.6041 18.9546 4.96363 17.3972 3.79653C15.8399 2.62943 13.9462 1.9986 12 1.9986C10.0538 1.9986 8.16012 2.62943 6.60275 3.79653C5.04538 4.96363 3.90828 6.6041 3.36193 8.47199C2.81558 10.3399 2.88942 12.3345 3.57237 14.1569C4.25533 15.9793 5.51061 17.5312 7.15 18.58" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M8 14C7.44287 13.2572 7.1036 12.3738 7.02021 11.449C6.93682 10.5242 7.1126 9.59446 7.52787 8.76393C7.94313 7.9334 8.58147 7.23492 9.37135 6.74675C10.1612 6.25857 11.0714 6 12 6C12.9286 6 13.8388 6.25857 14.6287 6.74675C15.4185 7.23492 16.0569 7.9334 16.4721 8.76393C16.8874 9.59446 17.0632 10.5242 16.9798 11.449C16.8964 12.3738 16.5571 13.2572 16 14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M12 12C12.5523 12 13 11.5523 13 11C13 10.4477 12.5523 10 12 10C11.4477 10 11 10.4477 11 11C11 11.5523 11.4477 12 12 12Z" fill={color} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"/>
+      <Path d="M12 12C12.5523 12 13 11.5523 13 11C13 10.4477 12.5523 10 12 10C11.4477 10 11 10.4477 11 11C11 11.5523 11.4477 12 12 12Z" fill={color} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   )
 }
 
-export const Library = ({size=24, color="black", strokeWidth=2 }) => {
+export const Library = ({ size = 24, color = "black", strokeWidth = 2 }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M16 6L20 20" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
@@ -115,10 +115,19 @@ export const Library = ({size=24, color="black", strokeWidth=2 }) => {
   );
 };
 
-export const Home = ({ size=24, color="black", strokeWidth=2, fill="none" }) => {
+export const Home = ({ size = 24, color = "black", strokeWidth = 2, fill = "none" }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill}>
       <Path d="M3.18579 9.15771C3.06333 9.42161 2.99993 9.70906 3 9.99999V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21L9 21V13.5C9 12.6716 9.67157 12 10.5 12H13.5C14.3284 12 15 12.6716 15 13.5V21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V9.99999C21.0001 9.70906 20.9367 9.42161 20.8142 9.15771C20.6918 8.8938 20.5132 8.65979 20.291 8.47199L13.291 2.47199C12.93 2.1669 12.4726 1.99951 12 1.99951C11.5274 1.99951 11.07 2.1669 10.709 2.47199L3.709 8.47199C3.4868 8.65979 3.30824 8.8938 3.18579 9.15771Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+export const CloseIcon = ({ size = 24, color = "black", strokeWidth = 2 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M18 6L6 18" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M6 6L18 18" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };
