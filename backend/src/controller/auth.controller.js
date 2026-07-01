@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 import Playlist from "../model/Playlist.js";
 import PlaylistItem from "../model/PlaylistItem.js";
 import Subscription from "../model/Subscription.js";
-import { getPublicIdFromUrl } from "../lib/utils.js";
+import { formatUserName, generateProfileImage, generateUserName, getPublicIdFromUrl } from "../lib/utils.js";
 
 export const signup = async (req, res) => {
   const { email, password } = req.body;
@@ -37,9 +37,15 @@ export const signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
+    const defaultUserName = generateUserName(email);
+    const formatedUserName = formatUserName(defaultUserName);
+    const defaultProfilePic = generateProfileImage(defaultUserName);
+
     const newUser = new User({
       email,
-      password: hashPassword
+      password: hashPassword,
+      userName: formatedUserName,
+      profilePic: defaultProfilePic
     });
 
     if (newUser) {

@@ -1,26 +1,35 @@
 import { View, Text, TouchableOpacity, TextInput, Alert, Pressable } from 'react-native'
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useAuthStore from '@/store/useAuthStore';
 import axios from 'axios';
 import * as secureStorage from 'expo-secure-store';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, Eye, EyeClosed } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useOnBoardingStore from '@/store/useOnBoardingStore';
 
-const Signup = () => {
+const CreatePasswordScreen = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const inputRef = useRef<TextInput>(null);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [ReEnterPassword, setReEnterPassword] = useState("");
+  const [secure, setVisibility] = useState(true);
 
   const { setAuth } = useAuthStore();
+  const { email, password, setPassword, resetCredentials } = useOnBoardingStore();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSignup = async () => {
     try {
-      if (password !== ReEnterPassword) {
-        throw new Error('ReEnterPassword not match');
+      if (password.length < 6) {
+        return;
       }
 
       const response = await axios.post('http://localhost:3000/api/auth/signup', {
@@ -32,8 +41,10 @@ const Signup = () => {
 
       setAuth(data.user, data.tokens.accessToken);
       await secureStorage.setItemAsync('refreshToken', data.tokens.refreshToken);
+
+      resetCredentials();
       router.navigate({
-        pathname: '/(auth)/setup/PickProfileImage'
+        pathname: '/signup/userName'
       });
 
     } catch (error: any) {
@@ -65,12 +76,14 @@ const Signup = () => {
           paddingHorizontal: 12,
           marginBottom: 16,
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <Pressable
           onPress={() => router.back()}
           style={{
+            position: "absolute",
+            left: 8,
             height: 32,
             width: 32,
             justifyContent: "center",
@@ -85,7 +98,7 @@ const Signup = () => {
             height: "100%",
             flex: 1,
             justifyContent: "center",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
           <Text
@@ -118,71 +131,95 @@ const Signup = () => {
               fontSize: 24
             }}
           >
-            What&apos;s your email?
+            Create a password
           </Text>
         </View>
 
-        {/* Email Input */}
-        <View
-          style={{
-            height: 50,
-            width: "100%",
-            paddingLeft: 12,
-            borderWidth: 1,
-            justifyContent: "center",
-            borderRadius: 8
-          }}
-        >
-          <TextInput
-            placeholder='Email'
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoFocus={true}
+        <View>
+          {/* Email Input */}
+          <View
             style={{
-              fontFamily: "SF Pro",
-              fontSize: 15
+              height: 50,
+              width: "100%",
+              paddingLeft: 12,
+              paddingRight: 12,
+              borderWidth: 1,
+              alignItems: "center",
+              borderRadius: 8,
+              flexDirection: "row"
             }}
-          />
+          >
+            <View
+              style={{
+                flex: 1
+              }}
+            >
+              <TextInput
+                ref={inputRef}
+                placeholder='Password'
+                value={password}
+                onChangeText={setPassword}
+                autoCapitalize="none"
+                secureTextEntry={secure}
+                // autoFocus={true}
+                style={{
+                  fontFamily: "SF Pro",
+                  fontSize: 15
+                }}
+              />
+            </View>
+
+            <Pressable
+              onPress={() => {
+                setVisibility(!secure);
+              }}
+            >
+              {secure ? <EyeClosed size={22} /> : <Eye size={22} />}
+            </Pressable>
+
+          </View>
+
+          <View>
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 12,
+                fontWeight: "400"
+              }}
+            >
+              Use at least 6 character
+            </Text>
+
+            <View
+              style={{
+                opacity: 1
+              }}
+            >
+              <Text>
+                Error message
+              </Text>
+            </View>
+          </View>
         </View>
 
-        {/* <TextInput
-          placeholder='Password'
-          autoCapitalize="none"
-          value={password}
-          onChangeText={setPassword}
-          style={{
-            height: 50,
-            width: "100%",
-            borderWidth: 1,
-            paddingLeft: 12
-          }}
-        /> */}
-
-        {/* confirm password */}
-        {/* <TextInput
-          placeholder='Re-enter Password'
-          value={ReEnterPassword}
-          onChangeText={setReEnterPassword}
-          style={{
-            height: 50,
-            width: "100%",
-            borderWidth: 1,
-            paddingLeft: 12
-          }}
-        /> */}
       </View>
 
       <View
         style={{
-          marginTop: 16,
+          marginTop: 20,
           paddingHorizontal: 20
         }}
       >
         {/* Button */}
         <TouchableOpacity
+          onPress={() => {
+            if (password.length > 0) {
+              handleSignup();
+            }
+            return;
+          }}
           style={{
+            opacity: password.length > 0 ? 1 : 0.5,
             height: 48,
             width: "100%",
             alignItems: "center",
@@ -190,7 +227,7 @@ const Signup = () => {
             backgroundColor: "black",
             borderRadius: 32
           }}
-          onPress={handleSignup}
+        // onPress={handleSignup}
         >
           <Text
             style={{
@@ -200,7 +237,7 @@ const Signup = () => {
               color: "white"
             }}
           >
-            Signup
+            Continue
           </Text>
         </TouchableOpacity>
       </View>
@@ -208,4 +245,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default CreatePasswordScreen;

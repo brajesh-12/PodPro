@@ -1,4 +1,4 @@
-import { View, Text, Pressable, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Pressable, FlatList, TouchableOpacity, Dimensions, StyleSheet } from 'react-native';
 import React from 'react';
 import { useRouter } from 'expo-router';
 import { Search } from 'lucide-react-native';
@@ -6,8 +6,11 @@ import { Image } from 'expo-image';
 import categories from '@/constants/categories';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSearchStore from '@/store/useSearchStore';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const { width: SCREEN_WIDTH } = Dimensions.get("screen"); 
+const { width: SCREEN_WIDTH } = Dimensions.get("screen");
 
 const SearchIndex = () => {
   const router = useRouter();
@@ -16,9 +19,42 @@ const SearchIndex = () => {
   return (
     <View
       style={{
-        paddingTop: insets.top
+        flex: 1,
+        backgroundColor: "black"
       }}
     >
+      {/* top blur */}
+      <MaskedView
+        style={{
+          position: "absolute",
+          right: 0,
+          left: 0,
+          top: 0,
+          height: 150,
+          zIndex: 10
+        }}
+        maskElement={
+          <LinearGradient
+            style={StyleSheet.absoluteFill}
+            colors={['rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+          />}
+      >
+        <BlurView
+          intensity={30}
+          tint="light"
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            left: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.2)'
+          }}
+        />
+      </MaskedView>
+
       {/* Search Bar */}
       <Pressable
         onPress={() =>
@@ -82,7 +118,7 @@ const SearchIndex = () => {
         }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: 48 + 16,
+          paddingTop: 48 + 16 + insets.top,
           gap: 10,
           paddingBottom: 250,
         }}

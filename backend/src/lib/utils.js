@@ -141,3 +141,43 @@ export const getPublicIdFromUrl = (url) => {
   const pathWithoutVersion = part[1].replace(/^v\d+\//, '');
   return pathWithoutversion.replace(/\.[^/.]+$/, "");
 };
+
+export const generateUserName = (email) => {
+  if(!email || !email.includes("@")) {
+    return `user_${Math.floor(Math.random() * 10000)}`;
+  }
+
+  const rawPrefix = email.split("@")[0];
+
+  let cleanPrefix = rawPrefix.replace(/[^a-zA-Z]/g, '');
+
+  if(!cleanPrefix) {
+    cleanPrefix = 'user';
+  }
+
+  const suffix = Math.floor(100 + Math.random() * 900);
+
+  return `${cleanPrefix}${suffix}`;
+};
+
+export const formatUserName = (string) => {
+  if(!string) return;
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
+export const generateProfileImage = (identifier) => {
+  let safeIdentifier = 'U';
+
+  if(typeof identifier === "string") {
+    const trimmed = identifier.trim();
+
+    if(trimmed.length > 0 && !trimmed.includes('[native code]')) {
+      safeIdentifier = trimmed;
+    }
+  }
+
+  const firstLetter = safeIdentifier.charAt(0);
+  const avatarUrl = `https://ui-avatars.com/api/?name=${firstLetter}&background=random&color=fff&bold=true&size=256`;
+
+  return avatarUrl;
+};

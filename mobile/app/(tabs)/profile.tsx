@@ -68,7 +68,6 @@ const ProfileScreen = () => {
         flex: 1
       }}
     >
-
       {/* Header */}
       <View
         style={{
@@ -128,16 +127,18 @@ const ProfileScreen = () => {
               style={{
                 height: 72,
                 width: 72,
-                backgroundColor: "rgb(200, 200, 200)",
-                borderRadius: 50,
-                overflow: "hidden"
+                justifyContent: "center",
+                alignItems: "center"
               }}
             >
               <Image
                 style={{
-                  height: '100%',
-                  width: '100%',
+                  height: "100%",
+                  width: "100%",
+                  borderRadius: 100
                 }}
+                contentFit="cover"
+                contentPosition={"center"}
                 source={{ uri: user?.profilePic }}
               />
             </Pressable>
@@ -175,7 +176,7 @@ const ProfileScreen = () => {
                   fontSize: 15
                 }}
               >
-                UserName
+                {user?.userName}
               </Text>
             </View>
 

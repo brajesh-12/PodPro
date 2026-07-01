@@ -1,16 +1,25 @@
-import { View } from 'react-native';
+import { StatusBar, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
 import { SubscriptionHeader } from '@/components/Header';
 import EpisodeCard from '@/components/EpisodeCard';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import Animated, { clamp, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 
 const HEADER_HEIGHT = 182;
 
 const PodcastsScreen = () => {
 
-  const { setFollowingPodcasts, fetchFeed, feed, currentPage, hasNextPage, isSelected, singlePodFeed, } = useSubscriptionStore();
+  const { setFollowingPodcasts,
+    fetchFeed,
+    feed,
+    currentPage,
+    hasNextPage,
+    isSelected,
+    singlePodFeed,
+    followingPodcasts,
+  } = useSubscriptionStore();
 
   const handleFeed = async () => {
     console.log("Running handleFeed");
@@ -61,6 +70,142 @@ const PodcastsScreen = () => {
   });
 
   const insets = useSafeAreaInsets();
+
+  if (followingPodcasts.length <= 0) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          paddingTop: insets.top,
+          backgroundColor: "rgb(15, 15, 15)"
+        }}
+      >
+        <StatusBar
+          barStyle={"light-content"}
+        />
+        {/* Header */}
+        <View
+          style={{
+            paddingHorizontal: 20,
+            height: 48
+          }}
+        >
+          <View>
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 24,
+                fontWeight: "700",
+                lineHeight: 32,
+                color: "white"
+              }}
+            >
+              Podcasts
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={{
+            paddingTop: 16
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              paddingVertical: 40,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                height: 227,
+                width: 240
+              }}
+            >
+              <Image
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+                contentFit="cover"
+                source={require('../../../assets/images/empty-state-illustration.png')}
+              />
+            </View>
+          </View>
+
+          <View
+            style={{
+              paddingHorizontal: 20
+            }}
+          >
+            <View
+              style={{
+                paddingBottom: 8
+              }}
+            >
+              <Text
+                style={{
+                  color: "white",
+                  fontFamily: "SF Pro",
+                  fontSize: 22,
+                  fontWeight: "600",
+                  lineHeight: 28,
+                  textAlign: "center"
+                }}
+              >
+                New episodes straight to you
+              </Text>
+            </View>
+            <View>
+              <Text
+                style={{
+                  color: "rgba(250, 250, 250, 0.6)",
+                  fontFamily: "SF Pro",
+                  fontSize: 19,
+                  fontWeight: "400",
+                  lineHeight: 26,
+                  textAlign: "center"
+                }}
+              >
+                Follow to get the latest episodes from podcasts that you love.
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={{
+              paddingHorizontal: 20,
+              paddingVertical: 48
+            }}
+          >
+            <View
+              style={{
+                height: 48,
+                backgroundColor: "yellow",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 32
+              }}
+            >
+              <Text
+                style={{
+                  color: 'black',
+                  fontFamily: "SF Pro",
+                  fontSize: 16,
+                  fontWeight: "600"
+                }}
+              >
+                Explore Podcasts
+              </Text>
+            </View>
+          </View>
+        </View>
+
+      </View>
+    );
+  };
 
   return (
     <View

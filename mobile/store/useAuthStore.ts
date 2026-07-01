@@ -43,6 +43,7 @@ const secureStorage: StateStorage = {
 const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
+
       user: null,
       token: null,
       isAuthorized: false,

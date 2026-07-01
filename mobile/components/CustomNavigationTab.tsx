@@ -1,4 +1,4 @@
-import { Dimensions, View, Text, TouchableOpacity } from 'react-native';
+import { Dimensions, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { Gesture, GestureDetector, Pressable } from 'react-native-gesture-handler';
@@ -9,6 +9,9 @@ import usePlayerStore from '@/store/usePlayerStore';
 import AudioSlider from './AudioSlider';
 import { Backward, Forward, SleepTimer, SpeedControl } from '@/Icons-assets/Icon';
 import { useEffect } from 'react';
+import { BlurView } from 'expo-blur';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { height: SCREEN_HEIGHT, width } = Dimensions.get("screen");
 const MINIPLAYER_HEIGHT = 54
@@ -17,6 +20,8 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   const insets = useSafeAreaInsets();
 
   const { activeEpisode, isPlaying, togglePlay, progress, seekTo } = usePlayerStore();
+
+  const backgroundHeight = activeEpisode ? 158 : 100;
 
   const startProgress = useSharedValue(0);
   const animationProgress = useSharedValue(1);
@@ -204,15 +209,45 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   };
 
   const handleRewind = () => {
-
     const seekTarget = progress.position - 10;
     seekTo(seekTarget);
   };
 
   return (
     <>
-      {/* Player screen */}
+      {/* background Blur */}
+      <MaskedView
+        style={{
+          position: "absolute",
+          bottom: 0,
+          right: 0,
+          left: 0,
+          height: backgroundHeight,
+        }}
+        maskElement={
+          <LinearGradient
+            style={StyleSheet.absoluteFill}
+            colors={['rgba(250, 250, 250, 1)', 'rgba(250, 250, 250, 0.1)']}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
+          />
+        }
+      >
+        <BlurView
+          intensity={16}
+          tint="default"
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            left: 0,
+            top: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.2)",
+          }}
+        />
+      </MaskedView>
 
+      {/* Player screen */}
       {activeEpisode &&
         <GestureDetector
           gesture={composedGesture}
@@ -223,6 +258,13 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
               overflow: "hidden",
               backgroundColor: "rgb(255, 255, 255)",
               borderRadius: 12,
+              shadowColor: "rgb(0, 0, 0)",
+              shadowOpacity: 0.15,
+              shadowRadius: 2,
+              shadowOffset: {
+                height: 4,
+                width: 2
+              }
             }, playerAnimationStytle]}
           >
             <Animated.View
@@ -462,7 +504,14 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
           left: 16,
           backgroundColor: "white",
           height: 64,
-          borderRadius: 32
+          borderRadius: 32,
+          shadowColor: "rgb(0, 0, 0)",
+          shadowOpacity: 0.15,
+          shadowRadius: 2,
+          shadowOffset: {
+            height: 4,
+            width: 2
+          }
         }, tabBarAnimationStyle]}
       >
         {state.routes.map((route, index) => {

@@ -1,13 +1,16 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, StatusBar } from 'react-native';
 import Section from '@/components/Section';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { useEffect } from 'react';
-import { useNetworkStore } from '@/store/useNetworkStore';
+// import { useNetworkStore } from '@/store/useNetworkStore';
 import NewEpisodes from '@/components/NewEpisodes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
+import useAuthStore from '@/store/useAuthStore';
 
 const Header = () => {
   // const router = useRouter();
+  const { user } = useAuthStore();
 
   return (
     <View
@@ -16,9 +19,10 @@ const Header = () => {
         marginBottom: 8
       }}
     >
+      <StatusBar barStyle={"default"}/>
       <View
         style={{
-          height: 48,
+          height: 56,
           flexDirection: 'row',
           paddingLeft: 20,
           paddingRight: 12,
@@ -50,12 +54,23 @@ const Header = () => {
         >
           <Pressable
             style={{
-              height: 40,
-              width: 40,
+              height: 44,
+              width: 44,
               backgroundColor: "grey",
-              borderRadius: 100
+              borderRadius: 100,
+              overflow: "visible",
             }}
-          ></Pressable>
+          >
+            <Image
+              source={{uri: user?.profilePic}}
+              style={{
+                height: "100%",
+                width: "100%",
+                borderRadius: 100
+              }}
+              contentFit="cover"
+            />
+          </Pressable>
         </View>
       </View>
 

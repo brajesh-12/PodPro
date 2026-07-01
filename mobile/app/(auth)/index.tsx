@@ -51,7 +51,7 @@ const WelcomeScreen = () => {
             }}
             onPress={() => {
               router.navigate({
-                pathname: '/(auth)/acess/signup'
+                pathname: "/signup"
               });
             }}
           >
@@ -80,7 +80,7 @@ const WelcomeScreen = () => {
             }}
             onPress={() => {
               router.navigate({
-                pathname: '/(auth)/acess/signin'
+                pathname: "/(auth)/signup"
               });
             }}
           >
@@ -97,15 +97,6 @@ const WelcomeScreen = () => {
             </Text>
           </Pressable>
 
-          {/* <Pressable
-            onPress={() => router.navigate({
-              pathname: '/(auth)/setup/PickProfileImage'
-            })}
-          >
-            <Text>
-              PickProfile
-            </Text>
-          </Pressable> */}
         </View>
       </View>
     </View>

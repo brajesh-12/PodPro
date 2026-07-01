@@ -81,7 +81,7 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
                     width: '100%',
                     borderRadius: 8
                   }}
-                  contentFit='cover'
+                  contentFit="cover"
                 />
               </View>
 
