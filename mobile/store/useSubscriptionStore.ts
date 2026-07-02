@@ -26,6 +26,7 @@ export interface SavedEpisode {
 }
 
 interface SubscriptionStore {
+  isFetching: boolean;
   followingPodcasts: FollowedPod[];
   feed: SavedEpisode[];
   subscriptionIds: Set<number>;
@@ -49,6 +50,7 @@ interface SubscriptionStore {
 
 const useSubscriptionStore = create<SubscriptionStore>(
   (set, get) => ({
+    isFetching: false,
     followingPodcasts: [],
     feed: [],
     subscriptionIds: new Set(),
@@ -73,6 +75,8 @@ const useSubscriptionStore = create<SubscriptionStore>(
 
     fetchFeed: async (pageNum) => {
       try {
+        set({isFetching: true});
+
         const response = await API.followingFeed(pageNum);
         const episodes = response.episodes.map((ep: any) => ({
           podcastId: ep.podcastId,
@@ -101,6 +105,8 @@ const useSubscriptionStore = create<SubscriptionStore>(
         console.log("currentPage:",response?.currentPage);
       } catch (error) {
         console.log("Error fetching feed:", error);
+      } finally {
+        set({isFetching: false});
       }
     },
 

@@ -21,10 +21,10 @@ export const CATEGORIES = {
   HEALTH: '1512',
   NEWS: '1489',
   SCIENCE: '1533',
-  SPORTS: '1316',
   TRUE_CRIME: '1488',
   EDUCATION: '1304',
   HISTORY: '1487',
+  FICTION: '1483'
 }
 
 export const fetchPodcasts = async (genreId: string, limit: number) => {

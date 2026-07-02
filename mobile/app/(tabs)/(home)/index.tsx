@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StatusBar } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import Section from '@/components/Section';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import { useEffect } from 'react';
@@ -7,6 +7,7 @@ import NewEpisodes from '@/components/NewEpisodes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import useAuthStore from '@/store/useAuthStore';
+import { NewEpisodesSkeleton, SectionSkeleton } from '@/components/SkeletonLoader';
 
 const Header = () => {
   // const router = useRouter();
@@ -19,7 +20,6 @@ const Header = () => {
         marginBottom: 8
       }}
     >
-      <StatusBar barStyle={"default"}/>
       <View
         style={{
           height: 56,
@@ -62,7 +62,7 @@ const Header = () => {
             }}
           >
             <Image
-              source={{uri: user?.profilePic}}
+              source={{ uri: user?.profilePic }}
               style={{
                 height: "100%",
                 width: "100%",
@@ -79,15 +79,15 @@ const Header = () => {
 };
 
 const HomeScreen = () => {
-  const { history, trending, fetchData, science, comedy, education } = usePodcastStore();
+  const { fetchData, podcastsData, fetchPodcastsData, isLoading } = usePodcastStore();
   // const { isOnline } = useNetworkStore();
 
-  const historyPods = history.slice(0, 10);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    fetchPodcastsData();
+  }, [fetchData, fetchPodcastsData]);
 
   // if (!isOnline) {
   //   return (
@@ -117,27 +117,50 @@ const HomeScreen = () => {
         style={{
           paddingBottom: 180
         }}
+        contentContainerStyle={{
+          paddingBottom: 120
+        }}
       >
-        {/* <Header screen='home' /> */}
         <Header />
         <>
           <NewEpisodes />
 
-          {/* <Trending data={trending} /> */}
-          <Section title='Popular' data={trending} />
-          <Section title={'History'} data={historyPods} />
-          <Section title={'Comedy'} data={comedy} />
-          <Section title={'Education'} data={education} />
-          <Section title={'Science'} data={science} />
+          {/* <NewEpisodesSkeleton /> */}
 
-          {/* bottom space */}
           <View
             style={{
-              height: 180,
-              backgroundColor: "tranparent"
+              paddingTop: 24
             }}
           >
+            {isLoading
+              ? (
+                <View
+                  style={{
+                    gap: 24
+                  }}
+                >
+                  <SectionSkeleton />
+                  <SectionSkeleton />
+                </View>
+              )
+              : (
+                <View>
+                  <Section title='Popular' data={podcastsData.popular} />
+                  <Section title={'History'} data={podcastsData.history} />
+                  <Section title={'Comedy'} data={podcastsData.comedy} />
+                  <Section title={'Education'} data={podcastsData.education} />
+                  <Section title={'Technology'} data={podcastsData.technology} />
+                  <Section title={'Science'} data={podcastsData.science} />
+                  <Section title={'Buiness'} data={podcastsData.business} />
+                  <Section title={'True Crime'} data={podcastsData.trueCrime} />
+                  <Section title={'News'} data={podcastsData.news} />
+                  <Section title={'Health & Fitness'} data={podcastsData.health} />
+                  <Section title={'Fiction'} data={podcastsData.fiction} />
+                </View>
+              )
+            }
           </View>
+
         </>
       </ScrollView>
     </View>

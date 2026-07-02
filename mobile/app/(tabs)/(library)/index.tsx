@@ -10,6 +10,7 @@ import { Image } from 'expo-image';
 import usePlayerStore from '@/store/usePlayerStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useModalStore from '@/store/useModalStore';
+import SkeletonLoader, { PodcastSkeleton } from '@/components/SkeletonLoader';
 
 const LibraryScreen = () => {
   const insets = useSafeAreaInsets();
@@ -75,10 +76,10 @@ const LibraryScreen = () => {
           <View>
             <Text
               style={{
-              fontFamily: "SF Pro",
-              fontSize: 24,
-              fontWeight: "800",
-            }}
+                fontFamily: "SF Pro",
+                fontSize: 24,
+                fontWeight: "800",
+              }}
             >
               Library
             </Text>
@@ -268,9 +269,17 @@ const LibraryScreen = () => {
       style={{
         position: "relative",
         flex: 1,
-        paddingTop: insets.top
+        paddingTop: insets.top,
+        // backgroundColor: "black"
       }}
     >
+
+      {/* <SkeletonLoader
+        height={200}
+        width={"100%"}
+      /> */}
+
+      {/* <PodcastSkeleton/> */}
 
       {/* Playlists Layout */}
       <FlatList

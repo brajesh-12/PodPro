@@ -157,7 +157,7 @@ const Episodes = ({episodes}: {episodes: SavedEpisode[]}) => {
                       width: 353,
                       fontFamily: "SF Pro",
                       fontSize: 14,
-                      lineHeight: 16,
+                      lineHeight: 18,
                       fontWeight: "400"
                     }}
                   >
