@@ -4,6 +4,7 @@ import usePlayerStore from "./usePlayerStore";
 import * as SecureStorage from "expo-secure-store";
 import { Alert } from "react-native";
 import authApi from "@/axios/interceptors";
+import useDownloadStore from "./useDownloadStore";
 
 interface User {
   id: string;
@@ -103,6 +104,9 @@ const useAuthStore = create<AuthStore>()(
       clearLocalStore: async () => {
         set({ user: null });
         set({ token: null });
+
+        useDownloadStore.getState().clearDownloads();
+
         set({ isAuthorized: false });
 
         usePlayerStore.getState().resetPlayer();
@@ -116,7 +120,7 @@ const useAuthStore = create<AuthStore>()(
       deleteAccount: async (password) => {
         try {
           await authApi.post('/auth/delete', {
-            password: password
+            password: password,
           });
 
           await get().clearLocalStore();

@@ -13,7 +13,7 @@ interface DownloadState {
   removeDownload: (episodeId: string, eId: string | undefined) => Promise<void>;
   getAudioSource: (episode: SavedEpisode) => string;
   getImageSource: (episode: SavedEpisode) => string;
-
+  clearDownloads: () => void;
 }
 
 const useDownloadStore = create<DownloadState>(
@@ -29,7 +29,7 @@ const useDownloadStore = create<DownloadState>(
 
     startDownload: async (episode, podcastId) => {
       // Prevent duplicate download
-      if(get().downloadEpisodes[episode.id] || get().activeDownloads[episode.id]) return;
+      if(get().downloadEpisodes[episode.id] || get().activeDownloads[episode.id] !== undefined) return;
 
       set((state) => ({
         activeDownloads: {...state.activeDownloads, [episode.id]: 0}
@@ -80,7 +80,13 @@ const useDownloadStore = create<DownloadState>(
         const newDownloads = { ...state.downloadEpisodes };
         delete newDownloads[episodeId];
 
-        return { downloadEpisodes: newDownloads };
+        const newActive = { ...state.activeDownloads };
+        delete newActive[episodeId];
+
+        return { 
+          downloadEpisodes: newDownloads,
+          activeDownloads: newActive
+        };
       });
 
       // after removing it from storage update the database
@@ -90,7 +96,7 @@ const useDownloadStore = create<DownloadState>(
       fetchDPEpisodes();
     },
 
-    clearAllOnLogout: () => {
+    clearDownloads: () => {
       DownloadManager.clearAll();
 
       // set downloadEpisodes and activeDownloads to empty object

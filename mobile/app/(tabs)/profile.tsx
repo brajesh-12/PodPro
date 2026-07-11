@@ -2,12 +2,13 @@ import { View, Text, Pressable, Alert, ScrollView, TouchableOpacity } from 'reac
 import React, { useState } from 'react'
 import useAuthStore from '@/store/useAuthStore'
 // import { useNetworkStore } from '@/store/useNetworkStore';
-import { Image } from 'expo-image';
+// import { Image } from 'expo-image';
 import * as imagePicker from 'expo-image-picker';
 import UP_API from '@/services/updateAPI';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraIcon, ChevronRight } from 'lucide-react-native';
 import useModalStore from '@/store/useModalStore';
+import { ProfileIcon } from '@/Icons-assets/Icon';
 
 const ProfileScreen = () => {
   const insets = useSafeAreaInsets();
@@ -131,7 +132,12 @@ const ProfileScreen = () => {
                 alignItems: "center"
               }}
             >
-              <Image
+              <ProfileIcon
+                size={72}
+                strokeWidth={2}
+                color="rgb(141, 11, 167)"
+              />
+              {/* <Image
                 style={{
                   height: "100%",
                   width: "100%",
@@ -140,7 +146,7 @@ const ProfileScreen = () => {
                 contentFit="cover"
                 contentPosition={"center"}
                 source={{ uri: user?.profilePic }}
-              />
+              /> */}
             </Pressable>
 
             <Pressable

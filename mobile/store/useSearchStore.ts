@@ -17,10 +17,12 @@ interface SearchStore {
   recent: Podcast[];
   searchQuery: string;
   episodes: SavedEpisode[];
+  episodesToRender: SavedEpisode[];
   selectedCategory: Category | null;
   categoryTopEpisodes: SavedEpisode[];
   categoryTopPodcasts: Podcast[];
 
+  setEpisodesToRender: (episodes: SavedEpisode[]) => void;
   setSelectedCategory: (category: Category) => void; 
   setSearchedPodcast: (podcast: Podcast) => void;
   setEpisodes: (feedUrl: string) => Promise<void>;
@@ -38,10 +40,15 @@ const useSearchStore = create<SearchStore>(
     recent: [],
     searchedPodcast: null,
     episodes: [],
+    episodesToRender: [],
     searchQuery: "",
     selectedCategory: null,
     categoryTopEpisodes: [],
     categoryTopPodcasts: [],
+
+    setEpisodesToRender: (episodes) => {
+      set({episodesToRender: episodes})
+    },
 
     setSelectedCategory: async (category) => {
       set({selectedCategory: category});
@@ -57,6 +64,7 @@ const useSearchStore = create<SearchStore>(
     setEpisodes: async (feedUrl) => {
       const data = await fetchEpisodes(feedUrl);
       set({episodes: data});
+      set({episodesToRender: get().episodes.slice(0, 10)});
     },
 
     fetchSearchedPodcast: async (id) => {

@@ -4,7 +4,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { useEffect } from "react";
 import CreatePlaylistModal from "@/components/CreatePlaylistModal";
 // import PlaylistSelection from "@/components/PlaylistSelectionModal";
-import { initNetworkListener, useNetworkStore } from "@/store/useNetworkStore";
+import { initNetworkListener } from "@/store/useNetworkStore";
 import useDownloadStore from "@/store/useDownloadStore";
 import CustomModal from "@/components/CustomModal";
 // import { StatusBar } from "react-native";
@@ -15,6 +15,7 @@ import PlaylistSelection from "@/components/PlaylistSelection";
 import PlaylistBottomSheet from "@/components/PlaylistBottomSheet";
 import GlobalPlaylistCreation from "@/components/GlobalPlaylistCreation";
 import ProfileScreenModal from "@/components/ProfileScreenModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function RootLayout() {
   // here we use isHydration for loading splash screen
@@ -31,8 +32,27 @@ export default function RootLayout() {
   //     </>
   //   )
   // }
+  const { isAuthorized, isHydrated, clearLocalStore } = useAuthStore();
 
-  const { isAuthorized, isHydrated } = useAuthStore();
+  useEffect(() => {
+    const checkFreshInstall = async () => {
+      try {
+        const hasLaunched = await AsyncStorage.getItem('has_launched_before');
+
+        if (hasLaunched === null) {
+          clearLocalStore();
+
+          await AsyncStorage.setItem('has_launched_before', 'true');
+        }
+      } catch (error) {
+        console.error("Error checking fresh install:", error);
+      }
+    };
+
+    checkFreshInstall();
+    // eslint-disable-next-line
+  }, []);
+
   // const { isOnline } = useNetworkStore();
   const { hydrate } = useDownloadStore();
 
@@ -83,11 +103,11 @@ export default function RootLayout() {
 
         <CustomModal />
         <CreatePlaylistModal />
-        <PlaylistSelection/>
-        <PlaylistBottomSheet/>
-        <GlobalPlaylistCreation/>
-        <ProfileScreenModal/>
-        
+        <PlaylistSelection />
+        <PlaylistBottomSheet />
+        <GlobalPlaylistCreation />
+        <ProfileScreenModal />
+
       </GestureHandlerRootView>
 
     </>

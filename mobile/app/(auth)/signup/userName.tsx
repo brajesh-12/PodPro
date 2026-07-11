@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native'
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ const CreateUserName = () => {
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
 
-  const [ userName, setUserName ] = useState("");
+  const [userName, setUserName] = useState("");
 
   const { toggleAuthorization } = useAuthStore();
 
@@ -22,153 +22,153 @@ const CreateUserName = () => {
   }, []);
 
   return (
-    <View
+    <KeyboardAvoidingView
+      behavior={Platform.OS ==='ios' ? 'padding' : 'height'}
       style={{
-        flex: 1,
-        paddingTop: insets.top
+        flex: 1
       }}
     >
-
-      {/* header */}
       <View
         style={{
-          height: 48,
-          paddingHorizontal: 12,
-          marginBottom: 24,
-          alignItems: "flex-end",
-          justifyContent: "center",
+          flex: 1,
+          paddingTop: insets.top
         }}
       >
-
-        <Pressable
-          onPress={toggleAuthorization}
-          style={{
-            paddingVertical: 8,
-            paddingHorizontal: 16,
-            backgroundColor: "white",
-            borderRadius: 32,
-            shadowColor: "rgb(0, 0, 0)",
-            shadowOpacity: 0.12,
-            shadowRadius: 16,
-            shadowOffset: {
-              height: 1,
-              width: 1
-            }
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 14,
-              fontWeight: "400"
-            }}
-          >
-            Skip
-          </Text>
-        </Pressable>
-      </View>
-
-      <View
-        style={{
-          paddingHorizontal: 20,
-          marginBottom: 20,
-          gap: 12
-        }}
-      >
-
-        {/* Title */}
-        <View>
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontWeight: "700",
-              fontSize: 24
-            }}
-          >
-            What should we call you?
-          </Text>
-        </View>
-
-        {/* Email Input */}
         <View
           style={{
-            height: 50,
-            width: "100%",
-            paddingLeft: 12,
-            paddingRight: 12,
-            borderWidth: 1,
-            alignItems: "center",
-            borderRadius: 8,
-            flexDirection: "row"
+            height: 48,
+            paddingHorizontal: 12,
+            alignItems: "flex-end",
+            justifyContent: "center",
+            marginBottom: 8
           }}
         >
-          <View
+
+          <Pressable
+            onPress={toggleAuthorization}
             style={{
-              flex: 1
+              paddingVertical: 8,
+              paddingHorizontal: 16,
             }}
           >
-            <TextInput
-              ref={inputRef}
-              value={userName}
-              onChangeText={setUserName}
-              autoCapitalize="none"
-              // autoFocus={true}
+            <Text
               style={{
                 fontFamily: "SF Pro",
-                fontSize: 15
+                fontSize: 14,
+                fontWeight: "500"
               }}
-            />
-          </View>
-
+            >
+              Skip
+            </Text>
+          </Pressable>
         </View>
 
-        <Text
+        <View
           style={{
-            fontFamily: "SF Pro",
-            fontSize: 12,
-            fontWeight: "400"
+            paddingHorizontal: 20,
+            marginBottom: 20,
+            gap: 16
           }}
         >
-          This appear on your Podpro profile.
-        </Text>
 
-      </View>
-
-      <View
-        style={{
-          marginTop: 20,
-          paddingHorizontal: 20
-        }}
-      >
-        {/* Button */}
-        <TouchableOpacity
-          onPress={() => router.navigate({
-            pathname: "/signup/userName"
-          })}
-          style={{
-            opacity: userName.trim().length > 0 ? 1 : 0.5,
-            height: 48,
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "black",
-            borderRadius: 32
-          }}
-        // onPress={handleSignup}
-        >
-          <Text
+          {/* Title */}
+          <View
             style={{
-              fontFamily: "SF Pro",
-              fontSize: 15,
-              fontWeight: "500",
-              color: "white"
+              gap: 6
             }}
           >
-            Continue
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontWeight: "700",
+                fontSize: 26
+              }}
+            >
+              What Should we call your?
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontWeight: "500",
+                fontSize: 14,
+                color: "rgba(0, 0, 0, 0.6)"
+              }}
+            >
+              Will display on your profile.
+            </Text>
+          </View>
+
+          <View>
+            <View
+              style={{
+                height: 50,
+                width: "100%",
+                paddingLeft: 12,
+                borderWidth: userName.length > 0 ? 1.4 : 0,
+                borderColor: 'black',
+                justifyContent: "center",
+                borderRadius: 8,
+                backgroundColor: "rgb(226, 226, 226)"
+              }}
+            >
+              <TextInput
+                ref={inputRef}
+                placeholder='Your name'
+                value={userName}
+                onChangeText={setUserName}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                // autoFocus={true}
+                style={{
+                  fontFamily: "SF Pro",
+                  fontSize: 15,
+                }}
+              />
+            </View>
+          </View>
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            marginTop: 16,
+            paddingHorizontal: 20,
+            justifyContent: "flex-end",
+            paddingBottom: 32
+          }}
+        >
+          {/* Button */}
+          <TouchableOpacity
+            onPress={() => router.navigate({
+              pathname: "/signup/userName"
+            })}
+            style={{
+              opacity: userName.trim().length > 0 ? 1 : 0.5,
+              height: 48,
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "black",
+              borderRadius: 32
+            }}
+          // onPress={handleSignup}
+          >
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 15,
+                fontWeight: "500",
+                color: "white"
+              }}
+            >
+              Continue
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
+
   );
 };
 

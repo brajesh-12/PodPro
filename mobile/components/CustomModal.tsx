@@ -1,5 +1,5 @@
 import useModalStore from '@/store/useModalStore';
-import { ClosedCaptionIcon, Play } from 'lucide-react-native';
+import { Play } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import Animated, {
@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { scheduleOnRN } from 'react-native-worklets';
-import { Download, Podcasts, Save, Share } from '@/Icons-assets/Icon';
+import { CloseIcon, Download, Follow, Podcasts, Save, Share, Unfollow } from '@/Icons-assets/Icon';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import useDownloadStore from '@/store/useDownloadStore';
 import usePlaylistStore from '@/store/usePlaylistStore';
@@ -123,8 +123,8 @@ const CustomModal = () => {
               elevation: 5
             }}
           >
-            {/* <Cross size={22} strokeWidth={1.2}/> */}
-            <ClosedCaptionIcon size={20} strokeWidth={1.2} />
+            <CloseIcon size={24} strokeWidth={2}/>
+            {/* <ClosedCaptionIcon size={20} strokeWidth={1.2} /> */}
           </Pressable>
 
           <View
@@ -232,7 +232,7 @@ const PodcastSheet = () => {
           <View
             style={style.iconContainer}
           >
-            <Share size={24} strokeWidth={1.8} />
+            {isSubscribed ? <Unfollow size={22} strokeWidth={1.8}/> : <Follow size={22} strokeWidth={1.8}/>}
           </View>
 
           {/* text */}
@@ -297,7 +297,7 @@ const PodcastSheet = () => {
       </View>
     </View>
   )
-}
+};
 
 const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
   const { tappedEpisode, openPlaylistSelection, podcastId } = useModalStore();

@@ -10,7 +10,7 @@ import { Image } from 'expo-image';
 import usePlayerStore from '@/store/usePlayerStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useModalStore from '@/store/useModalStore';
-import SkeletonLoader, { PodcastSkeleton } from '@/components/SkeletonLoader';
+import { Add } from '@/Icons-assets/Icon';
 
 const LibraryScreen = () => {
   const insets = useSafeAreaInsets();
@@ -32,45 +32,18 @@ const LibraryScreen = () => {
     // eslint-disable-next-line
   }, []);
 
-  const AddButton = () => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          createPlaylist();
-        }}
-        style={{
-          paddingVertical: 12,
-          paddingHorizontal: 24,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "black",
-          position: "absolute",
-          right: 20,
-          bottom: 190,
-          borderRadius: 32,
-          height: 48
-        }}
-      >
-        <Text
-          style={{
-            color: "white"
-          }}
-        >
-          New Playlist
-        </Text>
-      </TouchableOpacity>
-    )
-  };
-
   const LibraryHeader = () => {
     return (
       <View>
         <View
           style={{
-            height: 48,
+            height: 70,
             flex: 1,
-            justifyContent: "center",
-            paddingHorizontal: 20
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingHorizontal: 20,
+            // alignItems: "center"
           }}
         >
           <View>
@@ -84,6 +57,45 @@ const LibraryScreen = () => {
               Library
             </Text>
           </View>
+
+          <TouchableOpacity
+            onPress={() => {
+              createPlaylist();
+            }}
+            style={{
+              paddingVertical: 12,
+              paddingLeft: 14,
+              paddingRight: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "white",
+              borderRadius: 32,
+              flexDirection: "row",
+              gap: 8,
+
+              shadowColor: "rgb(0, 0, 0)",
+              shadowOpacity: 0.1,
+              shadowRadius: 20,
+              shadowOffset: {
+                height: 2,
+                width: 2
+              }
+            }}
+          >
+            <View>
+              <Add size={20} strokeWidth={1.8} />
+            </View>
+            <Text
+              style={{
+                // color: "white"
+                fontFamily: "SF Pro",
+                fontSize: 16,
+                fontWeight: "600"
+              }}
+            >
+              Create
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* filter section */}
@@ -269,19 +281,10 @@ const LibraryScreen = () => {
       style={{
         position: "relative",
         flex: 1,
-        paddingTop: insets.top,
+        // paddingTop: insets.top,
         // backgroundColor: "black"
       }}
     >
-
-      {/* <SkeletonLoader
-        height={200}
-        width={"100%"}
-      /> */}
-
-      {/* <PodcastSkeleton/> */}
-
-      {/* Playlists Layout */}
       <FlatList
         key={layout ? 'list' : 'grid'}
         scrollEnabled={true}
@@ -295,10 +298,12 @@ const LibraryScreen = () => {
           gap: 16,
           paddingHorizontal: 20
         }}
+        style={{
+          paddingTop: insets.top
+        }}
         renderItem={({ item }) => layout ? <ListLayout playlist={item} /> : <BoardLayout playlist={item} />}
       />
 
-      <AddButton />
     </View>
   );
 };

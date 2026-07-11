@@ -1,4 +1,4 @@
-import Svg, { Line, Path } from 'react-native-svg';
+import Svg, { Line, Path, Mask, G, Circle } from 'react-native-svg';
 
 export const Save = ({ color = "black", size = 24, fill = "none", strokeWidth = 1.6 }) => {
   return (
@@ -128,6 +128,57 @@ export const CloseIcon = ({ size = 24, color = "black", strokeWidth = 2 }) => {
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M18 6L6 18" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M6 6L18 18" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+export const ProfileIcon = ({ size = 24, color = "black", strokeWidth = 2 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" >
+      <Mask id="mask0_1720_2504" maskType="alpha" maskUnits="userSpaceOnUse" x="1" y="1" width="22" height="22">
+        <Circle cx="12" cy="12" r="10.5" fill="#D9D9D9" stroke="black" />
+      </Mask>
+      <G mask="url(#mask0_1720_2504)">
+        <Circle cx="12" cy="12" r="10.25" stroke={color} strokeWidth={strokeWidth} />
+        <Circle cx="12" cy="24" r="10" fill={color} />
+        <Circle cx="12" cy="9" r="4" fill={color} />
+      </G>
+    </Svg>
+  );
+};
+
+export const Downloaded = ({ size = 24, fill = "black" }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM16.5703 9.67285C16.2103 9.26139 15.5843 9.22005 15.1729 9.58008L11.3955 12.8838L9.29297 11.2021C8.86602 10.8608 8.24287 10.9296 7.90137 11.3564C7.56001 11.7834 7.62979 12.4065 8.05664 12.748L10.6631 14.833C11.1205 15.1988 11.7739 15.1843 12.2148 14.7988L16.4766 11.0703C16.888 10.7103 16.9304 10.0843 16.5703 9.67285Z" fill={fill} />
+    </Svg>
+  )
+};
+
+export const Add = ({ size = 24, color = "black", strokeWidth = 2 }) => {
+  return (
+    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" >
+      <Path d="M5 12H19" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M12 5V19" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+export const Follow = ({ size = 24, strokeWidth = 2, color = "black" }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke={color} strokeWidth={strokeWidth} stroke-linecap="round" strokeLinejoin="round" />
+      <Path d="M8 12H16" stroke={color} strokeWidth={strokeWidth} stroke-linecap="round" strokeLinejoin="round" />
+      <Path d="M12 8V16" stroke={color} strokeWidth={strokeWidth} stroke-linecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+export const Unfollow = ({size=24, color="black", strokeWidth=2}) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" >
+      <Path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M8 12H16" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };

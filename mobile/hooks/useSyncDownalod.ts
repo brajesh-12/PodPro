@@ -3,13 +3,13 @@ import usePlaylistStore from "@/store/usePlaylistStore";
 
 
 const useSyncDownload = () => {
-  const { startDownload, hydrate, downloadEpisodes, activeDownloads } = useDownloadStore();
+  const { removeDownload, hydrate, downloadEpisodes, activeDownloads } = useDownloadStore();
   const { DPEpisodes } = usePlaylistStore();
 
   // sync download episodes from the database download playlist
-  const performSync = async () => {
+  const syncOfflineDelete = async () => {
     await hydrate();
-
+  
     const missingEpisodes = DPEpisodes.filter((episode: any) => {
       const isDownloaded = !!downloadEpisodes[episode.id];
       const isCurrentlyDownloading = activeDownloads[episode.id] !== undefined;
@@ -25,11 +25,11 @@ const useSyncDownload = () => {
     console.log(`Sync: Found ${missingEpisodes.length} missing episodes. Starting background downloads...`);
 
     for(const episode of missingEpisodes) {
-      startDownload(episode);
+      await removeDownload(episode.id, episode.episodeId);
     }
   };
 
-  return { performSync };
+  return { syncOfflineDelete };
 }
 
 export default useSyncDownload;

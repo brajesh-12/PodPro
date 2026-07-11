@@ -9,7 +9,7 @@ import useModalStore from '@/store/useModalStore';
 const PodcastCard: React.FC<{podcast: Podcast}> = ({podcast}) => {
   const router = useRouter();
 
-  const { openGlobalModal, setTappedPodcast } = useModalStore();
+  const { setTappedPodcast } = useModalStore();
 
   return (
     <TouchableOpacity
@@ -100,7 +100,7 @@ const PodcastCard: React.FC<{podcast: Podcast}> = ({podcast}) => {
       {/* more icon */}
       <Pressable
         onPress={() => {
-          openGlobalModal('podcast');
+          // openGlobalModal('podcast');
           setTappedPodcast(podcast);
         }}
         style={{

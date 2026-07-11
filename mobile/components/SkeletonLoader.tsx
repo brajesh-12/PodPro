@@ -1,5 +1,5 @@
-import { View, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withDelay, withTiming, Easing } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -265,8 +265,8 @@ export const SectionSkeleton = () => {
     >
       <View
         style={{
-          height: 38,
-          width: "100%",
+          height: 24,
+          width: 80,
           marginBottom: 24,
         }}
       >
@@ -274,7 +274,7 @@ export const SectionSkeleton = () => {
           height={"100%"}
           width={"100%"}
           style={{
-            borderRadius: 2
+            borderRadius: 32
           }}
           backgroundColor='rgba(107, 107, 107, 0.3)'
           direction="leftToRight"
@@ -294,7 +294,7 @@ export const SectionSkeleton = () => {
       </View>
     </View>
 
-  )
+  );
 };
 
 export const NewEpisodesSkeleton = () => {
@@ -306,16 +306,16 @@ export const NewEpisodesSkeleton = () => {
     >
       <View
         style={{
-          height: 36,
-          width: "100%",
-          marginBottom: 20
+          height: 24,
+          width: 80,
+          marginBottom: 20,
         }}
       >
         <SkeletonLoader
           height={"100%"}
           width={"100%"}
           style={{
-            borderRadius: 4
+            borderRadius: 32
           }}
           backgroundColor='rgba(107, 107, 107, 0.3)'
           direction="leftToRight"
@@ -438,6 +438,216 @@ export const NewEpisodesSkeleton = () => {
               width={"100%"}
               style={{
                 borderRadius: 4
+              }}
+              backgroundColor='rgba(107, 107, 107, 0.3)'
+              direction="leftToRight"
+              animation='shiver'
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+};
+
+export const EpisodesLoadingSkeleton = () => {
+  return (
+    <View>
+      <View
+        style={{
+          height: 20,
+          width: 200,
+          paddingHorizontal: 20,
+          marginBottom: 24
+        }}
+      >
+        <SkeletonLoader
+          height={"100%"}
+          width={"100%"}
+          style={{
+            borderRadius: 32
+          }}
+          backgroundColor='rgba(107, 107, 107, 0.3)'
+          direction="leftToRight"
+          animation='shiver'
+        />
+      </View>
+
+      <View
+        style={{
+          gap: 32
+        }}
+      >
+        <View
+          style={{
+            paddingHorizontal: 20
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 8,
+              alignItems: "center",
+              marginBottom: 12
+            }}
+          >
+            <View
+              style={{
+                height: 72,
+                width: 72
+              }}
+            >
+              <SkeletonLoader
+                height={"100%"}
+                width={"100%"}
+                style={{
+                  borderRadius: 12
+                }}
+                backgroundColor='rgba(107, 107, 107, 0.3)'
+                direction="leftToRight"
+                animation='shiver'
+              />
+            </View>
+
+            <View>
+              <View
+                style={{
+                  height: 16,
+                  width: 250,
+                  marginBottom: 8
+                }}
+              >
+                <SkeletonLoader
+                  height={"100%"}
+                  width={"100%"}
+                  style={{
+                    borderRadius: 32
+                  }}
+                  backgroundColor='rgba(107, 107, 107, 0.3)'
+                  direction="leftToRight"
+                  animation='shiver'
+                />
+              </View>
+              <View
+                style={{
+                  height: 16,
+                  width: 250
+                }}
+              >
+                <SkeletonLoader
+                  height={"100%"}
+                  width={"100%"}
+                  style={{
+                    borderRadius: 32
+                  }}
+                  backgroundColor='rgba(107, 107, 107, 0.3)'
+                  direction="leftToRight"
+                  animation='shiver'
+                />
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              height: 16,
+              width: 150
+            }}
+          >
+            <SkeletonLoader
+              height={"100%"}
+              width={"100%"}
+              style={{
+                borderRadius: 32
+              }}
+              backgroundColor='rgba(107, 107, 107, 0.3)'
+              direction="leftToRight"
+              animation='shiver'
+            />
+          </View>
+        </View>
+
+        <View
+          style={{
+            paddingHorizontal: 20
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 8,
+              alignItems: "center",
+              marginBottom: 12
+            }}
+          >
+            <View
+              style={{
+                height: 72,
+                width: 72
+              }}
+            >
+              <SkeletonLoader
+                height={"100%"}
+                width={"100%"}
+                style={{
+                  borderRadius: 12
+                }}
+                backgroundColor='rgba(107, 107, 107, 0.3)'
+                direction="leftToRight"
+                animation='shiver'
+              />
+            </View>
+
+            <View>
+              <View
+                style={{
+                  height: 16,
+                  width: 250,
+                  marginBottom: 8
+                }}
+              >
+                <SkeletonLoader
+                  height={"100%"}
+                  width={"100%"}
+                  style={{
+                    borderRadius: 32
+                  }}
+                  backgroundColor='rgba(107, 107, 107, 0.3)'
+                  direction="leftToRight"
+                  animation='shiver'
+                />
+              </View>
+              <View
+                style={{
+                  height: 16,
+                  width: 250
+                }}
+              >
+                <SkeletonLoader
+                  height={"100%"}
+                  width={"100%"}
+                  style={{
+                    borderRadius: 32
+                  }}
+                  backgroundColor='rgba(107, 107, 107, 0.3)'
+                  direction="leftToRight"
+                  animation='shiver'
+                />
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              height: 16,
+              width: 150
+            }}
+          >
+            <SkeletonLoader
+              height={"100%"}
+              width={"100%"}
+              style={{
+                borderRadius: 32
               }}
               backgroundColor='rgba(107, 107, 107, 0.3)'
               direction="leftToRight"

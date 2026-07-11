@@ -507,10 +507,10 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
           borderRadius: 32,
           shadowColor: "rgb(0, 0, 0)",
           shadowOpacity: 0.15,
-          shadowRadius: 2,
+          shadowRadius: 6,
           shadowOffset: {
-            height: 4,
-            width: 2
+            height: 1,
+            width: 1
           }
         }, tabBarAnimationStyle]}
       >
