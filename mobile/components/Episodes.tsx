@@ -29,7 +29,7 @@ const Episodes = ({episodes}: {episodes: SavedEpisode[]}) => {
 
   useEffect(() => {
     if (podcast) {
-      fetchEpisodesData(podcast.feedUrl)
+      fetchEpisodesData(podcast.feedUrl);
     }
   }, [fetchEpisodesData, podcast]);
 

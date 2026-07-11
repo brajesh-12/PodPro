@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import useAuthStore from '@/store/useAuthStore';
 import axios from 'axios';
 import * as secureStorage from 'expo-secure-store';
-import { ChevronLeft, Eye, EyeClosed } from 'lucide-react-native';
+import { ChevronLeft, Eye, EyeOff } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useOnBoardingStore from '@/store/useOnBoardingStore';
 
@@ -14,6 +14,7 @@ const CreatePasswordScreen = () => {
   const inputRef = useRef<TextInput>(null);
 
   const [secure, setVisibility] = useState(true);
+  const [errorText, setErrorText] = useState("");
 
   const { setAuth } = useAuthStore();
   const { email, password, setPassword, resetCredentials } = useOnBoardingStore();
@@ -29,6 +30,8 @@ const CreatePasswordScreen = () => {
   const handleSignup = async () => {
     try {
       if (password.length < 6) {
+        setPassword("");
+        setErrorText("Must have at least 6 characters");
         return;
       }
 
@@ -50,13 +53,15 @@ const CreatePasswordScreen = () => {
     } catch (error: any) {
       console.log("Error signing up:", error);
       if (error.response?.status === 400) {
-        Alert.alert("Error", error.response.data?.message);
-
+        resetCredentials();
+        return Alert.alert("Error", error.response.data?.message);
       } else if (error.message) {
-        Alert.alert("Error", error.message);
+        resetCredentials();
+        return Alert.alert("Error", error.message);
       }
       else {
-        Alert.alert("Error", "An unexpected system error occurred");
+        resetCredentials();
+       return Alert.alert("Error", "An unexpected system error occurred");
       }
     }
   };
@@ -74,7 +79,7 @@ const CreatePasswordScreen = () => {
         style={{
           height: 48,
           paddingHorizontal: 12,
-          marginBottom: 16,
+          marginBottom: 8,
           flexDirection: "row",
           alignItems: "center",
         }}
@@ -93,25 +98,6 @@ const CreatePasswordScreen = () => {
           <ChevronLeft size={24} strokeWidth={2} />
         </Pressable>
 
-        <View
-          style={{
-            height: "100%",
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 16,
-              fontWeight: "700"
-            }}
-          >
-            Create account
-          </Text>
-        </View>
-
       </View>
 
       <View
@@ -128,25 +114,31 @@ const CreatePasswordScreen = () => {
             style={{
               fontFamily: "SF Pro",
               fontWeight: "700",
-              fontSize: 24
+              fontSize: 26
             }}
           >
-            Create a password
+            Set a password
           </Text>
         </View>
 
-        <View>
-          {/* Email Input */}
+        <View
+          style={{
+            paddingTop: 8
+          }}
+        >
+          {/* Password Input */}
           <View
             style={{
               height: 50,
               width: "100%",
               paddingLeft: 12,
               paddingRight: 12,
-              borderWidth: 1,
+              borderWidth: password.length > 0 || errorText.length > 0 ? 1.5 : 0,
+              borderColor: errorText.length > 0 ? "rgb(251, 59, 59)" : "black",
               alignItems: "center",
               borderRadius: 8,
-              flexDirection: "row"
+              flexDirection: "row",
+              backgroundColor: "rgb(226, 226, 226)"
             }}
           >
             <View
@@ -174,31 +166,29 @@ const CreatePasswordScreen = () => {
                 setVisibility(!secure);
               }}
             >
-              {secure ? <EyeClosed size={22} /> : <Eye size={22} />}
+              {secure ? <EyeOff size={22} /> : <Eye size={22} />}
             </Pressable>
 
           </View>
 
-          <View>
+          <View
+            style={{
+              paddingTop: 6,
+              opacity: 1,
+            }}
+          >
             <Text
               style={{
                 fontFamily: "SF Pro",
                 fontSize: 12,
-                fontWeight: "400"
+                fontWeight: "500",
+                color: errorText.length > 0 ? "rgb(251, 59, 59)" : "black"
               }}
             >
-              Use at least 6 character
+              {errorText.length > 0 ? errorText : "Must have at least 6 characters"}
             </Text>
 
-            <View
-              style={{
-                opacity: 1
-              }}
-            >
-              <Text>
-                Error message
-              </Text>
-            </View>
+
           </View>
         </View>
 

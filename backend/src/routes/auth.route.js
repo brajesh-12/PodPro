@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { deleteAccount, globalLogOut, login, logout, Refresh, signup, updateProfilePic, updateUserName } from "../controller/auth.controller.js";
+import { deleteAccount, emailChecker, globalLogOut, login, logout, Refresh, signup, updateProfilePic, updateUserName } from "../controller/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import upload from "../middleware/multer.js";
 
 const router = Router();
 
+router.post("/email", emailChecker);
 router.post("/login", login);
 router.post("/signup", signup);
 router.post("/logout", protectRoute, logout);

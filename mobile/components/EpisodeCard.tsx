@@ -1,5 +1,5 @@
-import { View, Text, Pressable, Alert } from 'react-native';
-import { CirclePlay, EllipsisVertical, RemoveFormatting } from 'lucide-react-native';
+import { View, Text, Pressable } from 'react-native';
+import { CirclePlay, EllipsisVertical } from 'lucide-react-native';
 import useSubscriptionStore, { SavedEpisode } from '@/store/useSubscriptionStore';
 import { formatDuration, formatDate } from '@/lib/utils';
 import { Image } from 'expo-image';
@@ -9,31 +9,31 @@ import usePlayerStore from '@/store/usePlayerStore';
 import useDownloadStore from '@/store/useDownloadStore';
 import API from '@/services/api';
 import usePlaylistStore from '@/store/usePlaylistStore';
-import { Download, Save } from '@/Icons-assets/Icon';
+import { Downloaded, Save } from '@/Icons-assets/Icon';
+import AnimatedDownloadIcon from './AnimatedDownloadIcon';
 
-const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
+const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode, tab }) => {
   const router = useRouter();
 
   const { openModal, setTappedEpisode, setPodcastId } = useModalStore();
   const { setActiveEpisode } = usePlayerStore();
   const { followingPodcasts } = useSubscriptionStore();
-  const { downloadPlaylist, SaveEpisodes, savePlaylist, addingEpisode, fetchSavedEpisodes } = usePlaylistStore();
+  const { SaveEpisodes, savePlaylist, addingEpisode, fetchSavedEpisodes } = usePlaylistStore();
 
-  const { downloadEpisodes, startDownload, removeDownload } = useDownloadStore();
+  const { downloadEpisodes, startDownload, removeDownload, activeDownloads } = useDownloadStore();
 
   const findPodcastId = () => {
     const podcast = followingPodcasts.find((pod) => pod.podcastId === episode.podcastId);
     if (podcast) {
       return podcast.id
     };
-
     return null;
   };
   const podId = findPodcastId();
-  const isSaved = SaveEpisodes.some((ep) => episode.id === ep.id );
+  const isSaved = SaveEpisodes.some((ep) => episode.id === ep.id);
 
   const handleSave = async () => {
-    if(isSaved) {
+    if (isSaved) {
       await API.removeEpisode(savePlaylist?.id, episode.episodeId);
       fetchSavedEpisodes();
     }
@@ -46,40 +46,50 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
       await addingEpisode(body);
       fetchSavedEpisodes();
     }
-  }
+  };
 
   const updateDownload = async () => {
-    if (!downloadEpisodes[episode.id]) {
-      // this is download condition
-      if (!podId || !downloadPlaylist?.id) {
-        Alert.alert("Error", "Download playlist or podcast not found");
-        return;
-      }
+    const isDownloaded = Boolean(downloadEpisodes[episode.id]);
+    const isDownloading = activeDownloads[episode.id] !== undefined;
 
-      await startDownload(episode, podId);
-
-    } else {
-      // this is remove from download condition
-      removeDownload(episode.id, episode.episodeId);
+    if (isDownloaded || isDownloading) {
+      console.log("Downloading:", isDownloaded);
+      await removeDownload(episode.id, episode.episodeId);
+    }
+    else {
+      if (podId)
+        await startDownload(episode, podId);
     }
   };
 
   return (
     <Pressable
       onPress={() => {
-        router.navigate({
-          pathname: "/(tabs)/(podcast)/episode/[id]",
-          params: { id: `${episode.episodeId}` }
-        })
+        if (tab === 'home') {
+          router.navigate({
+            pathname: "/(tabs)/(home)/episode/[id]",
+            params: { id: `${episode.id}` }
+          })
+        } else if (tab === 'search') {
+          router.navigate({
+            pathname: "/(tabs)/(search)/episode/[id]",
+            params: { id: `${episode.id}` }
+          })
+        } else {
+          router.navigate({
+            pathname: "/(tabs)/(podcast)/episode/[id]",
+            params: { id: `${episode.episodeId}` }
+          })
+        }
       }}
       key={episode.id}
       style={{
-        paddingHorizontal: 20,
-        paddingBottom: 12,
+        paddingBottom: 8,
         paddingTop: 6,
         borderBottomWidth: 0.8,
         borderBottomColor: 'grey',
-        marginBottom: 8
+        marginBottom: 8,
+        paddingLeft: 20,
       }}
     >
 
@@ -93,7 +103,10 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
           style={{
             flexDirection: 'row',
             gap: 12,
-            alignItems: 'center'
+            alignItems: 'center',
+            // backgroundColor: "yellow",
+            marginBottom: 8,
+            paddingRight: 8
           }}
         >
           {/* Left side */}
@@ -101,8 +114,9 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
             style={{
               flexDirection: "row",
               alignItems: 'center',
+              flex: 1,
+              // justifyContent: "center",
               gap: 12,
-              marginBottom: 8
             }}
           >
             <View
@@ -125,8 +139,10 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
 
             <View
               style={{
+                flex: 1,
                 flexDirection: 'column',
                 gap: 4,
+                // backgroundColor: "blue"
               }}
             >
               <Text
@@ -137,7 +153,6 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
                   fontSize: 16,
                   fontWeight: '600',
                   lineHeight: 24,
-                  width: 237
                 }}
               >
                 {episode.title}
@@ -158,6 +173,14 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
 
           {/* Right side */}
           <Pressable
+            style={{
+              height: 32,
+              width: 32,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 32,
+              // backgroundColor: "red"
+            }}
             onPress={() => {
               setTappedEpisode(episode);
               setPodcastId(podId);
@@ -188,9 +211,11 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
       <View
         style={{
           flexDirection: 'row',
-          height: 32,
+          height: 40,
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          paddingRight: 12
+          // backgroundColor: "yellow"
         }}
       >
         {/* Left Section */}
@@ -209,38 +234,66 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode }> = ({ episode }) => {
 
         <View
           style={{
+            flex: 1,
+            height: "100%",
             flexDirection: 'row',
-            gap: 16
+            gap: 2,
+            alignItems: "center",
+            justifyContent: "flex-end",
+            // backgroundColor: "red"
           }}
         >
 
           <Pressable
+            style={{
+              height: 38,
+              width: 32,
+              justifyContent: "center",
+              paddingLeft: 7,
+              borderRadius: 32
+            }}
             onPress={handleSave}
           >
-            <Save size={22} fill={isSaved ? 'black' : 'none'}/>
+            <Save size={22} fill={isSaved ? 'black' : 'none'} />
           </Pressable>
 
           <Pressable
+            style={{
+              height: 38,
+              width: 32,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 32,
+              // backgroundColor: "rgb(217, 217, 217)"
+            }}
             onPress={updateDownload}
           >
             {downloadEpisodes[episode.id]
-              ? <RemoveFormatting size={22} />
-              : <Download size={22} />
+              ? <Downloaded size={28} />
+              : <AnimatedDownloadIcon episode={episode} />
             }
           </Pressable>
 
           <Pressable
+            style={{
+              height: 32,
+              width: 32,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 32,
+              // backgroundColor: "rgb(217, 217, 217)"
+            }}
             onPress={() => {
               setActiveEpisode(episode);
             }}
           >
-            <CirclePlay size={22} strokeWidth={2} />
+            <CirclePlay size={24} strokeWidth={2} />
           </Pressable>
 
         </View>
       </View>
     </Pressable>
-  )
-}
+  );
+};
 
 export default EpisodeCard;

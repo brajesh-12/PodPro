@@ -5,7 +5,7 @@ import { Podcast } from '@/store/usePodcastStore';
 import useModalStore from '@/store/useModalStore';
 import { ChevronRight } from 'lucide-react-native';
 
-const Section = ({title, data}: { title: string; data: Podcast[] }) => {
+const Section = ({ title, data, tab }: { title: string; data: Podcast[]; tab: string }) => {
   const router = useRouter();
 
   const { setTappedPodcast, openModal } = useModalStore();
@@ -37,7 +37,7 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
           {title}
         </Text>
 
-        <ChevronRight size={22} strokeWidth={1.8}/>
+        <ChevronRight size={22} strokeWidth={1.8} />
       </Pressable>
 
       <FlatList
@@ -49,13 +49,23 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
         contentContainerStyle={{
           paddingLeft: 20
         }}
-        renderItem={({item}) => {
+        renderItem={({ item }) => {
           return (
             <TouchableOpacity
-              onPress={() => router.navigate({
-                pathname: "/(tabs)/(home)/podcast/[id]",
-                params: {id: item.id}
-              })}
+              onPress={() => {
+                if (tab === "home") {
+                  router.navigate({
+                    pathname: "/(tabs)/(home)/podcast/[id]",
+                    params: { id: item.id }
+                  })
+
+                } else if (tab === "search") {
+                  router.navigate({
+                    pathname: "/(tabs)/(search)/podcast/[id]",
+                    params: { id: item.id }
+                  })
+                }
+              }}
               onLongPress={() => {
                 openModal('podcast');
                 setTappedPodcast(item);
@@ -74,8 +84,8 @@ const Section = ({title, data}: { title: string; data: Podcast[] }) => {
                   width: 160
                 }}
               >
-                <Image 
-                  source={{uri: item.thumbnail}}
+                <Image
+                  source={{ uri: item.thumbnail }}
                   style={{
                     height: '100%',
                     width: '100%',

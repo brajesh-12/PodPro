@@ -236,13 +236,13 @@ const PodcastsScreen = () => {
         onEndReached={!isSelected ? handleFeed : handleSinglePod}
         onEndReachedThreshold={0.1}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <EpisodeCard episode={item} />}
+        renderItem={({ item }) => <EpisodeCard episode={item} tab='podcasts'/>}
         onScroll={scrollHandler}
         bounces={false}
         scrollEventThrottle={16}
         overScrollMode="never"
         contentContainerStyle={{
-          paddingTop: 190 + insets.top,
+          paddingTop: isSelected ? 190 + insets.top : 142 + insets.top,
           paddingBottom: 120
         }}
       />

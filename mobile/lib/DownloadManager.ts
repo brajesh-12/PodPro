@@ -1,4 +1,5 @@
-import {Directory, File, Paths,} from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
+import { createDownloadResumable } from 'expo-file-system/legacy'
 import { SavedEpisode } from '@/store/useSubscriptionStore';
 
 // download directory
@@ -34,15 +35,23 @@ const DownloadManager = {
 
     try {
       // Download audio with progress
-      onProgress(0.2);
-      await File.downloadFileAsync(episode.audioUrl, audioFile);
+      const downloadResumable = createDownloadResumable(episode.audioUrl, audioFile.uri, {}, 
+        (downloadProgress) => {
+          if(downloadProgress.totalBytesExpectedToWrite > 0) {
+            const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+
+            onProgress(progress * 0.9);
+          }
+        }
+       );
+
+      await downloadResumable.downloadAsync();
 
       // Download image
-      onProgress(0.5);
+      onProgress(0.95);
       await File.downloadFileAsync(episode.image, imageFile);
 
       // Write Matadata JSON
-      onProgress(0.9);
       const localData = {
         ...episode,
         localAudioUri: audioFile.uri,
@@ -106,6 +115,6 @@ const DownloadManager = {
       return {};
     }
   }
-}
+};
 
 export default DownloadManager;

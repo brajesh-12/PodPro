@@ -3,7 +3,6 @@ import { Cast, Search, ChevronDown, ArrowLeft } from 'lucide-react-native';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import { filter } from '@/constants/filter';
 import { Bell } from '@/Icons-assets/Icon';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -174,7 +173,7 @@ const Header: React.FC<Screen> = ({ screen }) => {
   );
 };
 
-export const SubscriptionHeader = ({style}: {style: any}) => {
+export const SubscriptionHeader = ({ style }: { style: any }) => {
   const router = useRouter();
   const insets = useSafeAreaInsets()
 
@@ -190,7 +189,7 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
         zIndex: 2,
         backgroundColor: "rgb(242, 242, 242)",
         paddingTop: insets.top
-      },style]}
+      }, style]}
     >
       {/* top */}
       <View
@@ -254,7 +253,7 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
         {followingPodcasts.map((pod) => (
           <TouchableOpacity
             onPress={() => {
-              if(selectedPodcast?.id === pod.id) {
+              if (selectedPodcast?.id === pod.id) {
                 setIsSelected(false);
                 clearSelectedPodcast();
                 fetchFeed(1);
@@ -281,7 +280,7 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
                 borderRadius: 112,
                 padding: 2,
                 borderWidth: 2,
-                borderColor: selectedPodcast?.id === pod.id ?  "grey" : "rgb(242, 242, 242)"
+                borderColor: selectedPodcast?.id === pod.id ? "grey" : "rgb(242, 242, 242)"
               }}
             >
               <Image
@@ -313,77 +312,34 @@ export const SubscriptionHeader = ({style}: {style: any}) => {
         ))}
       </ScrollView>
 
-      {/* Botton container filter/cta(when isSelected === true) */}
-      {
-        isSelected
-          ? (
-            <View>
-              <Pressable
-                onPress={() => {
-                  router.navigate({
-                    pathname: "/(tabs)/(podcast)/[podcastId]",
-                    params: { podcastId: `${selectedPodcast?.id}` }
-                  })
-                }}
-                style={{
-                  height: 32,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "SF Pro",
-                    fontSize: 16,
-                    fontWeight: "600",
-                    lineHeight: 24
-                  }}
-                >
-                  View Podcast
-                </Text>
-              </Pressable>
-            </View>
-          )
-          : (
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                flexDirection: 'row',
-                gap: 8,
-                paddingLeft: 20,
-                paddingVertical: 6,
-                height: 40,
-                justifyContent: 'center'
+      { isSelected &&
+        <View>
+          <Pressable
+            onPress={() => {
+              router.navigate({
+                pathname: "/(tabs)/(podcast)/[podcastId]",
+                params: { podcastId: `${selectedPodcast?.id}` }
+              })
+            }}
+            style={{
+              height: 32,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 16,
+                fontWeight: "600",
+                lineHeight: 24
               }}
             >
-              {filter.map((item) => (
-                <View
-                  key={item.id}
-                  style={{
-                    paddingHorizontal: 10,
-                    paddingVertical: 6,
-                    borderRadius: 8,
-                    backgroundColor: 'rgba(0, 0, 0, 0.14)'
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "SF Pro",
-                      fontSize: 14,
-                      fontWeight: 500,
-                      lineHeight: 16,
-                      color: 'white'
-                    }}
-                  >
-                    {item.category}
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-          )
+              View Podcast
+            </Text>
+          </Pressable>
+        </View>
       }
-
     </Animated.View>
 
 

@@ -80,7 +80,7 @@ const WelcomeScreen = () => {
             }}
             onPress={() => {
               router.navigate({
-                pathname: "/(auth)/signup"
+                pathname: "/signin"
               });
             }}
           >

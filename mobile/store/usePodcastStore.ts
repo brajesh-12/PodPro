@@ -39,18 +39,12 @@ export interface Episode {
 interface PodcastState {
   // data
   podcastsData: PodcastsData;
-  trending: Podcast[];
-  history: Podcast[];
-  comedy: Podcast[];
-  health: Podcast[];
-  science: Podcast[];
-  education: Podcast[];
-  news: Podcast[];
 
   filterResult: Podcast[];
 
   // Episodes data
   episodes: SavedEpisode[];
+  episodesToRender: SavedEpisode[];
   selectedEpisode: SavedEpisode | null;
 
   // singlePodcast
@@ -60,7 +54,7 @@ interface PodcastState {
   isLoading: boolean;
 
   // Actions
-  fetchData: () => Promise<void>;
+  setEpisodesToRender: (episodes: SavedEpisode[]) => void;
   fetchPod: (podcastId: string) => Promise<void>;
   fetchEpisodesData: (feedUrl: string) => Promise<void>;
   getEpisodeById: (episodeId: any) => void;
@@ -68,6 +62,7 @@ interface PodcastState {
   fetchFilterResult: (category: string) => void;
   resetPodcast: () => void;
   fetchPodcastsData: () => Promise<void>;
+  isLoadingEpisodes: boolean;
 }
 
 export const usePodcastStore = create<PodcastState>((set, get) => ({
@@ -84,20 +79,18 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
     fiction: [],
     trueCrime: [],
   },
-
-  trending: [],
-  history: [],
-  comedy: [],
-  health: [],
-  science: [],
-  education: [],
-  news: [],
   podcast: null,
   episodes: [],
+  episodesToRender: [],
   selectedEpisode: null,
   filterResult: [],
 
   isLoading: false,
+  isLoadingEpisodes: false,
+
+  setEpisodesToRender: (episodes) => {
+    set({episodesToRender: episodes});
+  },
 
   setPodcast: (podcast: any) => set({ podcast: podcast }),
 
@@ -144,27 +137,6 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
     }
   },
 
-  fetchData: async () => {
-    try {
-      set({ isLoading: true });
-      const trendingData = await fetchPodcasts(CATEGORIES.ALL, 12);
-      const historyData = await fetchPodcasts(CATEGORIES.HISTORY, 5);
-      const comedyData = await fetchPodcasts(CATEGORIES.COMEDY, 5);
-      const scienceData = await fetchPodcasts(CATEGORIES.SCIENCE, 5);
-      const educationData = await fetchPodcasts(CATEGORIES.EDUCATION, 5);
-
-      set({ trending: trendingData });
-      set({ history: historyData.sort(() => Math.random() - 0.5) });
-      set({ comedy: comedyData.sort(() => Math.random() - 0.5) });
-      set({ science: scienceData });
-      set({ education: educationData });
-    } catch (error) {
-      console.error("Error fetching data", error);
-    } finally {
-      set({ isLoading: false })
-    }
-  },
-
   fetchPod: async (podcastId) => {
     try {
       const podcastData = await fetchPodcast(podcastId);
@@ -176,9 +148,10 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
   },
 
   fetchEpisodesData: async (feedUrl) => {
-    try {
+    try {  
       const episodesData = await fetchEpisodes(feedUrl);
       set({ episodes: episodesData });
+      set({episodesToRender: get().episodes.slice(0, 10)});
 
     } catch (error) {
       console.error("Error fetching episodes:", error);

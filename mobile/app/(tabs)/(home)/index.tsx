@@ -5,19 +5,20 @@ import { useEffect } from 'react';
 // import { useNetworkStore } from '@/store/useNetworkStore';
 import NewEpisodes from '@/components/NewEpisodes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Image } from 'expo-image';
+// import { Image } from 'expo-image';
 import useAuthStore from '@/store/useAuthStore';
-import { NewEpisodesSkeleton, SectionSkeleton } from '@/components/SkeletonLoader';
+import { SectionSkeleton } from '@/components/SkeletonLoader';
+import { ProfileIcon } from '@/Icons-assets/Icon';
+import { useRouter } from 'expo-router';
 
 const Header = () => {
   // const router = useRouter();
-  const { user } = useAuthStore();
+  // const { user } = useAuthStore();
 
   return (
     <View
       style={{
         backgroundColor: 'none',
-        marginBottom: 8
       }}
     >
       <View
@@ -28,7 +29,6 @@ const Header = () => {
           paddingRight: 12,
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: 0,
           width: "100%"
         }}
       >
@@ -52,7 +52,10 @@ const Header = () => {
             gap: 2
           }}
         >
-          <Pressable
+          <Pressable>
+            <ProfileIcon size={44} color="rgb(141, 11, 167)" />
+          </Pressable>
+          {/* <Pressable
             style={{
               height: 44,
               width: 44,
@@ -70,7 +73,46 @@ const Header = () => {
               }}
               contentFit="cover"
             />
-          </Pressable>
+          </Pressable> */}
+          {/* <View
+            style={{
+              height: 40,
+              width: 40,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <LottieView
+              ref={lottieRef}
+              style={{
+                height: 32,
+                width: 32,
+                position: "absolute",
+                right: 4,
+                left: 4,
+                top: 4,
+                bottom: 4,
+                zIndex: 2
+              }}
+              source={require("@/assets/micro-animation/icon.json")}
+              loop={true}
+            />
+
+            <Svg
+              width="40" height="40" viewBox="0 0 40 40"
+              style={{ transform: [{ rotate: '-90deg' }] }}
+            >
+              <Circle cx={'20'} cy={'20'} r={18} stroke={"#E5E5EA"} strokeWidth={"4"} fill={'none'} />
+              <AnimatedCircle
+                cx="20" cy="20" r={18}
+                stroke="#000" strokeWidth="4" fill="none"
+                strokeLinecap="round" strokeDasharray={CIRCUMFERENCE}
+                animatedProps={animatedProps}
+              // originX="20" originY="20" rotation="-90"
+              />
+            </Svg>
+          </View> */}
+
         </View>
       </View>
 
@@ -79,15 +121,14 @@ const Header = () => {
 };
 
 const HomeScreen = () => {
-  const { fetchData, podcastsData, fetchPodcastsData, isLoading } = usePodcastStore();
+  const { podcastsData, fetchPodcastsData, isLoading } = usePodcastStore();
   // const { isOnline } = useNetworkStore();
 
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
-    fetchData();
     fetchPodcastsData();
-  }, [fetchData, fetchPodcastsData]);
+  }, [fetchPodcastsData]);
 
   // if (!isOnline) {
   //   return (
@@ -125,11 +166,9 @@ const HomeScreen = () => {
         <>
           <NewEpisodes />
 
-          {/* <NewEpisodesSkeleton /> */}
-
           <View
             style={{
-              paddingTop: 24
+              paddingTop: 12
             }}
           >
             {isLoading
@@ -145,17 +184,17 @@ const HomeScreen = () => {
               )
               : (
                 <View>
-                  <Section title='Popular' data={podcastsData.popular} />
-                  <Section title={'History'} data={podcastsData.history} />
-                  <Section title={'Comedy'} data={podcastsData.comedy} />
-                  <Section title={'Education'} data={podcastsData.education} />
-                  <Section title={'Technology'} data={podcastsData.technology} />
-                  <Section title={'Science'} data={podcastsData.science} />
-                  <Section title={'Buiness'} data={podcastsData.business} />
-                  <Section title={'True Crime'} data={podcastsData.trueCrime} />
-                  <Section title={'News'} data={podcastsData.news} />
-                  <Section title={'Health & Fitness'} data={podcastsData.health} />
-                  <Section title={'Fiction'} data={podcastsData.fiction} />
+                  <Section title='Popular' data={podcastsData.popular} tab='home' />
+                  <Section title={'History'} data={podcastsData.history} tab='home' />
+                  <Section title={'Comedy'} data={podcastsData.comedy} tab='home' />
+                  <Section title={'Education'} data={podcastsData.education} tab='home' />
+                  <Section title={'Technology'} data={podcastsData.technology} tab='home' />
+                  <Section title={'Science'} data={podcastsData.science} tab='home' />
+                  <Section title={'Buiness'} data={podcastsData.business} tab='home' />
+                  <Section title={'True Crime'} data={podcastsData.trueCrime} tab='home' />
+                  <Section title={'News'} data={podcastsData.news} tab='home' />
+                  <Section title={'Health & Fitness'} data={podcastsData.health} tab='home' />
+                  <Section title={'Fiction'} data={podcastsData.fiction} tab='home' />
                 </View>
               )
             }

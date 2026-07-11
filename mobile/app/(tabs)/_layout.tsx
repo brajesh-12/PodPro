@@ -1,9 +1,8 @@
-import { Home, Podcasts, Library } from '@/Icons-assets/Icon';
+import { Home, Podcasts, Library, ProfileIcon } from '@/Icons-assets/Icon';
 import { Tabs } from 'expo-router';
 import { useEffect } from 'react';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
-import { View } from 'react-native';
 import { Search } from 'lucide-react-native';
 import CustomTab from '@/components/CustomNavigationTab';
 
@@ -36,7 +35,7 @@ const TabsLayout = () => {
         <Tabs.Screen name='(home)' options={{ title: "Home", tabBarIcon: ({ focused, color }) => <Home size={22} fill={focused ? 'blue' : "none"} color={focused ? 'blue' : "black"} />, }} />
 
         <Tabs.Screen name='(podcast)' options={{
-          title: "Podcast", tabBarIcon: ({ focused }) => <Podcasts size={22}
+          title: "Podcasts", tabBarIcon: ({ focused }) => <Podcasts size={22}
             color={focused ? 'blue' : 'black'}
           />
         }} />
@@ -51,17 +50,7 @@ const TabsLayout = () => {
 
         <Tabs.Screen name='profile' options={{
           title: "Profile",
-          tabBarIcon: ({ focused }) => (
-            <View
-              style={{
-                height: 22,
-                width: 22,
-                borderRadius: 11,
-                backgroundColor: `${focused ? "black" : "grey"}`
-              }}
-            >
-            </View>
-          )
+          tabBarIcon: ({ focused }) => <ProfileIcon size={22} color={focused ? "rgb(141, 11, 167)" : "black"} />
         }}
         />
       </Tabs>

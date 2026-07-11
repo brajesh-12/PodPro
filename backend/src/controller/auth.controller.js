@@ -12,26 +12,55 @@ import PlaylistItem from "../model/PlaylistItem.js";
 import Subscription from "../model/Subscription.js";
 import { formatUserName, generateProfileImage, generateUserName, getPublicIdFromUrl } from "../lib/utils.js";
 
+export const emailChecker = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if(!email) return res.status(400).json({message: "Email address is missing"});
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if(!emailRegex.test(email)) {
+     return res.status(400).json({message: "Invalid email address."})
+    }
+
+    const user = await User.findOne({email: email});
+    if(user) return res.status(400).json({
+      isAvailable: false,
+      message: "Looks like you already have an account! Try logging in."
+    });
+
+    res.status(200).json({
+      isAvailable: true
+    });
+
+  } catch (error) {
+    console.error("Error checking email:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export const signup = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     if (!email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ message: 'All fields are required.' });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be more than 6 characters" });
+      return res.status(400).json({ message: "Password must be more than 6 characters." });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email address" });
+      return res.status(400).json({ message: "Invalid email address." });
     }
 
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: "User already exist, try login" });
+      return res.status(400).json({ message: "User already exist, try login." });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -57,7 +86,7 @@ export const signup = async (req, res) => {
 
       // saving refreshToken to database
       const familyId = crypto.randomUUID();
-      const dateToLive = 5
+      const dateToLive = 5;
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + dateToLive);
 
@@ -93,7 +122,7 @@ export const signup = async (req, res) => {
     console.error("Error in sigup controller:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
@@ -217,7 +246,7 @@ export const updateUserName = async (req, res) => {
 
   } catch (error) {
     console.error("Error updating userName:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error." });
   }
 };
 
@@ -288,7 +317,7 @@ export const deleteAccount = async (req, res) => {
       console.log(`[Transaction] Aborted: Incorrect password provided for user: ${user._id}`);
 
       res.status(401).json({
-        message: "Incorrect password"
+        message: "Incorrect password."
       });
       await session.abortTransaction();
       session.endSession();
@@ -324,14 +353,14 @@ export const deleteAccount = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Account deleted successfully"
+      message: "Account deleted successfully."
     });
 
   } catch (error) {
     console.error("Error deleting account:", error);
     await session.abortTransaction();
 
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error." });
   } finally {
     // CLEANUP: Always end the session
     if (session.inTransaction()) {

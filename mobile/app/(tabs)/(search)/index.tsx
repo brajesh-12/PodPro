@@ -20,7 +20,7 @@ const SearchIndex = () => {
     <View
       style={{
         flex: 1,
-        backgroundColor: "black"
+        // backgroundColor: "black"
       }}
     >
       {/* top blur */}

@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -48,7 +48,7 @@ const GenreScreen = () => {
           backgroundColor: "rgb(242, 242, 242)"
         }}
       >
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             router.back();
           }}
@@ -56,13 +56,20 @@ const GenreScreen = () => {
             height: 44,
             width: 44,
             justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 32,
-            backgroundColor: 'grey'
+            paddingLeft: 7,
+            backgroundColor: "white",
+            borderRadius: 100,
+            shadowOpacity: 0.12,
+            shadowColor: "rgb(0, 0, 0)",
+            shadowOffset: {
+              height: 2,
+              width: 1,
+            },
+            shadowRadius: 8
           }}
         >
-          <ChevronLeft size={22} strokeWidth={1.8} />
-        </Pressable>
+          <ChevronLeft size={26} />
+        </TouchableOpacity>
 
         <View>
           <Text
@@ -88,7 +95,7 @@ const GenreScreen = () => {
               paddingTop: insets.top
             }}
           >
-            <Section title="Top Shows" data={categoryTopPodcasts} />
+            <Section title="Top Shows" data={categoryTopPodcasts} tab='search' />
 
             <FlatList
               data={subGenres}
@@ -102,17 +109,18 @@ const GenreScreen = () => {
           <FlatList
             data={categoryTopPodcasts}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={(({item}) => <PodcastCard item={item}/>)}
+            renderItem={(({ item }) => <PodcastCard item={item} />)}
             numColumns={2}
             contentContainerStyle={{
-              paddingHorizontal: 20,
+              paddingHorizontal: 22,
               paddingTop: insets.top + 12,
-              paddingBottom: 200
+              paddingBottom: 200,
             }}
             columnWrapperStyle={{
-              gap: 16
+              justifyContent: "space-between"
             }}
             bounces={false}
+            showsVerticalScrollIndicator={false}
           />
         )
       }
@@ -134,7 +142,7 @@ const SubGenre = ({ item }: { item: any }) => {
   }, []);
 
   return (
-    <Section title={item.name} data={data} />
+    <Section title={item.name} data={data} tab='search' />
   );
 };
 

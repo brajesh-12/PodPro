@@ -1,14 +1,15 @@
-import { View, TouchableOpacity, Text } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { ArrowLeft, Search } from 'lucide-react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ChevronLeft, EllipsisVertical, ChevronRight } from 'lucide-react-native';
 import PodInfo from '@/components/PodInfo';
 import { usePodcastStore } from '@/store/usePodcastStore';
-import { useEffect } from 'react';
-import Episodes from '@/components/Episodes';
+import { useEffect, useState } from 'react';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import API from '@/services/api';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolateColor } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import EpisodeCard from '@/components/EpisodeCard';
+import useModalStore from '@/store/useModalStore';
 
 const HEADER_HEIGHT = 48;
 const TRIGGER_POINT = 320;
@@ -20,8 +21,23 @@ const PodcastDetail = () => {
 
   const router = useRouter();
 
-  const { fetchPod, podcast, fetchEpisodesData, setPodcast, resetPodcast, episodes } = usePodcastStore();
+  const [podInfoContainerHeight, setContainerHeight] = useState(0);
+
+  const { setTappedPodcast, openModal } = useModalStore();
+  const { fetchPod,
+    podcast,
+    fetchEpisodesData,
+    setPodcast,
+    resetPodcast,
+    episodes,
+    episodesToRender,
+    setEpisodesToRender
+  } = usePodcastStore();
+
   const { subscriptionIds } = useSubscriptionStore();
+
+  const [page, setPage] = useState(1);
+  const EPISODES_PER_PAGE = 10;
 
   const isSubscribed = subscriptionIds.has(numId);
 
@@ -47,6 +63,17 @@ const PodcastDetail = () => {
     }
   }, [fetchEpisodesData, podcast]);
 
+  const loadVisibleEpisodes = () => {
+    if (episodesToRender.length >= episodes.length) return;
+
+    const nextPage = page + 1;
+    const startIndex = 0;
+    const endIndex = nextPage * EPISODES_PER_PAGE;
+
+    setEpisodesToRender(episodes.slice(startIndex, endIndex));
+    setPage(nextPage);
+  };
+
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -55,7 +82,7 @@ const PodcastDetail = () => {
   });
 
   const opacityStyle = useAnimatedStyle(() => {
-    const scrolled = scrollY.value >= TRIGGER_POINT + 66;
+    const scrolled = scrollY.value >= podInfoContainerHeight;
 
     return {
       opacity: scrolled ? 1 : 0
@@ -65,13 +92,67 @@ const PodcastDetail = () => {
   const backgroundStyle = useAnimatedStyle(() => {
     const backgroundColor = interpolateColor(
       scrollY.value,
-      [TRIGGER_POINT, TRIGGER_POINT + 66],
+      [TRIGGER_POINT, podInfoContainerHeight],
       [`rgba(242, 242, 242, 0)`, `rgba(242, 242, 242, 1)`]
     )
     return { backgroundColor }
   });
 
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
+
+  const data = [{ id: 'podInfo_id', type: 'podInfo' }, { id: 'heading_id', type: 'heading' }, ...episodesToRender];
+
+  const renderItem = ({ item }: { item: any }) => {
+    if (item.type === 'podInfo') {
+      return (
+        <View
+          onLayout={(event) => {
+            const height = event.nativeEvent.layout.height;
+            setContainerHeight(height);
+          }}
+        >
+          <PodInfo podcast={podcast} />
+        </View>
+      );
+    }
+    else if (item.type === 'heading') {
+      return (
+        <View
+          style={{
+            backgroundColor: "rgb(242, 242, 242)"
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 4,
+              paddingLeft: 20,
+              alignItems: "center",
+              paddingVertical: 14
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 20,
+                fontWeight: "700"
+              }}
+            >
+              Episodes
+            </Text>
+
+            <View>
+              <ChevronRight size={22} />
+            </View>
+          </View>
+        </View>
+      );
+    }
+    else {
+      return <EpisodeCard episode={item} tab='home' />
+    }
+  };
+
   return (
     <View
       style={{
@@ -100,7 +181,7 @@ const PodcastDetail = () => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: 8
+            gap: 12
           }}
         >
           <TouchableOpacity
@@ -109,25 +190,35 @@ const PodcastDetail = () => {
               router.back();
             }}
             style={{
-              alignItems: "center",
+              height: 44,
+              width: 44,
               justifyContent: "center",
-              height: 36,
-              width: 36,
-              borderRadius: 72
+              paddingLeft: 7,
+              backgroundColor: "white",
+              borderRadius: 100,
+              shadowOpacity: 0.12,
+              shadowColor: "rgb(0, 0, 0)",
+              shadowOffset: {
+                height: 2,
+                width: 1,
+              },
+              shadowRadius: 8
             }}
           >
-            <ArrowLeft size={24} strokeWidth={2} />
+            <ChevronLeft size={26} />
           </TouchableOpacity>
 
           <Animated.View
             style={opacityStyle}
           >
             <Text
+              numberOfLines={1}
+              ellipsizeMode='tail'
               style={{
                 fontFamily: "SF Pro",
                 fontWeight: "600",
-                fontSize: 16,
-                lineHeight: 24,
+                fontSize: 18,
+                lineHeight: 28,
                 color: "black"
               }}
             >
@@ -138,108 +229,45 @@ const PodcastDetail = () => {
         </View>
 
         <TouchableOpacity
-          onPress={() => router.navigate({
-            pathname: '/search'
-          })}
+          onPress={() => {
+            setTappedPodcast(podcast);
+            openModal("podcast");
+          }}
           style={{
-            alignItems: "center",
+            height: 44,
+            width: 44,
             justifyContent: "center",
-            height: 36,
-            width: 36,
-            borderRadius: 72
+            alignItems: "center",
+            backgroundColor: "white",
+            borderRadius: 100,
+            shadowOpacity: 0.12,
+            shadowColor: "rgb(0, 0, 0)",
+            shadowOffset: {
+              height: 2,
+              width: 1,
+            },
+            shadowRadius: 8
           }}
         >
-          <Search size={24} />
+          <EllipsisVertical size={22} />
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Top Section */}
-      <Animated.ScrollView
+      <Animated.FlatList
+        data={data}
+        keyExtractor={(item) => item.id}
+        scrollEnabled={true}
         showsVerticalScrollIndicator={false}
+        renderItem={renderItem}
+        onScroll={onScroll}
+        stickyHeaderIndices={[1]}
         bounces={false}
+        onEndReached={loadVisibleEpisodes}
+        onEndReachedThreshold={0.2}
         style={{
           paddingTop: HEADER_HEIGHT
         }}
-        onScroll={onScroll}
-        scrollEnabled={true}
-        stickyHeaderIndices={[1]}
-        scrollEventThrottle={16}
-      >
-        <PodInfo podcast={podcast} />
-
-        {/* Filter */}
-        <Animated.View
-          style={{
-            backgroundColor: "rgb(242, 242, 242)"
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              gap: '8',
-              paddingLeft: 20,
-              alignItems: "center",
-              height: 44,
-            }}
-          >
-            <View
-              style={{
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-                borderRadius: 6,
-                backgroundColor: "black",
-                flexWrap: "wrap",
-                alignItems: "center"
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "SF Pro",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                  color: "white"
-                }}
-              >
-                Episodes
-              </Text>
-            </View>
-
-            <View
-              style={{
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-                borderRadius: 6,
-                backgroundColor: "rgb(217, 217, 217)",
-                flexWrap: "wrap",
-                alignItems: "center"
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "SF Pro",
-                  fontSize: 14,
-                  fontWeight: "400",
-                  lineHeight: 16
-                }}
-              >
-                More like this
-              </Text>
-            </View>
-          </View>
-        </Animated.View>
-
-        {!podcast?.feedUrl
-          ? (
-            <View>
-              <Text>
-                Premimum members only
-              </Text>
-            </View>
-          )
-          : <Episodes episodes={episodes}/>
-        }
-      </Animated.ScrollView>
+      />
     </View>
   )
 }
