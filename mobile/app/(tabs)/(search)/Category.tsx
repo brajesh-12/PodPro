@@ -7,8 +7,7 @@ import useSearchStore, { Category } from '@/store/useSearchStore';
 import Section from '@/components/Section';
 import { fetchPodcasts } from '@/services/podcastAPI';
 import { Podcast } from '@/store/usePodcastStore';
-import { Image } from 'expo-image';
-import useModalStore from '@/store/useModalStore';
+import PodcastCard from '@/components/PodcastCard';
 
 const GenreScreen = () => {
   const insets = useSafeAreaInsets();
@@ -16,7 +15,7 @@ const GenreScreen = () => {
 
   const [subGenres, setSubGenres] = useState<Category[]>([]);
 
-  const { selectedCategory, categoryTopPodcasts } = useSearchStore();
+  const { selectedCategory, categoryTopPodcasts, setCategoryTitle } = useSearchStore();
 
   useEffect(() => {
     if (selectedCategory?.subGenres) {
@@ -95,7 +94,17 @@ const GenreScreen = () => {
               paddingTop: insets.top
             }}
           >
-            <Section title="Top Shows" data={categoryTopPodcasts} tab='search' />
+            <Section title="Top Shows" data={categoryTopPodcasts} tab='search'
+              onPress={() => {
+                setCategoryTitle("Top Shows");
+                if (selectedCategory) {
+                  router.navigate({
+                    pathname: "/(tabs)/(search)/[code]",
+                    params: { code: selectedCategory?.code }
+                  });
+                }
+              }}
+            />
 
             <FlatList
               data={subGenres}
@@ -109,7 +118,7 @@ const GenreScreen = () => {
           <FlatList
             data={categoryTopPodcasts}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={(({ item }) => <PodcastCard item={item} />)}
+            renderItem={(({ item }) => <PodcastCard item={item} tab='search' />)}
             numColumns={2}
             contentContainerStyle={{
               paddingHorizontal: 22,
@@ -129,7 +138,10 @@ const GenreScreen = () => {
 };
 
 const SubGenre = ({ item }: { item: any }) => {
+  const router = useRouter();
+
   const [data, setData] = useState<Podcast[]>([]);
+  const { setCategoryTitle } = useSearchStore();
 
   const fetchData = async () => {
     const response = await fetchPodcasts(item.code, 6);
@@ -142,86 +154,16 @@ const SubGenre = ({ item }: { item: any }) => {
   }, []);
 
   return (
-    <Section title={item.name} data={data} tab='search' />
+    <Section title={item.name} data={data} tab='search'
+      onPress={() => {
+        setCategoryTitle(item.name);
+        router.navigate({
+          pathname: "/(tabs)/(search)/[code]",
+          params: { code: item.code }
+        });
+      }}
+    />
   );
 };
-
-const PodcastCard = ({ item }: { item: Podcast }) => {
-  const router = useRouter();
-  const { openModal, setTappedPodcast } = useModalStore();
-
-  return (
-    <TouchableOpacity
-      onPress={() => router.navigate({
-        pathname: "/(tabs)/(search)/podcast/[id]",
-        params: { id: item.id }
-      })}
-      onLongPress={() => {
-        openModal('podcast');
-        setTappedPodcast(item);
-      }}
-      style={{
-        flexDirection: 'column',
-        gap: 12,
-        marginBottom: 20
-      }}
-    >
-
-      {/* Thumbail container */}
-      <View
-        style={{
-          height: 168.5,
-          width: 168.5
-        }}
-      >
-        <Image
-          source={{ uri: item.thumbnail }}
-          style={{
-            height: '100%',
-            width: '100%',
-            borderRadius: 8
-          }}
-          contentFit='cover'
-        />
-      </View>
-
-      {/* Text container */}
-      <View
-        style={{
-          flexDirection: 'column',
-          gap: 4
-        }}
-      >
-        <Text
-          numberOfLines={1}
-          ellipsizeMode='tail'
-          style={{
-            width: 146,
-            fontFamily: "SF Pro",
-            fontWeight: '500',
-            fontSize: 14,
-            lineHeight: 16
-          }}
-        >
-          {item.title}
-        </Text>
-
-        <Text
-          numberOfLines={1}
-          ellipsizeMode='tail'
-          style={{
-            width: 146,
-            fontFamily: "SF Pro",
-            fontWeight: '400',
-            fontSize: 14,
-            lineHeight: 16
-          }}
-        >
-          {item.artist}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  )
-}
 
 export default GenreScreen;

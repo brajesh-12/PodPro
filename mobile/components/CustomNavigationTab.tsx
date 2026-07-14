@@ -83,7 +83,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     const paddingTop = interpolate(
       animationProgress.value,
       [0, 1],
-      [insets.top, 0],
+      [insets.top + 32, 0],
       Extrapolation.CLAMP
     );
 
@@ -118,7 +118,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     const paddingHorizontal = interpolate(
       animationProgress.value,
       [0, 1],
-      [20, 10,],
+      [24, 10,],
       Extrapolation.CLAMP
     );
 
@@ -185,7 +185,8 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     return {
       opacity,
       position: "absolute",
-      top: insets.top + 417,
+      top: insets.top + 449,
+      // bottom: 32,
       width: "100%",
       left: 0,
       zIndex: 0,
@@ -278,7 +279,6 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
               {/* Cover */}
               <Animated.View
                 style={[{
-                  // backgroundColor: "yellow",
                   overflow: "hidden",
                   flexShrink: 0
                 }, coverStyle]}

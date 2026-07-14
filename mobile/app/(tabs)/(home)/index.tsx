@@ -10,6 +10,8 @@ import useAuthStore from '@/store/useAuthStore';
 import { SectionSkeleton } from '@/components/SkeletonLoader';
 import { ProfileIcon } from '@/Icons-assets/Icon';
 import { useRouter } from 'expo-router';
+import categories from '@/constants/categories';
+import { CATEGORIES } from '@/services/podcastAPI';
 
 const Header = () => {
   // const router = useRouter();
@@ -121,7 +123,8 @@ const Header = () => {
 };
 
 const HomeScreen = () => {
-  const { podcastsData, fetchPodcastsData, isLoading } = usePodcastStore();
+  const router = useRouter();
+  const { podcastsData, fetchPodcastsData, isLoading, setCategoryTitle } = usePodcastStore();
   // const { isOnline } = useNetworkStore();
 
   const insets = useSafeAreaInsets();
@@ -129,6 +132,14 @@ const HomeScreen = () => {
   useEffect(() => {
     fetchPodcastsData();
   }, [fetchPodcastsData]);
+
+  const onPress = (title: string, code: string)=> {
+    setCategoryTitle(title);
+    router.navigate({
+      pathname: "/(tabs)/(home)/category/[code]",
+      params: {code: code}
+    })
+  }
 
   // if (!isOnline) {
   //   return (
@@ -184,17 +195,39 @@ const HomeScreen = () => {
               )
               : (
                 <View>
-                  <Section title='Popular' data={podcastsData.popular} tab='home' />
-                  <Section title={'History'} data={podcastsData.history} tab='home' />
-                  <Section title={'Comedy'} data={podcastsData.comedy} tab='home' />
-                  <Section title={'Education'} data={podcastsData.education} tab='home' />
-                  <Section title={'Technology'} data={podcastsData.technology} tab='home' />
-                  <Section title={'Science'} data={podcastsData.science} tab='home' />
-                  <Section title={'Buiness'} data={podcastsData.business} tab='home' />
-                  <Section title={'True Crime'} data={podcastsData.trueCrime} tab='home' />
-                  <Section title={'News'} data={podcastsData.news} tab='home' />
-                  <Section title={'Health & Fitness'} data={podcastsData.health} tab='home' />
-                  <Section title={'Fiction'} data={podcastsData.fiction} tab='home' />
+                  <Section title='Popular' data={podcastsData.popular} tab='home' 
+                    onPress={() => {onPress('Popular', CATEGORIES.ALL)}}
+                  />
+                  <Section title={'History'} data={podcastsData.history} tab='home' 
+                    onPress={() => {onPress('History', CATEGORIES.HISTORY)}}
+                  />
+                  <Section title={'Comedy'} data={podcastsData.comedy} tab='home' 
+                    onPress={() => {onPress('Comedy', CATEGORIES.COMEDY)}}
+                  />
+                  <Section title={'Education'} data={podcastsData.education} tab='home' 
+                    onPress={() => {onPress('Education', CATEGORIES.EDUCATION)}}
+                  />
+                  <Section title={'Technology'} data={podcastsData.technology} tab='home' 
+                    onPress={() => {onPress('Technology', CATEGORIES.TECHNOLOGY)}}
+                  />
+                  <Section title={'Science'} data={podcastsData.science} tab='home' 
+                    onPress={() => {onPress('Science', CATEGORIES.SCIENCE)}}
+                  />
+                  <Section title={'Business'} data={podcastsData.business} tab='home' 
+                    onPress={() => {onPress('Business', CATEGORIES.BUSINESS)}}
+                  />
+                  <Section title={'True Crime'} data={podcastsData.trueCrime} tab='home' 
+                    onPress={() => {onPress('True Crime', CATEGORIES.TRUE_CRIME)}}
+                  />
+                  <Section title={'News'} data={podcastsData.news} tab='home' 
+                    onPress={() => {onPress('News', CATEGORIES.NEWS)}}
+                  />
+                  <Section title={'Health & Fitness'} data={podcastsData.health} tab='home' 
+                    onPress={() => {onPress('Health & Fitness', CATEGORIES.HEALTH)}}
+                  />
+                  <Section title={'Fiction'} data={podcastsData.fiction} tab='home' 
+                    onPress={() => {onPress('Fiction', CATEGORIES.FICTION)}}
+                  />
                 </View>
               )
             }

@@ -18,9 +18,12 @@ interface SearchStore {
   searchQuery: string;
   episodes: SavedEpisode[];
   episodesToRender: SavedEpisode[];
+
   selectedCategory: Category | null;
   categoryTopEpisodes: SavedEpisode[];
   categoryTopPodcasts: Podcast[];
+  categoryTitle: string;
+  setCategoryTitle: (title: string) => void; 
 
   setEpisodesToRender: (episodes: SavedEpisode[]) => void;
   setSelectedCategory: (category: Category) => void; 
@@ -42,9 +45,14 @@ const useSearchStore = create<SearchStore>(
     episodes: [],
     episodesToRender: [],
     searchQuery: "",
+
     selectedCategory: null,
     categoryTopEpisodes: [],
     categoryTopPodcasts: [],
+    categoryTitle: "",
+    setCategoryTitle: (title) => {
+      set({categoryTitle: title});
+    },
 
     setEpisodesToRender: (episodes) => {
       set({episodesToRender: episodes})
@@ -53,7 +61,7 @@ const useSearchStore = create<SearchStore>(
     setSelectedCategory: async (category) => {
       set({selectedCategory: category});
 
-      const podcasts = await fetchPodcasts(category.code, 5);
+      const podcasts = await fetchPodcasts(category.code, 15);
       set({categoryTopPodcasts: podcasts});
     },
 

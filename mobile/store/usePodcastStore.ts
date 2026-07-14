@@ -41,6 +41,7 @@ interface PodcastState {
   podcastsData: PodcastsData;
 
   filterResult: Podcast[];
+  categoryTitle: string;
 
   // Episodes data
   episodes: SavedEpisode[];
@@ -54,6 +55,7 @@ interface PodcastState {
   isLoading: boolean;
 
   // Actions
+  setCategoryTitle: (title: string) => void;
   setEpisodesToRender: (episodes: SavedEpisode[]) => void;
   fetchPod: (podcastId: string) => Promise<void>;
   fetchEpisodesData: (feedUrl: string) => Promise<void>;
@@ -83,10 +85,15 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
   episodes: [],
   episodesToRender: [],
   selectedEpisode: null,
+  categoryTitle: "",
   filterResult: [],
 
   isLoading: false,
   isLoadingEpisodes: false,
+
+  setCategoryTitle: (title) => {
+    set({categoryTitle: title});
+  },
 
   setEpisodesToRender: (episodes) => {
     set({episodesToRender: episodes});

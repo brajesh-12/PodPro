@@ -5,7 +5,7 @@ import { Podcast } from '@/store/usePodcastStore';
 import useModalStore from '@/store/useModalStore';
 import { ChevronRight } from 'lucide-react-native';
 
-const Section = ({ title, data, tab }: { title: string; data: Podcast[]; tab: string }) => {
+const Section = ({ title, data, tab, onPress }: { title: string; data: Podcast[]; tab: string, onPress: () => void}) => {
   const router = useRouter();
 
   const { setTappedPodcast, openModal } = useModalStore();
@@ -17,6 +17,7 @@ const Section = ({ title, data, tab }: { title: string; data: Podcast[]; tab: st
       }}
     >
       <Pressable
+        onPress={onPress}
         style={{
           flexDirection: 'row',
           paddingLeft: 20,
