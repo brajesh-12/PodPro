@@ -18,9 +18,20 @@ const AudioSlider = () => {
 
   useEffect(() => {
     if(!isDragging) {
-      playingProgress.value = withTiming(progress.position / progress.duration, {duration: 500});
+      playingProgress.value = withTiming(progress.position / progress.duration, {duration: 300});
     };
   }, [progress.position, progress.duration, playingProgress, isDragging, isPlaying]);
+
+  const finishSeeking = (targetTime: any) => {
+    if(seekTo) {
+      seekTo(targetTime);
+    }
+
+    const timeout = setTimeout(() => {
+      setIsDragging(false)
+    }, 700);
+    return () => clearTimeout(timeout);
+  };
 
   const pan = Gesture.Pan()
     .onBegin(() => {
@@ -34,12 +45,15 @@ const AudioSlider = () => {
       }
     })
     .onFinalize(() => {
-      scheduleOnRN(setIsDragging, false)
       const targetTime = playingProgress.value * progress.duration;
 
-      if(seekTo) {
-        scheduleOnRN(seekTo, targetTime)
-      };
+      scheduleOnRN(finishSeeking, targetTime);
+
+      // if(seekTo) {
+      //   scheduleOnRN(seekTo, targetTime);
+      // };
+      // scheduleOnRN(setIsDragging, false);
+      // scheduleOnRN(finishSeeking, targetTime);
     });
 
   const activeTrackStyle = useAnimatedStyle(() => {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {XMLParser} from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 
 const parserConfig = {
   ignoreAttributes: false,
@@ -52,7 +52,7 @@ export const fetchPodcast = async (podcastId: string) => {
     console.log('Fetching podcast with ID:', podcastId);
     const response = await fetch(`${BASE_API}/lookup?id=${podcastId}&entity=podcast`);
 
-    if(!response.ok) {
+    if (!response.ok) {
       throw new Error(`API error: ${response.status} - ${response.statusText}`);
     }
 
@@ -68,8 +68,6 @@ export const fetchPodcast = async (podcastId: string) => {
       genres: result.genres
     };
 
-    console.log("Podcast Data:", tranformedData);
-
     return tranformedData || null;
 
   } catch (error) {
@@ -77,7 +75,7 @@ export const fetchPodcast = async (podcastId: string) => {
   }
 };
 
-export const fetchEpisodes = async (feedUrl: string, ) => {
+export const fetchEpisodes = async (feedUrl: string,) => {
   try {
     if (!feedUrl) {
       throw new Error('Feed URL is empty');
@@ -102,8 +100,8 @@ export const fetchEpisodes = async (feedUrl: string, ) => {
       podcastTitle: channel.title
     }));
 
-    const trailers = allMappedEpisodes.filter((ep:any) => ep.episodeType === 'trailer');
-    const mainEpisodes = allMappedEpisodes.filter((ep:any) => ep.episodeType !== 'trailer');
+    const trailers = allMappedEpisodes.filter((ep: any) => ep.episodeType === 'trailer');
+    const mainEpisodes = allMappedEpisodes.filter((ep: any) => ep.episodeType !== 'trailer');
 
     const sortedEpisodes = [...trailers, ...mainEpisodes];
 
@@ -145,7 +143,7 @@ export const searchPodcast = async (query: string, limit: number) => {
 export const newPodcastFromCategory = async (genreId: string, limit: number) => {
   try {
     const response = await axios.get(`${BASE_API}/search`, {
-      params: { 
+      params: {
         term: 'podcast',
         genreId: genreId,
         limit,
@@ -159,7 +157,7 @@ export const newPodcastFromCategory = async (genreId: string, limit: number) => 
       id: result.collectionId,
       title: result.collectionName,
       thumbnail: result.artworkUrl60,
-      artist: result.artistName 
+      artist: result.artistName
     }));
 
   } catch (error) {
