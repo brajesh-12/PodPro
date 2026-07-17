@@ -223,7 +223,9 @@ const PlaylistBottomSheet = () => {
 
               {/* text */}
               <View
-                style={[style.textContainer]}
+                style={[style.textContainer, {
+                  borderBottomWidth: 0
+                }]}
               >
                 <Text
                   numberOfLines={1}

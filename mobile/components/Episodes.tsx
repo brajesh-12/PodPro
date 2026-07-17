@@ -71,7 +71,7 @@ const Episodes = ({episodes}: {episodes: SavedEpisode[]}) => {
 
             } else {
               const epInDB = DPEpisodes.find((ep) => item.id === ep.id);
-              await removeDownload(item.id, epInDB?.episodeId);
+              // await removeDownload(item.id, epInDB?.episodeId);
             }
           };
 

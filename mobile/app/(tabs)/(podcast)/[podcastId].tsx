@@ -123,7 +123,7 @@ const Podcast = () => {
     }
 
     return (
-      <EpisodeCard episode={item} />
+      <EpisodeCard episode={item} tab='Podcasts' />
     )
   }
 

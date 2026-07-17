@@ -149,7 +149,7 @@ const PodcastDetail = () => {
       );
     }
     else {
-      return <EpisodeCard episode={item} tab='home' />
+      return <EpisodeCard episode={item} tab='Home' />
     }
   };
 

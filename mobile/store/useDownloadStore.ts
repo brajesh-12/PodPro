@@ -4,13 +4,24 @@ import { SavedEpisode } from './useSubscriptionStore';
 import API from '@/services/api';
 import usePlaylistStore from './usePlaylistStore';
 
+export type DownloadStatus = 'IDLE' | "QUEUED" | "DOWNLOADING" | "PAUSED" | "CANCELLING" | "COMPLETED" | "FAILED";
+
+export interface DownloadTask {
+  episodeId: string;
+  status: DownloadStatus;
+  progress: number;
+};
+
 interface DownloadState {
   downloadEpisodes: Record<string, any>;
   activeDownloads: Record<string, number>;
+  tasks: Record<string, DownloadTask>
 
   hydrate: () => Promise<void>;
+  saveToDatabase: (podcastId: any, episodeId: string) => Promise<void>;
+  updateTaskState: (episodeId: string, status: DownloadStatus, progress?: number) => void; 
   startDownload: (episode: SavedEpisode, podcastId: number) => Promise<void>;
-  removeDownload: (episodeId: string, eId: string | undefined) => Promise<void>;
+  removeDownload: (episodeId: string) => void;
   getAudioSource: (episode: SavedEpisode) => string;
   getImageSource: (episode: SavedEpisode) => string;
   clearDownloads: () => void;
@@ -20,11 +31,40 @@ const useDownloadStore = create<DownloadState>(
   (set, get) => ({
     downloadEpisodes: {},
     activeDownloads: {},
+    tasks: {},
 
     // Load episodes from the disk
     hydrate: async() => {
       const episodesOnDisk = await DownloadManager.loadDownloadedEpisodes();
       set({downloadEpisodes: episodesOnDisk});
+    },
+
+    updateTaskState: (episodeId, status, progress) => {
+      set((state) => {
+        const existingTask = state.tasks[episodeId] || {episodeId, status: "IDLE", progress: 0}
+        console.log("ExistingTask:", existingTask);
+
+        if(status === "DOWNLOADING") {
+          if(
+            existingTask.status !== "QUEUED" &&
+            existingTask.status !== 'PAUSED' && 
+            existingTask.status !== 'DOWNLOADING'
+          ) {
+            return state;
+          }
+        }
+
+        return {
+          tasks: {
+            ...state.tasks,
+            [episodeId]: {
+              ...existingTask,
+              status,
+              progress: progress !== undefined ? progress : existingTask.progress,
+            }
+          }
+        };
+      })
     },
 
     startDownload: async (episode, podcastId) => {
@@ -73,28 +113,39 @@ const useDownloadStore = create<DownloadState>(
       }
     },
 
-    removeDownload: async (episodeId, eId) => {
-      DownloadManager.deleteEpisode(episodeId);
-      // update UI
+    removeDownload: (episodeId) => {
       set((state) => {
         const newDownloads = { ...state.downloadEpisodes };
         delete newDownloads[episodeId];
 
-        const newActive = { ...state.activeDownloads };
-        delete newActive[episodeId];
-
-        return { 
+        return {
           downloadEpisodes: newDownloads,
-          activeDownloads: newActive
-        };
+        }
       });
-
-      // after removing it from storage update the database
-      const { downloadPlaylist, fetchDPEpisodes } = usePlaylistStore.getState();
-
-      await API.removeEpisode(downloadPlaylist?.id, eId);
-      fetchDPEpisodes();
     },
+
+    // removeDownload: async (episodeId, eId) => {
+    //   DownloadManager.deleteEpisode(episodeId);
+    //   // update UI
+    //   set((state) => {
+    //     const newDownloads = { ...state.downloadEpisodes };
+    //     delete newDownloads[episodeId];
+
+    //     const newActive = { ...state.activeDownloads };
+    //     delete newActive[episodeId];
+
+    //     return { 
+    //       downloadEpisodes: newDownloads,
+    //       activeDownloads: newActive
+    //     };
+    //   });
+
+    //   // after removing it from storage update the database
+    //   const { downloadPlaylist, fetchDPEpisodes } = usePlaylistStore.getState();
+
+    //   await API.removeEpisode(downloadPlaylist?.id, eId);
+    //   fetchDPEpisodes();
+    // },
 
     clearDownloads: () => {
       DownloadManager.clearAll();
@@ -114,6 +165,24 @@ const useDownloadStore = create<DownloadState>(
     getImageSource: (episode) => {
       const local = get().downloadEpisodes[episode.id];
       return local ? local.localImageUri : episode.image;
+    },
+
+    saveToDatabase: async(podcastId: any, episodeId: string) => {
+      try {
+        const playlistId = usePlaylistStore.getState().downloadPlaylist;
+
+        const body = {
+          playlistId: playlistId,
+          podcastId: podcastId,
+          episodeId: episodeId
+        };
+
+        await API.addEpisodeToPlaylist(body);
+        await usePlaylistStore.getState().fetchDPEpisodes();
+
+      } catch (error) {
+        console.log("Error saving to database:", error);
+      }
     }
 
   })
