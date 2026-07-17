@@ -11,28 +11,30 @@ const RADIUS = 11
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const AnimatedDownloadIcon = ({ episode }: { episode: SavedEpisode }) => {
-  const { activeDownloads } = useDownloadStore();
+  const task = useDownloadStore(state => state.tasks[episode.id]) || {status: "IDLE", progress: 0};
 
   const progress = useSharedValue(1);
-
   const lottieRef = useRef<LottieView>(null);
-  const isDownloading = activeDownloads[episode.id] !== undefined;
+
+  const isDownloading = task.status === 'DOWNLOADING';
+  const isQueued = task.status === 'QUEUED';
+  // const isPaused = task.status === 'PAUSED';
 
   useEffect(() => {
-    if(isDownloading) {
+    if(isDownloading || isQueued) {
       lottieRef.current?.play();
     } else {
       lottieRef.current?.reset();
     }
-  }, [isDownloading, activeDownloads, episode.id]);
+  }, [isDownloading, isQueued]);
 
   useEffect(() => {
-    if (isDownloading) {
-      progress.value = withTiming(activeDownloads[episode.id], {duration: 150});
-    } else {
+    if (task.status === 'IDLE' || task.status === 'FAILED') {
       progress.value = withTiming(1, {duration: 300});
+    } else {
+      progress.value = task.progress;
     }
-  }, [progress, activeDownloads, episode.id, isDownloading]);
+  }, [progress, task.status, task.progress]);
 
   const animatedProps = useAnimatedProps(() => {
     return {

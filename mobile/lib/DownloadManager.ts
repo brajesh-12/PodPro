@@ -1,9 +1,12 @@
 import { Directory, File, Paths } from 'expo-file-system';
-import { createDownloadResumable } from 'expo-file-system/legacy'
+import { createDownloadResumable, DownloadPauseState } from 'expo-file-system/legacy'
 import { SavedEpisode } from '@/store/useSubscriptionStore';
+import DownloadDatabase from './DownloadDatabase';
 
 // download directory
 const Download_Dir = new Directory(Paths.document, "podcasts");
+
+const activeTasksRegistry: Record<string, any> = {};
 
 const DownloadManager = {
   // Ensure download directory exists
@@ -11,11 +14,14 @@ const DownloadManager = {
     if(!Download_Dir.exists) {
       Download_Dir.create();
     }
+
+    DownloadDatabase.init();
   },
 
   async downloadEpisode(
     episode: SavedEpisode,
-    onProgress: (progress: number) => void
+    onProgress: (progress: number) => void,
+    resumeData?: string | null
   ) {
     await this.init();
 
@@ -24,9 +30,6 @@ const DownloadManager = {
     if(!epidoseFolder.exists) {
       epidoseFolder.create();
     }
-
-    console.log("audioUrl:", episode.audioUrl);
-    console.log("coverImage:", episode.image);
 
     // file inside the folder
     const audioFile = new File(epidoseFolder, "audio.mp3");
@@ -42,10 +45,15 @@ const DownloadManager = {
 
             onProgress(progress * 0.9);
           }
-        }
-       );
+        },
+        resumeData ? JSON.parse(resumeData) : undefined
+      );
+
+      activeTasksRegistry[episode.id] = downloadResumable;
 
       await downloadResumable.downloadAsync();
+
+      delete activeTasksRegistry[episode.id];
 
       // Download image
       onProgress(0.95);
@@ -69,12 +77,39 @@ const DownloadManager = {
       if(epidoseFolder.exists) {
         epidoseFolder.delete();
       }
+      delete activeTasksRegistry[episode.id];
       return null;
     }
   },
 
+  async pauseDownload(episodeId: string): Promise<string | null> {
+    const task = activeTasksRegistry[episodeId];
+    if(task) {
+      try {
+        const pauseState: DownloadPauseState = await task.pauseAsync();
+        delete activeTasksRegistry[episodeId];
+
+        return JSON.stringify(pauseState);
+      } catch (error) {
+        console.log("Error pausing download:", error);
+        return null;
+      }
+    }
+    return null;
+  },
+
   // delete episode
-  deleteEpisode(episodeId: string) {
+  async deleteEpisode(episodeId: string) {
+    const task = activeTasksRegistry[episodeId];
+    if(task) {
+      try {
+        await task.cancelAsync();
+      } catch (error) {
+        console.log("Error deleting episode", error);
+      }
+      delete activeTasksRegistry[episodeId];
+    }
+
     const epidoseFolder = new Directory(Download_Dir, episodeId);
     if(epidoseFolder.exists) {
       epidoseFolder.delete();

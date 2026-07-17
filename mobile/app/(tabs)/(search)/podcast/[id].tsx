@@ -147,7 +147,7 @@ const PodcastDetail = () => {
       );
     }
     else {
-      return <EpisodeCard episode={item} tab='search' />
+      return <EpisodeCard episode={item} tab='Search' />
     }
   };
 

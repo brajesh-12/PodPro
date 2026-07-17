@@ -11,16 +11,22 @@ import API from '@/services/api';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import { Downloaded, Save } from '@/Icons-assets/Icon';
 import AnimatedDownloadIcon from './AnimatedDownloadIcon';
+import DonwloadEngine from '@/lib/DownloadEngine';
+import { usePodcastStore } from '@/store/usePodcastStore';
+import useSearchStore from '@/store/useSearchStore';
 
 const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode, tab }) => {
   const router = useRouter();
 
   const { openModal, setTappedEpisode, setPodcastId } = useModalStore();
+  const { podcast } = usePodcastStore();
+  const { searchedPodcast } = useSearchStore();
   const { setActiveEpisode } = usePlayerStore();
   const { followingPodcasts } = useSubscriptionStore();
   const { SaveEpisodes, savePlaylist, addingEpisode, fetchSavedEpisodes } = usePlaylistStore();
 
-  const { downloadEpisodes, startDownload, removeDownload, activeDownloads } = useDownloadStore();
+  const task = useDownloadStore(state => state.tasks[episode.id]) || { status: 'IDLE', progress: 0 };
+  const isHistoricallyDownladed = useDownloadStore(state => !!state.downloadEpisodes[episode.id]);
 
   const findPodcastId = () => {
     const podcast = followingPodcasts.find((pod) => pod.podcastId === episode.podcastId);
@@ -31,15 +37,27 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
   };
   const podId = findPodcastId();
   const isSaved = SaveEpisodes.some((ep) => episode.id === ep.id);
+  const savedEpisode = SaveEpisodes.find((ep) => episode.id === ep.id);
+
+  let podcastId;
+
+  if (tab === 'Home') {
+    podcastId = podcast?.id;
+  } else if (tab === 'Search') {
+    podcastId = searchedPodcast?.id;
+  } else {
+    podcastId = podId;
+  }
 
   const handleSave = async () => {
     if (isSaved) {
-      await API.removeEpisode(savePlaylist?.id, episode.episodeId);
+      await API.removeEpisode(savePlaylist?.id, savedEpisode?.episodeId);
       fetchSavedEpisodes();
     }
     else {
+
       const body = {
-        podcastId: podId,
+        podcastId: podcastId,
         episodeId: episode.id,
         playlistId: savePlaylist?.id
       }
@@ -48,29 +66,54 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
     }
   };
 
-  const updateDownload = async () => {
-    const isDownloaded = Boolean(downloadEpisodes[episode.id]);
-    const isDownloading = activeDownloads[episode.id] !== undefined;
-
-    if (isDownloaded || isDownloading) {
-      console.log("Downloading:", isDownloaded);
-      await removeDownload(episode.id, episode.episodeId);
+  const handleDownloadPress = () => {
+    switch (task.status) {
+      case 'IDLE':
+      case 'FAILED':
+        DonwloadEngine.enqueue(episode, podcastId);
+        break;
+      case 'DOWNLOADING':
+        // here we don't need to remove episode from database, as it has not been saved yet
+        DonwloadEngine.cancel(episode.id);
+        break;
+      case 'PAUSED':
+        DonwloadEngine.resume(episode.id);
+        break;
+      case 'QUEUED':
+      case 'COMPLETED':
+        // for this we need to remove episode from database
+        DonwloadEngine.cancel(episode.id);
+        break;
     }
-    else {
-      if (podId)
-        await startDownload(episode, podId);
+
+    if (isHistoricallyDownladed && task.status === 'IDLE') {
+      DonwloadEngine.cancel(episode.id);
     }
   };
+
+  // const updateDownload = async () => {
+  //   const isDownloaded = Boolean(downloadEpisodes[episode.id]);
+  //   const isDownloading = activeDownloads[episode.id] !== undefined;
+
+  //   if (isDownloaded || isDownloading) {
+  //     console.log("Downloading:", isDownloaded);
+  //     await removeDownload(episode.id, episode.episodeId);
+  //   }
+  //   else {
+  //     if (podId)
+  //       await startDownload(episode, podId);
+  //   }
+  // };
 
   return (
     <Pressable
       onPress={() => {
-        if (tab === 'home') {
+        if (tab === 'Home') {
           router.navigate({
             pathname: "/(tabs)/(home)/episode/[id]",
             params: { id: `${episode.id}` }
           })
-        } else if (tab === 'search') {
+        } else if (tab === 'Search') {
           router.navigate({
             pathname: "/(tabs)/(search)/episode/[id]",
             params: { id: `${episode.id}` }
@@ -266,9 +309,9 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
               borderRadius: 32,
               // backgroundColor: "rgb(217, 217, 217)"
             }}
-            onPress={updateDownload}
+            onPress={handleDownloadPress}
           >
-            {downloadEpisodes[episode.id]
+            {task.status === 'COMPLETED' || isHistoricallyDownladed
               ? <Downloaded size={28} />
               : <AnimatedDownloadIcon episode={episode} />
             }
