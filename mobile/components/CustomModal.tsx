@@ -1,7 +1,7 @@
 import useModalStore from '@/store/useModalStore';
 import { Play } from 'lucide-react-native';
 import { useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -10,12 +10,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { scheduleOnRN } from 'react-native-worklets';
-import { CloseIcon, Download, Follow, Podcasts, Save, Share, Unfollow } from '@/Icons-assets/Icon';
+import { CloseIcon, Download, Downloaded, Follow, Podcasts, Save, Share, Unfollow } from '@/Icons-assets/Icon';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import useDownloadStore from '@/store/useDownloadStore';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
 import usePlayerStore from '@/store/usePlayerStore';
+import DownloadEngine from '@/lib/DownloadEngine';
 
 // const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
 // const sheetHeight = SCREEN_HEIGHT * 0.5;
@@ -123,7 +124,7 @@ const CustomModal = () => {
               elevation: 5
             }}
           >
-            <CloseIcon size={24} strokeWidth={2}/>
+            <CloseIcon size={24} strokeWidth={2} />
             {/* <ClosedCaptionIcon size={20} strokeWidth={1.2} /> */}
           </Pressable>
 
@@ -232,7 +233,7 @@ const PodcastSheet = () => {
           <View
             style={style.iconContainer}
           >
-            {isSubscribed ? <Unfollow size={22} strokeWidth={1.8}/> : <Follow size={22} strokeWidth={1.8}/>}
+            {isSubscribed ? <Unfollow size={22} strokeWidth={1.8} /> : <Follow size={22} strokeWidth={1.8} />}
           </View>
 
           {/* text */}
@@ -301,282 +302,301 @@ const PodcastSheet = () => {
 
 const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
   const { tappedEpisode, openPlaylistSelection, podcastId } = useModalStore();
-  const { startDownload, removeDownload, downloadEpisodes } = useDownloadStore();
-  const { downloadPlaylist, SaveEpisodes, savePlaylist, fetchSavedEpisodes } = usePlaylistStore();
+  const { downloadEpisodes } = useDownloadStore();
+  const { SaveEpisodes, savePlaylist, fetchSavedEpisodes } = usePlaylistStore();
   const { setActiveEpisode } = usePlayerStore();
+  const { tasks } = useDownloadStore();
 
-  console.log("PodcastId From Episode:", podcastId);
+  if (tappedEpisode) {
 
-  const handleDownload = async () => {
-    if (tappedEpisode) {
-      if (!downloadEpisodes[tappedEpisode.id]) {
-        if (!podcastId || !downloadPlaylist?.id) {
-          return Alert.alert("Something went wrong");
-        }
+    const task = tasks[tappedEpisode?.id] || { status: 'IDLE', progress: 0 };
+    const isHistoricallyDownladed = downloadEpisodes[tappedEpisode.id]
 
-        await startDownload(tappedEpisode, podcastId);
+    const handleDownload = async () => {
+      switch (task.status) {
+        case 'IDLE':
+        case 'FAILED':
+          DownloadEngine.enqueue(tappedEpisode, podcastId);
+          break;
+
+        case 'DOWNLOADING':
+          DownloadEngine.cancel(tappedEpisode.id);
+          break;
+        case 'PAUSED':
+          DownloadEngine.resume(tappedEpisode.id);
+          break;
+        case 'QUEUED':
+        case 'COMPLETED':
+          DownloadEngine.cancel(tappedEpisode.id);
+          break;
       }
-      else {
-        await removeDownload(tappedEpisode.id, tappedEpisode.episodeId);
-      }
-    };
-  };
 
-  const isSaved = SaveEpisodes.some((ep) => tappedEpisode?.id === ep.id);
-
-  const handleSave = async () => {
-    if(isSaved) {
-      await API.removeEpisode(savePlaylist?.id, tappedEpisode?.episodeId);
-      fetchSavedEpisodes();
-    }
-    else {
-      const body = {
-        podcastId: podcastId,
-        episodeId: tappedEpisode?.id,
-        playlistId: savePlaylist?.id
+      if (isHistoricallyDownladed && task.status === 'IDLE') {
+        DownloadEngine.cancel(tappedEpisode?.id);
       };
 
-      await API.addEpisodeToPlaylist(body);
-      fetchSavedEpisodes();
+      handleClose();
     };
-  };
 
-  return (
-    <View>
-      {/* title */}
-      <View
-        style={{
-          marginBottom: 16,
-          paddingHorizontal: 4,
-          justifyContent: "center",
-          // backgroundColor: "yellow"
-        }}
-      >
+    const isSaved = SaveEpisodes.some((ep) => tappedEpisode?.id === ep.id);
+
+    const handleSave = async () => {
+      if (isSaved) {
+        await API.removeEpisode(savePlaylist?.id, tappedEpisode?.episodeId);
+        fetchSavedEpisodes();
+      }
+      else {
+        const body = {
+          podcastId: podcastId,
+          episodeId: tappedEpisode?.id,
+          playlistId: savePlaylist?.id
+        };
+
+        await API.addEpisodeToPlaylist(body);
+        fetchSavedEpisodes();
+      };
+    };
+
+    return (
+      <View>
+        {/* title */}
         <View
           style={{
+            marginBottom: 16,
+            paddingHorizontal: 4,
             justifyContent: "center",
-            borderBottomWidth: 1,
-            borderBottomColor: "rgb(221, 221, 221)",
-            paddingVertical: 12,
-            paddingRight: 32,
-            paddingLeft: 4
+            // backgroundColor: "yellow"
           }}
         >
-          <Text
-            numberOfLines={1}
+          <View
             style={{
-              fontFamily: "SF Pro",
-              fontSize: 24,
-              fontWeight: "600",
-              lineHeight: 32
+              justifyContent: "center",
+              borderBottomWidth: 1,
+              borderBottomColor: "rgb(221, 221, 221)",
+              paddingVertical: 12,
+              paddingRight: 32,
+              paddingLeft: 4
             }}
           >
-            {tappedEpisode?.title}
-            {/* Episode Title long long long */}
-          </Text>
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 24,
+                fontWeight: "600",
+                lineHeight: 32
+              }}
+            >
+              {tappedEpisode?.title}
+              {/* Episode Title long long long */}
+            </Text>
 
-          <Text
-            numberOfLines={1}
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 16,
-              fontWeight: "400",
-              lineHeight: 24
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 16,
+                fontWeight: "400",
+                lineHeight: 24
+              }}
+            >
+              {tappedEpisode?.podcastTitle}
+              {/* Podcast Artist */}
+            </Text>
+          </View>
+
+        </View>
+
+        {/* options */}
+        <View
+          style={{
+            backgroundColor: 'rgb(236, 236, 236)',
+            borderRadius: 26,
+            marginTop: 12
+          }}
+        >
+          <View
+            style={style.optionContainer}
+          >
+            {/* icon */}
+            <View
+              style={style.iconContainer}
+            >
+              <Share size={24} strokeWidth={1.8} />
+            </View>
+
+            {/* text */}
+            <View
+              style={style.textContainer}
+            >
+              <Text
+                numberOfLines={1}
+                style={style.text}
+              >
+                Share
+              </Text>
+            </View>
+          </View>
+
+          <Pressable
+            onPress={() => {
+              setActiveEpisode(tappedEpisode);
+              handleClose();
             }}
+            style={style.optionContainer}
           >
-            {tappedEpisode?.podcastTitle}
-            {/* Podcast Artist */}
-          </Text>
-        </View>
+            {/* icon */}
+            <View
+              style={style.iconContainer}
+            >
+              <Play size={22} strokeWidth={1.8} />
+            </View>
 
+            {/* text */}
+            <View
+              style={style.textContainer}
+            >
+              <Text
+                numberOfLines={1}
+                style={style.text}
+              >
+                Play
+              </Text>
+            </View>
+          </Pressable>
+
+          <Pressable
+            onPress={() => {
+              handleDownload();
+            }}
+            style={style.optionContainer}
+          >
+            {/* icon */}
+            <View
+              style={style.iconContainer}
+            >
+              {task.status === "COMPLETED" || isHistoricallyDownladed 
+                ? <Downloaded size={24} />
+                : <Download size={22} strokeWidth={1.8} />
+              }
+            </View>
+
+            {/* text */}
+            <View
+              style={style.textContainer}
+            >
+              <Text
+                numberOfLines={1}
+                style={style.text}
+              >
+                Download
+              </Text>
+            </View>
+          </Pressable>
+
+          <Pressable
+            onPress={() => {
+              handleSave();
+            }}
+            style={[style.optionContainer]}
+          >
+            {/* icon */}
+            <View
+              style={style.iconContainer}
+            >
+              <Save size={24} strokeWidth={1.8} fill={isSaved ? 'black' : "none"} />
+            </View>
+
+            {/* text */}
+            <View
+              style={[style.textContainer]}
+            >
+              <Text
+                numberOfLines={1}
+                style={style.text}
+              >
+                {isSaved ? "Remove from Save" : "Save"}
+              </Text>
+            </View>
+          </Pressable>
+
+          <Pressable
+            onPress={() => {
+              handleClose();
+              openPlaylistSelection();
+            }}
+            style={[style.optionContainer]}
+          >
+            {/* icon */}
+            <View
+              style={style.iconContainer}
+            >
+              <Save size={24} strokeWidth={1.8} />
+            </View>
+
+            {/* text */}
+            <View
+              style={[style.textContainer]}
+            >
+              <Text
+                numberOfLines={1}
+                style={style.text}
+              >
+                Save To Playlist
+              </Text>
+            </View>
+          </Pressable>
+
+          <View
+            style={[style.optionContainer]}
+          >
+            {/* icon */}
+            <View
+              style={style.iconContainer}
+            >
+              <Save size={24} strokeWidth={1.8} />
+            </View>
+
+            {/* text */}
+            <View
+              style={[style.textContainer]}
+            >
+              <Text
+                numberOfLines={1}
+                style={style.text}
+              >
+                Go To Episode
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={[style.optionContainer]}
+          >
+            {/* icon */}
+            <View
+              style={style.iconContainer}
+            >
+              <Podcasts size={24} strokeWidth={1.8} />
+            </View>
+
+            {/* text */}
+            <View
+              style={[style.textContainer, { borderBottomWidth: 0 }]}
+            >
+              <Text
+                numberOfLines={1}
+                style={style.text}
+              >
+                Go To Podcast
+              </Text>
+            </View>
+          </View>
+
+        </View>
       </View>
-
-      {/* options */}
-      <View
-        style={{
-          backgroundColor: 'rgb(236, 236, 236)',
-          borderRadius: 26,
-          marginTop: 12
-        }}
-      >
-        <View
-          style={style.optionContainer}
-        >
-          {/* icon */}
-          <View
-            style={style.iconContainer}
-          >
-            <Share size={24} strokeWidth={1.8} />
-          </View>
-
-          {/* text */}
-          <View
-            style={style.textContainer}
-          >
-            <Text
-              numberOfLines={1}
-              style={style.text}
-            >
-              Share
-            </Text>
-          </View>
-        </View>
-
-        <Pressable
-          onPress={() => {
-            setActiveEpisode(tappedEpisode);
-            handleClose();
-          }}
-          style={style.optionContainer}
-        >
-          {/* icon */}
-          <View
-            style={style.iconContainer}
-          >
-            <Play size={22} strokeWidth={1.8} />
-          </View>
-
-          {/* text */}
-          <View
-            style={style.textContainer}
-          >
-            <Text
-              numberOfLines={1}
-              style={style.text}
-            >
-              Play
-            </Text>
-          </View>
-        </Pressable>
-
-        <Pressable
-          onPress={() => {
-            handleDownload();
-          }}
-          style={style.optionContainer}
-        >
-          {/* icon */}
-          <View
-            style={style.iconContainer}
-          >
-            <Download size={22} strokeWidth={1.8} />
-          </View>
-
-          {/* text */}
-          <View
-            style={style.textContainer}
-          >
-            <Text
-              numberOfLines={1}
-              style={style.text}
-            >
-              Download
-            </Text>
-          </View>
-        </Pressable>
-
-        <Pressable
-          onPress={() => {
-            handleSave();
-          }}
-          style={[style.optionContainer]}
-        >
-          {/* icon */}
-          <View
-            style={style.iconContainer}
-          >
-            <Save size={24} strokeWidth={1.8} fill={isSaved? 'black' : "none"}/>
-          </View>
-
-          {/* text */}
-          <View
-            style={[style.textContainer]}
-          >
-            <Text
-              numberOfLines={1}
-              style={style.text}
-            >
-              {isSaved ? "Remove from Save" : "Save"}
-            </Text>
-          </View>
-        </Pressable>
-
-        <Pressable
-          onPress={() => {
-            handleClose();
-            openPlaylistSelection();
-          }}
-          style={[style.optionContainer]}
-        >
-          {/* icon */}
-          <View
-            style={style.iconContainer}
-          >
-            <Save size={24} strokeWidth={1.8} />
-          </View>
-
-          {/* text */}
-          <View
-            style={[style.textContainer]}
-          >
-            <Text
-              numberOfLines={1}
-              style={style.text}
-            >
-              Save To Playlist
-            </Text>
-          </View>
-        </Pressable>
-
-        <View
-          style={[style.optionContainer]}
-        >
-          {/* icon */}
-          <View
-            style={style.iconContainer}
-          >
-            <Save size={24} strokeWidth={1.8} />
-          </View>
-
-          {/* text */}
-          <View
-            style={[style.textContainer]}
-          >
-            <Text
-              numberOfLines={1}
-              style={style.text}
-            >
-              Go To Episode
-            </Text>
-          </View>
-        </View>
-
-        <View
-          style={[style.optionContainer]}
-        >
-          {/* icon */}
-          <View
-            style={style.iconContainer}
-          >
-            <Podcasts size={24} strokeWidth={1.8} />
-          </View>
-
-          {/* text */}
-          <View
-            style={[style.textContainer, { borderBottomWidth: 0 }]}
-          >
-            <Text
-              numberOfLines={1}
-              style={style.text}
-            >
-              Go To Podcast
-            </Text>
-          </View>
-        </View>
-
-      </View>
-    </View>
-  );
+    );
+  }
 };
 
 export const style = StyleSheet.create({

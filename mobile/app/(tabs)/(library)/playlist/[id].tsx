@@ -1,17 +1,16 @@
-import { View, Text, TouchableOpacity, FlatList, Pressable, Modal, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Pressable, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import usePlaylistStore from '@/store/usePlaylistStore';
-import { ArrowLeft, EllipsisVertical, Download, Play, X, Edit } from 'lucide-react-native';
+import { ArrowLeft, EllipsisVertical, Download, Play, Edit } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { formatDate, formatDuration } from '@/lib/utils';
-import SafeArea from '@/components/SafeArea';
-import { SavedEpisode } from '@/store/useSubscriptionStore';
 import API from '@/services/api';
 import * as imagePicker from 'expo-image-picker';
 import UP_API from '@/services/updateAPI';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import useModalStore from '@/store/useModalStore';
 
 const HEADER_HEIGHT = 48;
 
@@ -23,25 +22,10 @@ const SelectedPlaylist = () => {
   const translateY = useSharedValue(0);
 
   const [triggerPoint, setTriggerPoint] = useState(0);
-
-  const [tappedEpisode, setTappedEpisode] = useState<SavedEpisode | null>(null);
-  const [modalVisibile, setModalVisible] = useState(false);
   const [image, setImage] = useState<string | null>(null);
 
   const { singlePlaylist, selectedPlaylist, fetchEpisodes, playlistEpisodes } = usePlaylistStore();
-
-  const handleRemove = async (playlistId: any, eId: any) => {
-    const response = await API.removeEpisode(playlistId, eId);
-    if (response?.data.status === 500) {
-      Alert.alert("Error", "Something went wrong.");
-      return;
-    }
-
-    const message = response?.data?.message;
-    Alert.alert(`${message}`);
-    setModalVisible(false);
-    fetchEpisodes(id);
-  }
+  const { setTappedEpisode, openPlaylistOptions, setPodcastId } = useModalStore();
 
   const handleImageUpdate = async () => {
     await UP_API.updatePlaylistCover(id, image);
@@ -302,6 +286,22 @@ const SelectedPlaylist = () => {
             paddingBottom: 180
           }}
           renderItem={({ item }) => {
+
+            const getPodcastId = async () => {
+              const podcast = await API.getPodcastFromDocId(item.podcastId);
+              return podcast.id
+            };
+
+            const handlePress = async () => {
+              setTappedEpisode(item);
+              openPlaylistOptions("episode");
+
+              const id = await getPodcastId();
+              if (id != null) {
+                setPodcastId(id);
+              }
+            };
+
             return (
               <View
                 style={{
@@ -380,10 +380,7 @@ const SelectedPlaylist = () => {
 
                 <View>
                   <Pressable
-                    onPress={() => {
-                      setModalVisible(true);
-                      setTappedEpisode(item);
-                    }}
+                    onPress={handlePress}
                     style={{
                       height: 30,
                       width: 30,
@@ -400,91 +397,6 @@ const SelectedPlaylist = () => {
         />
 
       </Animated.ScrollView>
-
-      <Modal
-        visible={modalVisibile}
-        onRequestClose={() => setModalVisible(false)}
-        transparent={true}
-      >
-        <SafeArea>
-          <View
-            style={{
-              flex: 1,
-              position: "relative",
-              paddingHorizontal: 12
-            }}
-          >
-            {/* modal card */}
-            <View
-              style={{
-                position: "absolute",
-                right: 12,
-                left: 12,
-                bottom: 32,
-                backgroundColor: "white",
-                paddingHorizontal: 12,
-                borderRadius: 12,
-              }}
-            >
-              {/* title container */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  paddingVertical: 8,
-                  gap: 12
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode='tail'
-                  style={{
-                    fontFamily: "SF Pro",
-                    fontSize: 18,
-                    fontWeight: "600",
-                    lineHeight: 28,
-                    flex: 1
-                  }}
-                >
-                  {tappedEpisode?.title}
-                </Text>
-
-                <Pressable
-                  onPress={() => setModalVisible(false)}
-                  style={{
-                    height: 30,
-                    width: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexShrink: 0
-                  }}
-                >
-                  <X size={20} />
-                </Pressable>
-              </View>
-
-              <View>
-                <Pressable
-                  onPress={() => {
-                    handleRemove(id, tappedEpisode?.episodeId);
-                  }}
-                  style={{
-                    height: 40,
-                    justifyContent: 'center'
-                  }}
-                >
-                  <Text>
-                    Remove from playlist
-                  </Text>
-                </Pressable>
-              </View>
-
-            </View>
-          </View>
-
-        </SafeArea>
-      </Modal>
     </View>
 
   )

@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, EllipsisVertical, Play, RemoveFormatting, Search } from 'lucide-react-native';
+import { EllipsisVertical, Play, ChevronLeft } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { formatDate, formatDuration } from '@/lib/utils';
@@ -8,11 +8,13 @@ import usePlayerStore from '@/store/usePlayerStore';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import useModalStore from '@/store/useModalStore';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
-import { Download, Save, Share } from '@/Icons-assets/Icon';
+import { Downloaded, Save, Share } from '@/Icons-assets/Icon';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
 import useDownloadStore from '@/store/useDownloadStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import DownloadEngine from '@/lib/DownloadEngine';
+import AnimatedDownloadIcon from '@/components/AnimatedDownloadIcon';
 
 const HEADER_HEIGHT = 48;
 
@@ -24,23 +26,12 @@ const EpisodeDetail = () => {
   const { id: episodeId } = useLocalSearchParams();
   // const { getEpisodeById, selectedEpisode, podcast } = usePodcastStore();
   const { selectedEpisode, setSelectedEpisode, followingPodcasts } = useSubscriptionStore();
-  const { setActiveEpisode } = usePlayerStore()
+  const { setActiveEpisode } = usePlayerStore();
   const { setTappedEpisode, setPodcastId, openModal } = useModalStore();
   const { SaveEpisodes, savePlaylist, fetchSavedEpisodes } = usePlaylistStore();
-  const { downloadEpisodes, startDownload, removeDownload } = useDownloadStore();
+  const { downloadEpisodes, tasks } = useDownloadStore();
 
   const [containerHeight, setContainerHeight] = useState(0);
-  console.log("containerHeight:", containerHeight);
-
-  const getPodcastId = (docId: any) => {
-    const podcast = followingPodcasts.find((pod) => pod.podcastId === docId);
-    if (podcast) {
-      return podcast.id;
-    }
-    return null;
-  };
-
-  const podId = getPodcastId(selectedEpisode?.podcastId);
 
   useEffect(() => {
     const id = Array.isArray(episodeId) ? episodeId[0] : episodeId;
@@ -48,45 +39,6 @@ const EpisodeDetail = () => {
       setSelectedEpisode(id);
     }
   }, [episodeId, setSelectedEpisode]);
-
-  const handlePlay = () => {
-    setActiveEpisode({
-      id: episodeId,
-      title: selectedEpisode?.title,
-      audioUrl: selectedEpisode?.audioUrl,
-      podcastId: selectedEpisode?.podcastId,
-      image: selectedEpisode?.image,
-      podcastTitle: selectedEpisode?.podcastTitle
-    });
-  };
-
-  const isSaved = SaveEpisodes.some((ep) => selectedEpisode?.id === ep.id);
-  const handleSave = async () => {
-    if (isSaved) {
-      await API.removeEpisode(savePlaylist?.id, selectedEpisode?.episodeId);
-      fetchSavedEpisodes();
-    } else {
-      const body = {
-        podcastId: podId,
-        episodeId: selectedEpisode?.id,
-        playlistId: savePlaylist?.id
-      }
-      await API.addEpisodeToPlaylist(body);
-      fetchSavedEpisodes();
-    };
-  };
-
-  const updateDownload = async () => {
-    if (selectedEpisode?.id) {
-      if (downloadEpisodes[selectedEpisode.id]) {
-        await removeDownload(selectedEpisode.id, selectedEpisode.episodeId);
-      } else {
-        if (podId) {
-          await startDownload(selectedEpisode, podId);
-        }
-      }
-    };
-  };
 
   const scrollY = useSharedValue(0);
 
@@ -101,8 +53,8 @@ const EpisodeDetail = () => {
 
     return {
       backgroundColor: scrolled ? 'rgb(242, 242, 242)' : 'none',
-      borderBottomWidth: scrolled ? 0.8 : 0,
-      borderBottomColor: scrolled ? 'grey' : "none",
+      // borderBottomWidth: scrolled ? 0.8 : 0,
+      // borderBottomColor: scrolled ? 'grey' : "none",
     }
   });
 
@@ -114,10 +66,89 @@ const EpisodeDetail = () => {
     }
   });
 
+  // const updateDownload = async () => {
+  //   if (selectedEpisode?.id) {
+  //     if (downloadEpisodes[selectedEpisode.id]) {
+  //       // await removeDownload(selectedEpisode.id, selectedEpisode.episodeId);
+  //     } else {
+  //       if (podId) {
+  //         await startDownload(selectedEpisode, podId);
+  //       }
+  //     }
+  //   };
+  // };
+
   if (selectedEpisode) {
+
+    const getPodcastId = (docId: any) => {
+      const podcast = followingPodcasts.find((pod) => pod.podcastId === docId);
+      if (podcast) {
+        return podcast.id;
+      }
+      return null;
+    };
+
+    const podId = getPodcastId(selectedEpisode?.podcastId);
+
+    const handlePlay = () => {
+      setActiveEpisode({
+        id: episodeId,
+        title: selectedEpisode?.title,
+        audioUrl: selectedEpisode?.audioUrl,
+        podcastId: selectedEpisode?.podcastId,
+        image: selectedEpisode?.image,
+        podcastTitle: selectedEpisode?.podcastTitle
+      });
+    };
+
+    const isSaved = SaveEpisodes.some((ep) => selectedEpisode?.id === ep.id);
+    const handleSave = async () => {
+      if (isSaved) {
+        await API.removeEpisode(savePlaylist?.id, selectedEpisode?.episodeId);
+        fetchSavedEpisodes();
+      } else {
+        const body = {
+          podcastId: podId,
+          episodeId: selectedEpisode?.id,
+          playlistId: savePlaylist?.id
+        }
+        await API.addEpisodeToPlaylist(body);
+        fetchSavedEpisodes();
+      };
+    };
+
+    const task = tasks[selectedEpisode.id] || {status: 'IDLE', progress: 0};
+    const isHistoricallyDownladed = !!downloadEpisodes[selectedEpisode.id];
+
+    const handleDownload = () => {
+      switch(task.status) {
+        case 'IDLE':
+        case 'FAILED':
+          DownloadEngine.enqueue(selectedEpisode, podId);
+          break;
+        
+        case 'PAUSED':
+          DownloadEngine.resume(selectedEpisode.id);
+          break;
+
+        case 'DOWNLOADING':
+          DownloadEngine.cancel(selectedEpisode.id);
+          break;
+
+        case 'QUEUED':
+        case 'COMPLETED':
+          DownloadEngine.cancel(selectedEpisode.id);
+          break;
+      }
+
+      if(isHistoricallyDownladed && task.status === 'IDLE') {
+        DownloadEngine.cancel(selectedEpisode.id);
+      }
+    };
+
     return (
       <View
-        style={{paddingTop: insets.top}}
+        style={{ paddingTop: insets.top }}
       >
 
         {/* Header */}
@@ -130,27 +161,45 @@ const EpisodeDetail = () => {
             paddingLeft: 12,
             paddingRight: 8,
             position: "absolute",
+            top: insets.top,
             right: 0,
             left: 0,
-            top: insets.top,
-            zIndex: 15
+            zIndex: 20
           }, headerStyle]}
         >
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => {
+              router.back();
+            }}
             style={{
-              alignItems: "center",
+              height: 44,
+              width: 44,
               justifyContent: "center",
-              height: 36,
-              width: 36,
-              borderRadius: 72
+              paddingLeft: 7,
+              backgroundColor: "white",
+              borderRadius: 100,
+              shadowOpacity: 0.12,
+              shadowColor: "rgb(0, 0, 0)",
+              shadowOffset: {
+                height: 2,
+                width: 1,
+              },
+              shadowRadius: 8
             }}
           >
-            <ArrowLeft size={24} strokeWidth={2} />
+            <ChevronLeft size={26} />
           </TouchableOpacity>
 
           <Animated.View
-            style={textStyle}
+            style={[
+              {
+                height: "100%",
+                flex: 1,
+                justifyContent: "center",
+                paddingLeft: 12
+              },
+              textStyle
+            ]}
           >
             <Text
               numberOfLines={1}
@@ -158,8 +207,8 @@ const EpisodeDetail = () => {
               style={{
                 fontFamily: "SF Pro",
                 fontWeight: "600",
-                fontSize: 16,
-                lineHeight: 24,
+                fontSize: 18,
+                lineHeight: 28,
                 color: "black",
                 width: 297
               }}
@@ -168,20 +217,6 @@ const EpisodeDetail = () => {
             </Text>
           </Animated.View>
 
-          <TouchableOpacity
-            onPress={() => router.navigate({
-              pathname: '/search'
-            })}
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              height: 36,
-              width: 36,
-              borderRadius: 72
-            }}
-          >
-            <Search size={24} strokeWidth={2} />
-          </TouchableOpacity>
         </Animated.View>
 
         <Animated.ScrollView
@@ -318,7 +353,7 @@ const EpisodeDetail = () => {
             >
 
               <Pressable
-                onPress={updateDownload}
+                onPress={handleDownload}
                 style={{
                   height: 44,
                   width: 44,
@@ -329,9 +364,9 @@ const EpisodeDetail = () => {
                 }}
               >
                 {
-                  downloadEpisodes[selectedEpisode.id] 
-                  ? <RemoveFormatting size={22} strokeWidth={2}/>
-                  : <Download size={22} strokeWidth={2} />
+                  isHistoricallyDownladed || task.status === 'COMPLETED'
+                    ? <Downloaded size={28} />
+                    : <AnimatedDownloadIcon episode={selectedEpisode} />
                 }
               </Pressable>
 

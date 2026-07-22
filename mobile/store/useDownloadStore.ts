@@ -21,7 +21,6 @@ interface DownloadState {
   saveToDatabase: (podcastId: any, episodeId: string) => Promise<void>;
   updateTaskState: (episodeId: string, status: DownloadStatus, progress?: number) => void; 
   startDownload: (episode: SavedEpisode, podcastId: number) => Promise<void>;
-  removeDownload: (episodeId: string) => void;
   getAudioSource: (episode: SavedEpisode) => string;
   getImageSource: (episode: SavedEpisode) => string;
   clearDownloads: () => void;
@@ -42,7 +41,6 @@ const useDownloadStore = create<DownloadState>(
     updateTaskState: (episodeId, status, progress) => {
       set((state) => {
         const existingTask = state.tasks[episodeId] || {episodeId, status: "IDLE", progress: 0}
-        console.log("ExistingTask:", existingTask);
 
         if(status === "DOWNLOADING") {
           if(
@@ -113,46 +111,11 @@ const useDownloadStore = create<DownloadState>(
       }
     },
 
-    removeDownload: (episodeId) => {
-      set((state) => {
-        const newDownloads = { ...state.downloadEpisodes };
-        delete newDownloads[episodeId];
-
-        return {
-          downloadEpisodes: newDownloads,
-        }
-      });
-    },
-
-    // removeDownload: async (episodeId, eId) => {
-    //   DownloadManager.deleteEpisode(episodeId);
-    //   // update UI
-    //   set((state) => {
-    //     const newDownloads = { ...state.downloadEpisodes };
-    //     delete newDownloads[episodeId];
-
-    //     const newActive = { ...state.activeDownloads };
-    //     delete newActive[episodeId];
-
-    //     return { 
-    //       downloadEpisodes: newDownloads,
-    //       activeDownloads: newActive
-    //     };
-    //   });
-
-    //   // after removing it from storage update the database
-    //   const { downloadPlaylist, fetchDPEpisodes } = usePlaylistStore.getState();
-
-    //   await API.removeEpisode(downloadPlaylist?.id, eId);
-    //   fetchDPEpisodes();
-    // },
-
     clearDownloads: () => {
       DownloadManager.clearAll();
 
       // set downloadEpisodes and activeDownloads to empty object
       set({
-        activeDownloads: {},
         downloadEpisodes: {}
       });
     },

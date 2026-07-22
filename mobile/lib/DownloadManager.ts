@@ -26,10 +26,15 @@ const DownloadManager = {
     await this.init();
 
     const epidoseFolder = new Directory(Download_Dir, episode.id);
+
+    if(epidoseFolder.exists && !resumeData) {
+      epidoseFolder.delete();
+    };
+
     // Now checks if this episode folder is already exists
     if(!epidoseFolder.exists) {
       epidoseFolder.create();
-    }
+    };
 
     // file inside the folder
     const audioFile = new File(epidoseFolder, "audio.mp3");

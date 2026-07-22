@@ -91,7 +91,7 @@ export const savePodcast = async (req, res) => {
     console.error("Error saving podcast:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const getPodcasts = async (req, res) => {
   try {
@@ -106,7 +106,7 @@ export const getPodcasts = async (req, res) => {
     console.error("Error getting podcasts:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const singlePod = async (req, res) => {
   try {
@@ -124,7 +124,7 @@ export const singlePod = async (req, res) => {
     console.error("Error getting podcast:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const followingFeed = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -162,7 +162,7 @@ export const followingFeed = async (req, res) => {
     console.error("Error getting feed:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const podEpisodes = async (req, res) => {
   const { podcastId } = req.params;
@@ -195,7 +195,7 @@ export const podEpisodes = async (req, res) => {
     console.error("Error fetching podcast episodes:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const unFollow = async (req, res) => {
   // url = podcasts/?id=podcastId
@@ -223,4 +223,24 @@ export const unFollow = async (req, res) => {
     console.error("Error unfollowing podcast", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
+export const getPodcastWithDocId = async (req, res) => {
+  try {
+    const id = req.query.id;
+
+    if(!id) {
+      return res.status(401).json({ message: "Insufficient data." });
+    }
+
+    const podInDatabase = await Podcast.findById(id);
+
+    res.status(200).json({
+      success: true,
+      podcast: podInDatabase
+    })
+  } catch (error) {
+    console.error("Error getting podcast:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

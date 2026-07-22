@@ -5,17 +5,25 @@ import usePlaylistStore from '@/store/usePlaylistStore';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import { Search } from 'lucide-react-native';
 import CustomTab from '@/components/CustomNavigationTab';
-
-// const Tab = createBottomTabNavigator();
-
+import DownloadEngine from '@/lib/DownloadEngine';
+import useDownloadStore from '@/store/useDownloadStore';
 
 const TabsLayout = () => {
   const { setSubscriptionIds, setFollowingPodcasts, followingPodcasts, fetchFeed } = useSubscriptionStore();
-  const { fetchPlaylists } = usePlaylistStore();
+  const { fetchPlaylists, fetchDPEpisodes } = usePlaylistStore();
+  const { hydrate } = useDownloadStore();
+  // const { syncOfflineDelete } = useSyncDownload();
+
+  const syncWithDatabase = async () => {
+    await fetchPlaylists();
+    await fetchDPEpisodes();
+    await hydrate();
+    DownloadEngine.syncDownloadWithDatabase();
+  }
 
   useEffect(() => {
     setFollowingPodcasts();
-    fetchPlaylists();
+    syncWithDatabase();
     // eslint-disable-next-line
   }, []);
 
@@ -54,39 +62,6 @@ const TabsLayout = () => {
         }}
         />
       </Tabs>
-
-      {/* <Tab.Navigator
-        tabBar={(props) => <CustomTab {...props}/>}
-        screenOptions={{headerShown: false}}
-      >
-        <Tab.Screen name='Home' component={HomeScreen}
-          options={{
-            tabBarIcon: ({focused, color}) => <Home size={22}
-            fill={focused ? "black" : "none"} color={focused ? 'black' : "black"}
-          />,
-        }}
-        />
-        <Tab.Screen name='Podcasts' component={PodcastsScreen}
-          options={{tabBarIcon: ({focused}) => <Podcasts size={22}/>}}
-        />
-        <Tab.Screen name='Library' component={LibraryScreen}
-          options={{tabBarIcon: ({focused}) => <Library size={22}/>}}
-        />
-        <Tab.Screen name='Profile' component={ProfileScreen}
-          options={{tabBarIcon: ({focused}) => (
-            <View
-              style={{
-                height: 22,
-                width: 22,
-                borderRadius: 11,
-                backgroundColor: `${focused ? "black" : "grey"}`
-              }}
-            >
-
-            </View>
-          )}}
-        />
-      </Tab.Navigator> */}
 
     </>
   );

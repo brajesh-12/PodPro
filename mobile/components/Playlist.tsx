@@ -93,7 +93,7 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
         <Pressable
           onPress={() => {
             setTappedPlaylist(playlist);
-            openPlaylistOptions();
+            openPlaylistOptions("playlist");
           }}
           style={{
             height: 30,
@@ -121,7 +121,7 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
       onLongPress={() => {
         if(playlist.type === "custom") {
           setTappedPlaylist(playlist);
-          openPlaylistOptions();
+          openPlaylistOptions("playlist");
         }
         return;
       }}

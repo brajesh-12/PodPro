@@ -140,7 +140,7 @@ const GenreCard = ({ item }: { item: any }) => {
       onPress={() => {
         setSelectedCategory(item);
         router.navigate({
-          pathname: "/(tabs)/(search)/category"
+          pathname: "/(tabs)/(search)/Category"
         });
       }}
       style={{

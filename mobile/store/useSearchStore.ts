@@ -18,6 +18,7 @@ interface SearchStore {
   searchQuery: string;
   episodes: SavedEpisode[];
   episodesToRender: SavedEpisode[];
+  selectedEpisode: SavedEpisode | null;
 
   selectedCategory: Category | null;
   categoryTopEpisodes: SavedEpisode[];
@@ -25,6 +26,7 @@ interface SearchStore {
   categoryTitle: string;
   setCategoryTitle: (title: string) => void; 
 
+  setSelectedEpisode: (episodeId: string) => void;
   setEpisodesToRender: (episodes: SavedEpisode[]) => void;
   setSelectedCategory: (category: Category) => void; 
   setSearchedPodcast: (podcast: Podcast) => void;
@@ -44,6 +46,8 @@ const useSearchStore = create<SearchStore>(
     searchedPodcast: null,
     episodes: [],
     episodesToRender: [],
+    selectedEpisode: null,
+
     searchQuery: "",
 
     selectedCategory: null,
@@ -73,6 +77,11 @@ const useSearchStore = create<SearchStore>(
       const data = await fetchEpisodes(feedUrl);
       set({episodes: data});
       set({episodesToRender: get().episodes.slice(0, 10)});
+    },
+
+    setSelectedEpisode: (episodeId) => {
+      const episode = get().episodes.find((ep) => ep.id === episodeId);
+      set({selectedEpisode: episode});
     },
 
     fetchSearchedPodcast: async (id) => {

@@ -11,7 +11,7 @@ import API from '@/services/api';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import { Downloaded, Save } from '@/Icons-assets/Icon';
 import AnimatedDownloadIcon from './AnimatedDownloadIcon';
-import DonwloadEngine from '@/lib/DownloadEngine';
+import DownloadEngine from '@/lib/DownloadEngine';
 import { usePodcastStore } from '@/store/usePodcastStore';
 import useSearchStore from '@/store/useSearchStore';
 
@@ -55,7 +55,6 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
       fetchSavedEpisodes();
     }
     else {
-
       const body = {
         podcastId: podcastId,
         episodeId: episode.id,
@@ -70,40 +69,26 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
     switch (task.status) {
       case 'IDLE':
       case 'FAILED':
-        DonwloadEngine.enqueue(episode, podcastId);
+        DownloadEngine.enqueue(episode, podcastId);
         break;
       case 'DOWNLOADING':
         // here we don't need to remove episode from database, as it has not been saved yet
-        DonwloadEngine.cancel(episode.id);
+        DownloadEngine.cancel(episode.id);
         break;
       case 'PAUSED':
-        DonwloadEngine.resume(episode.id);
+        DownloadEngine.resume(episode.id);
         break;
       case 'QUEUED':
       case 'COMPLETED':
         // for this we need to remove episode from database
-        DonwloadEngine.cancel(episode.id);
+        DownloadEngine.cancel(episode.id);
         break;
     }
 
     if (isHistoricallyDownladed && task.status === 'IDLE') {
-      DonwloadEngine.cancel(episode.id);
+      DownloadEngine.cancel(episode.id);
     }
   };
-
-  // const updateDownload = async () => {
-  //   const isDownloaded = Boolean(downloadEpisodes[episode.id]);
-  //   const isDownloading = activeDownloads[episode.id] !== undefined;
-
-  //   if (isDownloaded || isDownloading) {
-  //     console.log("Downloading:", isDownloaded);
-  //     await removeDownload(episode.id, episode.episodeId);
-  //   }
-  //   else {
-  //     if (podId)
-  //       await startDownload(episode, podId);
-  //   }
-  // };
 
   return (
     <Pressable

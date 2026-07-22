@@ -62,6 +62,20 @@ const API = {
     }
   },
 
+  getPodcastFromDocId: async (id: string) => {
+    try {
+      const response = await authApi.get(`/podcasts/lookup/document?id=${id}`);
+      const data = response.data;
+
+      console.log("Podcast:", data.podcast);
+
+      return data.podcast;
+
+    } catch (error: any) {
+      console.log("Error fetching podcast:", error.response.data?.message);
+    }
+  },
+
   followedPods: async () => {
     // here we get followed podcasts from the backend
     try {

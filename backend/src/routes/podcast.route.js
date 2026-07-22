@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { followingFeed, getPodcasts, podEpisodes, savePodcast, singlePod, unFollow } from '../controller/podcast.controller.js';
+import { followingFeed, getPodcasts, getPodcastWithDocId, podEpisodes, savePodcast, singlePod, unFollow } from '../controller/podcast.controller.js';
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = Router();
@@ -12,5 +12,6 @@ router.get("/lookup", singlePod);
 router.get("/episodes/feed", followingFeed);
 router.get("/episodes/:podcastId", podEpisodes);
 router.delete("/", unFollow);
+router.get("/lookup/document", getPodcastWithDocId);
 
 export default router;

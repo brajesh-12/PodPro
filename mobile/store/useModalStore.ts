@@ -34,7 +34,7 @@ interface ModalStore {
   setTappedPodcast: (podcast: any | null) => void;
   setTappedPlaylist: (playlist: any) => void;
   setPodcastId: (id: number | null) => void;
-  openPlaylistOptions: () => void;
+  openPlaylistOptions: (type: string) => void;
   closePlaylistOptions: () => void;
   createPlaylist: () => void;
   cancelCreate: () => void;
@@ -69,11 +69,13 @@ const useModalStore = create<ModalStore>(
       set({isCreating: false})
     },
 
-    openPlaylistOptions: () => {
-      set({playlistOpen: true})
+    openPlaylistOptions: (type) => {
+      set({type: type});
+      set({playlistOpen: true});
     },
 
     closePlaylistOptions: () => {
+      set({type: ""});
       set({playlistOpen: false})
     },
 

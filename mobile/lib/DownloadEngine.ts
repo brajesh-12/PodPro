@@ -9,7 +9,7 @@ const MAX_CONCURRENT_DOWNLOADS = 1 //how many episodes can download at once
 
 const episodeCache: Record<string, { episode: SavedEpisode, podcastId: any }> = {};
 
-const DonwloadEngine = {
+const DownloadEngine = {
   async enqueue(episode: SavedEpisode, podcastId: any) {
     // Save to Hard Drive (SQLite)
     episodeCache[episode.id] = { episode, podcastId };
@@ -25,7 +25,7 @@ const DonwloadEngine = {
     const store = useDownloadStore.getState();
 
     allTasks.forEach((t) => {
-      if(store.downloadEpisodes[t.episodeId]) {
+      if (store.downloadEpisodes[t.episodeId]) {
         DownloadDatabase.deleteTask(t.episodeId);
       }
     });
@@ -44,6 +44,7 @@ const DonwloadEngine = {
   async startTask(task: any) {
     DownloadDatabase.updateProgress(task.episodeId, task.progress, task.pauseData);
     useDownloadStore.getState().updateTaskState(task.episodeId, "DOWNLOADING", task.progress);
+    const { DPEpisodes } = usePlaylistStore.getState();
 
     const cacheData = await this.getEpisodeMetadata(task.episodeId);
     if (!cacheData) return;
@@ -66,7 +67,7 @@ const DonwloadEngine = {
     );
 
     const currentTaskState = useDownloadStore.getState().tasks[task.episodeId];
-    if(currentTaskState.status === "IDLE" || currentTaskState.status === "CANCELLING") {
+    if (currentTaskState.status === "IDLE" || currentTaskState.status === "CANCELLING") {
       return;
     }
 
@@ -79,21 +80,27 @@ const DonwloadEngine = {
         downloadEpisodes: { ...state.downloadEpisodes, [task.episodeId]: result }
       }));
 
-      try {
-        const { downloadPlaylist, fetchDPEpisodes } = usePlaylistStore.getState();
+      const isAlreadyInDB = DPEpisodes.some((ep) => ep.id === task.episodeId);
 
-        if (downloadPlaylist?.id) {
-          const body = {
-            podcastId: podcastId,
-            episodeId: episode.id,
-            playlistId: downloadPlaylist.id
+      if (!isAlreadyInDB) {
+        try {
+          const { downloadPlaylist, fetchDPEpisodes } = usePlaylistStore.getState();
+
+          if (downloadPlaylist?.id) {
+            const body = {
+              podcastId: podcastId,
+              episodeId: episode.id,
+              playlistId: downloadPlaylist.id
+            };
+
+            await API.addEpisodeToPlaylist(body);
+            await fetchDPEpisodes();
           };
-
-          await API.addEpisodeToPlaylist(body);
-          await fetchDPEpisodes();
-        };
-      } catch (error) {
-        console.log("Failed to sync completed download to database playlist:", error);
+        } catch (error) {
+          console.log("Failed to sync completed download to database playlist:", error);
+        }
+      } else {
+        console.log("Sync download complete. Episode is already in the database.");
       }
 
     } else {
@@ -143,13 +150,13 @@ const DonwloadEngine = {
 
         const epInDB = DPEpisodes.find((ep) => episodeId === ep.id);
 
-        if(downloadPlaylist?.id && epInDB) {
+        if (downloadPlaylist?.id && epInDB) {
           await API.removeEpisode(downloadPlaylist.id, epInDB.episodeId);
           await fetchDPEpisodes();
         }
 
         console.log("Download removed from Database.");
-        
+
       } catch (error) {
         console.log("Failed removing download from database:", error);
       }
@@ -168,7 +175,36 @@ const DonwloadEngine = {
     DownloadDatabase.upsertTask(episodeId, "QUEUED", task?.progress, task?.pauseData);
     useDownloadStore.getState().updateTaskState(episodeId, "QUEUED", task?.progress);
     this.processQueue();
+  },
+
+  async syncDownloadWithDatabase() {
+    const { downloadEpisodes, tasks } = useDownloadStore.getState();
+    const { DPEpisodes, downloadPlaylist } = usePlaylistStore.getState();
+
+    if (!downloadPlaylist?.id || !DPEpisodes) {
+      console.log("No remote download playlist found to sync.");
+      return;
+    }
+
+    const missingLocalEpisodes = DPEpisodes.filter((ep) => {
+      const isDownloaded = !!downloadEpisodes[ep.id];
+      const isCurrentlyDownloading = tasks[ep.id]?.status === "QUEUED" || tasks[ep.id]?.status === 'DOWNLOADING';
+
+      return !isDownloaded && !isCurrentlyDownloading;
+    });
+
+    if (missingLocalEpisodes.length > 0) {
+      console.log(`Found ${missingLocalEpisodes} missing episodes from cloud. Starting sync... `);
+
+      missingLocalEpisodes.forEach(async (ep) => {
+        const podcast = await API.getPodcastFromDocId(ep.podcastId);
+        const podcastId = podcast.id;
+        this.enqueue(ep, podcastId);
+      });
+    } else {
+      console.log("Local downloads are perfectly synced with the database.");
+    }
   }
 };
 
-export default DonwloadEngine;
+export default DownloadEngine;
