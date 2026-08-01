@@ -10,7 +10,7 @@ import { Image } from 'expo-image';
 import usePlayerStore from '@/store/usePlayerStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useModalStore from '@/store/useModalStore';
-import { Add } from '@/Icons-assets/Icon';
+// import { Add } from '@/Icons-assets/Icon';
 
 const LibraryScreen = () => {
   const insets = useSafeAreaInsets();
@@ -43,7 +43,6 @@ const LibraryScreen = () => {
             justifyContent: "space-between",
             alignItems: "center",
             paddingHorizontal: 20,
-            // alignItems: "center"
           }}
         >
           <View>
@@ -52,6 +51,7 @@ const LibraryScreen = () => {
                 fontFamily: "SF Pro",
                 fontSize: 24,
                 fontWeight: "800",
+                color: 'rgb(255, 255, 255)'
               }}
             >
               Library
@@ -63,15 +63,15 @@ const LibraryScreen = () => {
               createPlaylist();
             }}
             style={{
-              paddingVertical: 12,
-              paddingLeft: 14,
-              paddingRight: 20,
+              paddingVertical: 10,
+              paddingLeft: 16,
+              paddingRight: 16,
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "white",
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
               borderRadius: 32,
               flexDirection: "row",
-              gap: 8,
+              gap: 6,
 
               shadowColor: "rgb(0, 0, 0)",
               shadowOpacity: 0.1,
@@ -82,15 +82,14 @@ const LibraryScreen = () => {
               }
             }}
           >
-            <View>
-              <Add size={20} strokeWidth={1.8} />
-            </View>
             <Text
               style={{
                 // color: "white"
                 fontFamily: "SF Pro",
                 fontSize: 16,
-                fontWeight: "600"
+                fontWeight: "500",
+                color: 'rgb(255, 255, 255)',
+                letterSpacing: 0.2
               }}
             >
               Create
@@ -123,13 +122,14 @@ const LibraryScreen = () => {
                 fontFamily: "SF Pro",
                 fontWeight: "500",
                 fontSize: 14,
-                lineHeight: 16
+                lineHeight: 16,
+                color: 'rgb(255, 255, 255)'
               }}
             >
               Recent
             </Text>
 
-            <ChevronDown size={16} strokeWidth={2} />
+            <ChevronDown size={16} strokeWidth={2} color={'rgb(255, 255, 255)'} />
           </View>
 
           {/* Right container */}
@@ -144,7 +144,7 @@ const LibraryScreen = () => {
             onPress={handleLayout}
           >
             {
-              layout ? <LayoutGrid size={20} strokeWidth={2} /> : <List size={20} strokeWidth={2} />
+              layout ? <LayoutGrid size={20} strokeWidth={2} color={'rgb(255, 255, 255)'} /> : <List size={20} strokeWidth={2} color={'rgb(255, 255, 255)'} />
             }
           </TouchableOpacity>
 
@@ -282,7 +282,7 @@ const LibraryScreen = () => {
         position: "relative",
         flex: 1,
         // paddingTop: insets.top,
-        // backgroundColor: "black"
+        backgroundColor: "rgb(11, 11, 11)"
       }}
     >
       <FlatList

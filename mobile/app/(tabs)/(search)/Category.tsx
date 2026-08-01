@@ -27,7 +27,8 @@ const GenreScreen = () => {
     <View
       style={{
         flex: 1,
-        paddingTop: insets.top
+        paddingTop: insets.top,
+        backgroundColor: "rgb(11, 11, 11)"
       }}
     >
       {/* Header */}
@@ -44,7 +45,7 @@ const GenreScreen = () => {
           gap: 12,
           marginBottom: 12,
           zIndex: 100,
-          backgroundColor: "rgb(242, 242, 242)"
+          backgroundColor: "rgb(11, 11, 11)"
         }}
       >
         <TouchableOpacity
@@ -76,7 +77,8 @@ const GenreScreen = () => {
               fontFamily: "SF Pro",
               fontWeight: "600",
               fontSize: 18,
-              lineHeight: 28
+              lineHeight: 28,
+              color: 'rgba(255, 255, 255, 0.9)'
             }}
           >
             {selectedCategory?.name}

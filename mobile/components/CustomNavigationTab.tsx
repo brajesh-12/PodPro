@@ -1,6 +1,6 @@
 import { Dimensions, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { createAnimatedComponent, Extrapolation, interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { Gesture, GestureDetector, Pressable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -16,12 +16,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 const { height: SCREEN_HEIGHT, width } = Dimensions.get("screen");
 const MINIPLAYER_HEIGHT = 54
 
+const AnimatedMaskedView = createAnimatedComponent(MaskedView);
+
 const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   const insets = useSafeAreaInsets();
 
   const { activeEpisode, isPlaying, togglePlay, progress, seekTo } = usePlayerStore();
 
-  const backgroundHeight = activeEpisode ? 158 : 100;
+  const backgroundHeight = activeEpisode ? 190 : 120;
 
   const startProgress = useSharedValue(0);
   const animationProgress = useSharedValue(1);
@@ -93,13 +95,20 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
       [48, 12]
     );
 
+    const backgroundColor = interpolateColor(
+      animationProgress.value,
+      [0, 1],
+      ["rgba(11, 11, 11, 1)", "rgba(11, 11, 11, 0.6)"],
+    );
+
     return {
       height,
       bottom: bottomOffset,
       right: marginHorizontal,
       left: marginHorizontal,
       paddingTop,
-      borderRadius
+      borderRadius,
+      backgroundColor
     };
   });
 
@@ -228,22 +237,22 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
         maskElement={
           <LinearGradient
             style={StyleSheet.absoluteFill}
-            colors={['rgba(250, 250, 250, 1)', 'rgba(250, 250, 250, 0.1)']}
+            colors={['rgba(11, 11, 11, 1)', 'rgba(11, 11, 11, 0)']}
             start={{ x: 0, y: 1 }}
             end={{ x: 0, y: 0 }}
           />
         }
       >
         <BlurView
-          intensity={16}
-          tint="default"
+          intensity={22}
+          tint="dark"
           style={{
             position: "absolute",
             bottom: 0,
             right: 0,
             left: 0,
             top: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.2)",
+            backgroundColor: "rgba(11, 11, 11, 0.4)",
           }}
         />
       </MaskedView>
@@ -257,7 +266,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
             style={[{
               position: "absolute",
               overflow: "hidden",
-              backgroundColor: "rgb(255, 255, 255)",
+              backgroundColor: "rgb(11, 11, 11)",
               borderRadius: 12,
               shadowColor: "rgb(0, 0, 0)",
               shadowOpacity: 0.15,
@@ -274,8 +283,42 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                 flexDirection: 'row',
                 alignItems: "center",
                 gap: 12,
+                // backgroundColor: "red"
               }, miniPlayerStyle]}
             >
+
+              <AnimatedMaskedView
+                style={[{
+                  position: "absolute",
+                  right: 0,
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  height: "auto",
+                }, miniControlsStyle]}
+                maskElement={
+                  <LinearGradient
+                    style={[
+                      StyleSheet.absoluteFill
+                    ]}
+                    colors={['rgba(11, 11, 11, 1)', 'rgba(11, 11, 11, 1)']}
+                    start={{ x: 1, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  />
+                }
+              >
+                <BlurView
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(11, 11, 11, 0.4)'
+                  }}
+                  intensity={24}
+                />
+              </AnimatedMaskedView>
               {/* Cover */}
               <Animated.View
                 style={[{
@@ -312,7 +355,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                       fontSize: 13,
                       fontWeight: "600",
                       lineHeight: 16,
-                      color: "black"
+                      color: "rgb(255, 255, 255)"
                     }}
                   >
                     {activeEpisode?.title}
@@ -325,7 +368,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                       fontSize: 13,
                       fontWeight: "500",
                       lineHeight: 16,
-                      color: "black",
+                      color: "rgb(255, 255, 255)",
 
                     }}
                   >
@@ -354,8 +397,8 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                   >
                     {
                       isPlaying
-                        ? <Pause size={22} strokeWidth={1.2} fill={"black"} />
-                        : <Play size={22} strokeWidth={1.2} fill={"black"} />
+                        ? <Pause size={22} strokeWidth={1.2} fill={"rgb(255, 255, 255)"} />
+                        : <Play size={22} strokeWidth={1.2} fill={"rgb(255, 255, 255)"} color={'rgb(255, 255, 255)'} />
                     }
 
                   </Pressable>
@@ -364,14 +407,14 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                   <Pressable
                     onPress={handleForward}
                   >
-                    <Forward size={22} strokeWidth={1.2} />
+                    <Forward size={22} strokeWidth={1.2} color='rgb(255, 255, 255)' />
                   </Pressable>
                 </View>
               </Animated.View>
 
               <Animated.View
                 style={[{
-                  backgroundColor: "rgba(0, 0, 0, 0.2)",
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
                   position: 'absolute',
                   top: 0,
                   bottom: 0,
@@ -388,7 +431,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
               <View
                 style={{
                   gap: 2,
-                  paddingHorizontal: 20
+                  paddingHorizontal: 16
                 }}
               >
                 {/* Episode Title */}
@@ -400,7 +443,8 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                     fontFamily: "SF Pro",
                     fontSize: 24,
                     fontWeight: "600",
-                    lineHeight: 32
+                    lineHeight: 32,
+                    color: "rgb(255, 255, 255)"
                   }}
                 >
                   {activeEpisode?.title}
@@ -412,7 +456,8 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                     fontFamily: "SF Pro",
                     fontSize: 18,
                     fontWeight: "400",
-                    lineHeight: 28
+                    lineHeight: 28,
+                    color: "rgb(255, 255, 255)"
                   }}
                 >
                   {activeEpisode?.podcastTitle}
@@ -424,7 +469,6 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
 
               {/* Controls */}
               <View>
-
                 <View
                   style={{
                     flexDirection: "row",
@@ -434,7 +478,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                   }}
                 >
                   <View>
-                    <SpeedControl size={24} />
+                    <SpeedControl size={24} color='rgb(255, 255, 255)' />
                   </View>
 
                   <TouchableOpacity
@@ -446,7 +490,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                       height: 40
                     }}
                   >
-                    <Backward size={32} strokeWidth={1.88} />
+                    <Backward size={32} strokeWidth={1.88} color='rgb(255, 255, 255)' />
                   </TouchableOpacity>
 
                   {/* Play and Pause */}
@@ -477,11 +521,11 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                       height: 40
                     }}
                   >
-                    <Forward size={32} strokeWidth={1.88} />
+                    <Forward size={32} strokeWidth={1.88} color='rgb(255, 255, 255)' />
                   </TouchableOpacity>
 
                   <View>
-                    <SleepTimer size={24} />
+                    <SleepTimer size={24} color='rgb(255, 255, 255)' />
                   </View>
                 </View>
 
@@ -502,11 +546,11 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
           bottom: 32,
           right: 16,
           left: 16,
-          backgroundColor: "white",
+          backgroundColor: "rgba(11, 11, 11, 0.8)",
           height: 64,
           borderRadius: 32,
           shadowColor: "rgb(0, 0, 0)",
-          shadowOpacity: 0.15,
+          shadowOpacity: 0.18,
           shadowRadius: 6,
           shadowOffset: {
             height: 1,
@@ -514,12 +558,46 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
           }
         }, tabBarAnimationStyle]}
       >
+        <MaskedView
+          style={{
+            position: "absolute",
+            right: 0,
+            left: 0,
+            top: 0,
+            bottom: 0,
+            height: 64,
+            borderRadius: 32
+          }}
+          maskElement={
+            <LinearGradient
+              style={[StyleSheet.absoluteFill, {
+                borderRadius: 32,
+              }]}
+              colors={['rgba(11, 11, 11, 1)', 'rgba(11, 11, 11, 1)']}
+              start={{ x: 1, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            />
+          }
+        >
+          <BlurView
+            style={{
+              position: "absolute",
+              right: 0,
+              left: 0,
+              top: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(11, 11, 11, 0.4)'
+            }}
+            intensity={22}
+          />
+        </MaskedView>
+
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
 
           const { options } = descriptors[route.key];
 
-          const icon = options.tabBarIcon ? options.tabBarIcon({ focused: isFocused, color: 'yellow', size: 22 }) : null;
+          const icon = options.tabBarIcon ? options.tabBarIcon({ focused: isFocused, color: 'white', size: 22 }) : null;
 
           if (!icon) return null;
 
@@ -553,7 +631,8 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                   fontFamily: "SF Pro",
                   fontSize: 10,
                   fontWeight: `${isFocused ? "700" : "600"}`,
-                  lineHeight: 12
+                  lineHeight: 12,
+                  color: `${isFocused ? "rgb(255, 255, 255)" : "rgba(255, 255, 255, 0.6)"}`
                 }}
               >
                 {options.title}

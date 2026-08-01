@@ -8,7 +8,7 @@ export interface Podcast {
   artist: string,
   thumbnail: string,
   genres: [],
-  feedUrl: string
+  feedUrl: string,
 }
 
 export interface PodcastsData {
@@ -50,6 +50,7 @@ interface PodcastState {
 
   // singlePodcast
   podcast: Podcast | null;
+  podDescription: string;
 
   // states
   isLoading: boolean;
@@ -82,6 +83,8 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
     trueCrime: [],
   },
   podcast: null,
+  podDescription: "",
+
   episodes: [],
   episodesToRender: [],
   selectedEpisode: null,
@@ -156,8 +159,13 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
 
   fetchEpisodesData: async (feedUrl) => {
     try {  
-      const episodesData = await fetchEpisodes(feedUrl);
-      set({ episodes: episodesData });
+      const responseData = await fetchEpisodes(feedUrl);
+
+      const podDescription = responseData?.podDescription;
+      const episodes = responseData?.allMappedEpisodes;
+
+      set({podDescription: podDescription});
+      set({episodes: episodes});
       set({episodesToRender: get().episodes.slice(0, 10)});
 
     } catch (error) {

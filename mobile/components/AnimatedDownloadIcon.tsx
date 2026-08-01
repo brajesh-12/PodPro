@@ -53,7 +53,7 @@ const AnimatedDownloadIcon = ({ episode }: { episode: SavedEpisode }) => {
     >
       <LottieView
         ref={lottieRef}
-        source={require("@/assets/micro-animation/icon.json")}
+        source={require("@/assets/micro-animation/darkModeIcon.json")}
         style={{
           position: "absolute",
           right: 0,
@@ -65,33 +65,33 @@ const AnimatedDownloadIcon = ({ episode }: { episode: SavedEpisode }) => {
         // autoPlay={true}
       />
       <Svg
-        height={26}
-        width={26}
-        viewBox="0 0 26 26"
+        height={24}
+        width={24}
+        viewBox="0 0 24 24"
         style={{ transform: [{ rotate: '-90deg' }] }}
       >
         <Circle
-          cx={13}
-          cy={13}
+          cx={12}
+          cy={12}
           r={RADIUS}
-          stroke={'#000'}
+          stroke={'#ffffff'}
           opacity={0.3}
           strokeWidth={1.8}
           fill={"none"}
         />
         <AnimatedCircle
-          cx={13}
-          cy={13}
+          cx={12}
+          cy={12}
           r={RADIUS}
           fill={"none"}
-          stroke={"#000"} strokeDasharray={CIRCUMFERENCE}
+          stroke={"#fff"} strokeDasharray={CIRCUMFERENCE}
           strokeWidth={1.8}
           strokeLinecap={"round"}
           animatedProps={animatedProps}
         />
       </Svg>
     </View>
-  )
-}
+  );
+};
 
 export default AnimatedDownloadIcon;

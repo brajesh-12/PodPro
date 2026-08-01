@@ -17,6 +17,7 @@ import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
 import usePlayerStore from '@/store/usePlayerStore';
 import DownloadEngine from '@/lib/DownloadEngine';
+import { BlurView } from 'expo-blur';
 
 // const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
 // const sheetHeight = SCREEN_HEIGHT * 0.5;
@@ -81,7 +82,7 @@ const CustomModal = () => {
         bottom: 0,
         zIndex: 999,
         justifyContent: "flex-end",
-        backgroundColor: "rgba(0, 0, 0, 0.3)"
+        backgroundColor: "rgba(0, 0, 0, 0.6)"
       }}
     >
       <GestureDetector
@@ -89,13 +90,17 @@ const CustomModal = () => {
       >
         <Animated.View
           style={[{
-            width: "100%",
-            backgroundColor: "white",
-            borderTopLeftRadius: 36,
-            borderTopRightRadius: 36,
+            backgroundColor: "rgb(28, 28, 30)",
+            borderTopLeftRadius: 48,
+            borderTopRightRadius: 48,
+            borderRadius: 56,
             overflow: "hidden",
             paddingHorizontal: 20,
-            paddingBottom: 32
+            paddingBottom: 20,
+            position: "absolute",
+            bottom: 6,
+            right: 6,
+            left: 6,
           }, modalStyle]}
         >
           <Pressable
@@ -104,11 +109,11 @@ const CustomModal = () => {
             }}
             style={{
               position: "absolute",
-              top: 12,
-              right: 12,
+              top: 20,
+              right: 20,
               height: 44,
               width: 44,
-              backgroundColor: "white",
+              backgroundColor: "rgba(11, 11, 11, 0.6)",
               justifyContent: "center",
               alignItems: "center",
               borderRadius: 24,
@@ -118,30 +123,43 @@ const CustomModal = () => {
                 width: -3
               },
               shadowColor: "rgb(0, 0, 0)",
-              shadowOpacity: 0.18,
-              shadowRadius: 8,
+              shadowOpacity: 0.15,
+              shadowRadius: 16,
 
-              elevation: 5
+              elevation: 5,
+              overflow: "hidden"
             }}
           >
-            <CloseIcon size={24} strokeWidth={2} />
-            {/* <ClosedCaptionIcon size={20} strokeWidth={1.2} /> */}
+            <BlurView
+              intensity={22}
+              tint='dark'
+              style={{
+                height: "100%",
+                width: '100%',
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(255, 255, 255, 0.1)"
+              }}
+            >
+              <CloseIcon size={24} strokeWidth={2} color='rgb(255, 255, 255)' />
+            </BlurView>
           </Pressable>
 
           <View
             style={{
               height: 12,
               width: "100%",
-              justifyContent: "center",
+              paddingTop: 7,
+              // justifyContent: "center",
               alignItems: "center"
             }}
           >
             <View
               style={{
                 height: 5,
-                width: 36,
+                width: 32,
                 borderRadius: 32,
-                backgroundColor: "rgb(137, 137, 137)"
+                backgroundColor: "rgba(120, 120, 128, 0.7)"
               }}
             />
           </View>
@@ -174,17 +192,16 @@ const PodcastSheet = () => {
       {/* title */}
       <View
         style={{
-          marginBottom: 16,
+          marginBottom: 8,
           paddingHorizontal: 4,
           justifyContent: "center",
-          // backgroundColor: "yellow"
         }}
       >
         <View
           style={{
             justifyContent: "center",
             borderBottomWidth: 0.8,
-            borderBottomColor: "rgb(221, 221, 221)",
+            borderBottomColor: "rgba(255, 255, 255, 0.2)",
             paddingVertical: 12,
             paddingRight: 32,
             paddingLeft: 4
@@ -196,7 +213,8 @@ const PodcastSheet = () => {
               fontFamily: "SF Pro",
               fontSize: 24,
               fontWeight: "600",
-              lineHeight: 32
+              lineHeight: 32,
+              color: "rgba(255, 255, 255, 0.9)"
             }}
           >
             {tappedPodcast?.title}
@@ -208,7 +226,8 @@ const PodcastSheet = () => {
               fontFamily: "SF Pro",
               fontSize: 16,
               fontWeight: "400",
-              lineHeight: 24
+              lineHeight: 24,
+              color: "rgba(255, 255, 255, 0.6)"
             }}
           >
             {tappedPodcast?.artist}
@@ -220,9 +239,9 @@ const PodcastSheet = () => {
       {/* options */}
       <View
         style={{
-          backgroundColor: 'rgb(236, 236, 236)',
-          borderRadius: 26,
-          marginTop: 12
+          backgroundColor: 'rgba(120, 120, 128, 0.3)',
+            borderRadius: 32,
+            marginTop: 12
         }}
       >
         <Pressable
@@ -233,7 +252,7 @@ const PodcastSheet = () => {
           <View
             style={style.iconContainer}
           >
-            {isSubscribed ? <Unfollow size={22} strokeWidth={1.8} /> : <Follow size={22} strokeWidth={1.8} />}
+            {isSubscribed ? <Unfollow size={22} strokeWidth={1.8} color='rgb(255, 255, 255)' /> : <Follow size={22} strokeWidth={1.8} color='rgb(255, 255, 255)' />}
           </View>
 
           {/* text */}
@@ -256,7 +275,7 @@ const PodcastSheet = () => {
           <View
             style={style.iconContainer}
           >
-            <Download size={22} strokeWidth={1.8} />
+            <Download size={22} strokeWidth={1.8} color='rgb(255, 255, 255)' />
           </View>
 
           {/* text */}
@@ -279,7 +298,7 @@ const PodcastSheet = () => {
           <View
             style={style.iconContainer}
           >
-            <Share size={22} strokeWidth={1.8} />
+            <Share size={22} strokeWidth={1.8} color='rgb(255, 255, 255)' />
           </View>
 
           {/* text */}
@@ -332,7 +351,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
       }
 
       if (isHistoricallyDownladed && task.status === 'IDLE') {
-        DownloadEngine.cancel(tappedEpisode?.id);
+        DownloadEngine.cancel(tappedEpisode.id);
       };
 
       handleClose();
@@ -362,17 +381,16 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
         {/* title */}
         <View
           style={{
-            marginBottom: 16,
+            marginBottom: 8,
             paddingHorizontal: 4,
             justifyContent: "center",
-            // backgroundColor: "yellow"
           }}
         >
           <View
             style={{
               justifyContent: "center",
               borderBottomWidth: 1,
-              borderBottomColor: "rgb(221, 221, 221)",
+              borderBottomColor: "rgba(255, 255, 255, 0.2)",
               paddingVertical: 12,
               paddingRight: 32,
               paddingLeft: 4
@@ -384,7 +402,8 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
                 fontFamily: "SF Pro",
                 fontSize: 24,
                 fontWeight: "600",
-                lineHeight: 32
+                lineHeight: 32,
+                color: "rgba(255, 255, 255, 0.9)"
               }}
             >
               {tappedEpisode?.title}
@@ -397,7 +416,8 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
                 fontFamily: "SF Pro",
                 fontSize: 16,
                 fontWeight: "400",
-                lineHeight: 24
+                lineHeight: 24,
+                color: "rgba(255, 255, 255, 0.6)"
               }}
             >
               {tappedEpisode?.podcastTitle}
@@ -410,8 +430,8 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
         {/* options */}
         <View
           style={{
-            backgroundColor: 'rgb(236, 236, 236)',
-            borderRadius: 26,
+            backgroundColor: 'rgba(120, 120, 128, 0.3)',
+            borderRadius: 32,
             marginTop: 12
           }}
         >
@@ -422,7 +442,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Share size={24} strokeWidth={1.8} />
+              <Share size={24} strokeWidth={1.8} color='rgb(255, 255, 255)' />
             </View>
 
             {/* text */}
@@ -449,7 +469,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Play size={22} strokeWidth={1.8} />
+              <Play size={22} strokeWidth={1.8} fill={'rgb(255, 255, 255)'} color={'rgb(255, 255, 255)'} />
             </View>
 
             {/* text */}
@@ -475,9 +495,9 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              {task.status === "COMPLETED" || isHistoricallyDownladed 
-                ? <Downloaded size={24} />
-                : <Download size={22} strokeWidth={1.8} />
+              {task.status === "COMPLETED" || isHistoricallyDownladed
+                ? <Downloaded size={24} fill='rgb(255, 255, 255)' />
+                : <Download size={22} strokeWidth={1.8} color='rgb(255, 255, 255)' />
               }
             </View>
 
@@ -489,7 +509,10 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
                 numberOfLines={1}
                 style={style.text}
               >
-                Download
+                {task.status === 'COMPLETED' || isHistoricallyDownladed
+                  ? 'Remove from Download'
+                  : 'Download'
+                }
               </Text>
             </View>
           </Pressable>
@@ -504,7 +527,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Save size={24} strokeWidth={1.8} fill={isSaved ? 'black' : "none"} />
+              <Save size={24} strokeWidth={1.8} fill={isSaved ? 'rgba(255, 255, 255, 0.9)' : "none"} color='rgba(255, 255, 255, 0.9)' />
             </View>
 
             {/* text */}
@@ -531,7 +554,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Save size={24} strokeWidth={1.8} />
+              <Save size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
             </View>
 
             {/* text */}
@@ -554,7 +577,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Save size={24} strokeWidth={1.8} />
+              <Save size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
             </View>
 
             {/* text */}
@@ -577,7 +600,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Podcasts size={24} strokeWidth={1.8} />
+              <Podcasts size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
             </View>
 
             {/* text */}
@@ -613,13 +636,14 @@ export const style = StyleSheet.create({
     fontFamily: "SF Pro",
     fontSize: 17,
     lineHeight: 22,
-    letterSpacing: 0
+    letterSpacing: 0,
+    color: "rgba(255, 255, 255, 0.8)"
   },
   textContainer: {
     height: "100%",
     flex: 1,
     borderBottomWidth: 0.5,
-    borderBottomColor: "rgb(211, 211, 211)",
+    borderBottomColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
   },
   iconContainer: {
@@ -628,14 +652,4 @@ export const style = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  testStyle: {
-    height: 48,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingLeft: 14,
-    paddingRight: 11,
-    borderRadius: 24,
-    backgroundColor: "rgb(223, 223, 223)"
-  }
 });

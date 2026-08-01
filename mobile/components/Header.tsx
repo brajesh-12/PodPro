@@ -175,7 +175,7 @@ const Header: React.FC<Screen> = ({ screen }) => {
 
 export const SubscriptionHeader = ({ style }: { style: any }) => {
   const router = useRouter();
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   const { isSelected, setIsSelected, followingPodcasts, selectedPodcast, setSelectedPodcast, singlePodFeed, fetchFeed, clearSelectedPodcast } = useSubscriptionStore();
 
@@ -187,7 +187,7 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
         right: 0,
         left: 0,
         zIndex: 2,
-        backgroundColor: "rgb(242, 242, 242)",
+        backgroundColor: "rgb(11, 11, 11)",
         paddingTop: insets.top
       }, style]}
     >
@@ -213,7 +213,8 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
                   fontFamily: "SF Pro",
                   fontSize: 24,
                   fontWeight: "700",
-                  lineHeight: 32
+                  lineHeight: 32,
+                  color: 'rgba(255, 255, 255, 0.9)'
                 }}
               >
                 Podcasts
@@ -231,10 +232,10 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
                     justifyContent: "center",
                     height: 36,
                     width: 36,
-                    borderRadius: 72
+                    borderRadius: 72,
                   }}
                 >
-                  <ArrowLeft size={24} />
+                  <ArrowLeft size={24} color={'rgba(255, 255, 255, 0.8)'} />
                 </Pressable>
               )
           }
@@ -280,7 +281,7 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
                 borderRadius: 112,
                 padding: 2,
                 borderWidth: 2,
-                borderColor: selectedPodcast?.id === pod.id ? "grey" : "rgb(242, 242, 242)"
+                borderColor: selectedPodcast?.id === pod.id ? "grey" : "rgb(11, 11, 11)"
               }}
             >
               <Image
@@ -303,7 +304,8 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
                 fontWeight: '500',
                 lineHeight: 16,
                 width: 56,
-                textAlign: 'center'
+                textAlign: 'center',
+                color: "rgba(255, 255, 255, 0.9)"
               }}
             >
               {pod.title}
@@ -332,7 +334,8 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
                 fontFamily: "SF Pro",
                 fontSize: 16,
                 fontWeight: "600",
-                lineHeight: 24
+                lineHeight: 24,
+                color: "rgba(255, 255, 255, 0.9)"
               }}
             >
               View Podcast

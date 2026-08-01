@@ -61,11 +61,28 @@ export const fetchPodcast = async (id) => {
     const response = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=podcast`);
     const jsonResponse = await response.json();
     const result = jsonResponse.results[0];
-    console.log("fetch result:", result);
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status} - ${response.statusText}`);
     }
+
+    // get podcast description
+    const feedResponse = await fetch(result.feedUrl);
+    const responseText = await feedResponse.text();
+    const validation = XMLValidator.validate(responseText);
+
+    if (!validation) {
+      console.error("Invalid XML formate");
+      return null;
+    }
+
+    const jsonObj = parser.parse(responseText);
+    if (!jsonObj.rss || !jsonObj.rss.channel) {
+      console.error("RSS or channel node missing in feed");
+      return null;
+    }
+
+    const channel = jsonObj.rss.channel;
 
     const transformData = {
       id: result.collectionId,
@@ -73,7 +90,8 @@ export const fetchPodcast = async (id) => {
       artist: result.artistName,
       thumbnail: result.artworkUrl600,
       feedUrl: result.feedUrl,
-      genres: result.genres
+      genres: result.genres,
+      description: channel.description
     }
 
     return transformData || null;
@@ -85,7 +103,7 @@ export const fetchPodcast = async (id) => {
 
 export const syncEpisodes = async (podcast) => {
   const feedUrl = podcast.feedUrl;
-  if(!feedUrl) {
+  if (!feedUrl) {
     throw new Error("FeedUrl is not founc");
   }
 
@@ -136,14 +154,14 @@ export const syncEpisodes = async (podcast) => {
 };
 
 export const getPublicIdFromUrl = (url) => {
-  if(!url || !url.includes('/upload/')) return null;
+  if (!url || !url.includes('/upload/')) return null;
   const parts = url.split('upload');
   const pathWithoutVersion = part[1].replace(/^v\d+\//, '');
   return pathWithoutversion.replace(/\.[^/.]+$/, "");
 };
 
 export const generateUserName = (email) => {
-  if(!email || !email.includes("@")) {
+  if (!email || !email.includes("@")) {
     return `user_${Math.floor(Math.random() * 10000)}`;
   }
 
@@ -151,7 +169,7 @@ export const generateUserName = (email) => {
 
   let cleanPrefix = rawPrefix.replace(/[^a-zA-Z]/g, '');
 
-  if(!cleanPrefix) {
+  if (!cleanPrefix) {
     cleanPrefix = 'user';
   }
 
@@ -161,17 +179,17 @@ export const generateUserName = (email) => {
 };
 
 export const formatUserName = (string) => {
-  if(!string) return;
+  if (!string) return;
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
 
 export const generateProfileImage = (identifier) => {
   let safeIdentifier = 'U';
 
-  if(typeof identifier === "string") {
+  if (typeof identifier === "string") {
     const trimmed = identifier.trim();
 
-    if(trimmed.length > 0 && !trimmed.includes('[native code]')) {
+    if (trimmed.length > 0 && !trimmed.includes('[native code]')) {
       safeIdentifier = trimmed;
     }
   }
@@ -181,3 +199,40 @@ export const generateProfileImage = (identifier) => {
 
   return avatarUrl;
 };
+
+// export const updateDatabasePodcasts = async () => {
+//   console.log("Starting Podcast Update:");
+//   try {
+//     const podcasts = await Podcast.find({ description: { $exists: false } });
+
+//     const bulkOperations = [];
+
+//     for (const podcast of podcasts) {
+//       try {
+//         const pod = await fetchPodcast(podcast.id);
+
+//         bulkOperations.push({
+//           updateOne: {
+//             filter: { _id: podcast._id },
+//             update: {
+//               $set: { description: pod.description }
+//             }
+//           }
+//         });
+
+//         await new Promise(resolve => setTimeout(resolve, 500));
+//       } catch (error) {
+//         console.error(`Failed to process podcast ${podcast.id}:`, error.message);
+//       }
+//     }
+
+//     if (bulkOperations.length > 0) {
+//       const result = await Podcast.bulkWrite(bulkOperations);
+//       console.log(`Success! Updated ${result.modifiedCount} podcasts.`);
+//     } else {
+//       console.log("No valid descriptions were found to update.")
+//     }
+//   } catch (error) {
+//     console.error("Error updating Database Podcasts:", error.message);
+//   }
+// };

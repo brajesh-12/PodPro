@@ -24,6 +24,10 @@ const podcastSchema = mongoose.Schema({
   feedUrl: {
     type: String,
     required: true
+  },
+  description: {
+    type: String,
+    required: true
   }
 }, {timestamps: true});
 

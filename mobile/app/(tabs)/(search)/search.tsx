@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, TextInput, Pressable, FlatList } from 'react-native';
-import { ArrowLeft, EllipsisVertical, X, Search } from 'lucide-react-native';
+import { View, Text, TouchableOpacity, TextInput, Pressable, FlatList, StyleSheet } from 'react-native';
+import { EllipsisVertical, X, Search, ChevronLeft } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
@@ -8,6 +8,9 @@ import { searchPodcast } from '@/services/podcastAPI';
 import useDebounce from '@/hooks/useDebounce';
 import useModalStore from '@/store/useModalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const SearchScreen = () => {
   const router = useRouter();
@@ -41,52 +44,105 @@ const SearchScreen = () => {
     <View
       style={{
         flex: 1,
-        paddingTop: insets.top
+        paddingTop: insets.top,
+        backgroundColor: "rgb(11, 11, 11)"
       }}
     >
+      <MaskedView
+        style={{
+          position: "absolute",
+          right: 0,
+          left: 0,
+          top: 0,
+          height: 150,
+          zIndex: 10
+        }}
+        maskElement={
+          <LinearGradient
+            style={StyleSheet.absoluteFill}
+            colors={['rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+          />}
+      >
+        <BlurView
+          intensity={30}
+          tint="light"
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            left: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)'
+          }}
+        />
+      </MaskedView>
+
       {/* Search Bar */}
       <View
         style={{
+          position: "absolute",
+          top: insets.top,
+          right: 0,
+          left: 0,
           flexDirection: "row",
           height: 48,
-          width: "auto",
           paddingHorizontal: 16,
           gap: 8,
           alignItems: "center",
           marginBottom: 12,
-          marginTop: 12
+          marginTop: 12,
+          zIndex: 50
         }}
       >
         <TouchableOpacity
           onPress={() => {
-            router.back();
             resetSearch();
+            router.back();
           }}
           style={{
             height: 48,
             width: 48,
-            borderRadius: 24,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgb(218, 218, 218)"
+            backgroundColor: "rgb()",
+            borderRadius: 100,
+            shadowOpacity: 0.12,
+            shadowOffset: {
+              height: 2,
+              width: 1,
+            },
+            shadowRadius: 8,
+            overflow: "hidden"
           }}
         >
-          <ArrowLeft size={24} />
+          <BlurView
+            intensity={32}
+            style={{
+              flex: 1,
+              paddingLeft: 8,
+              justifyContent: 'center',
+              backgroundColor: "rgba(11, 11, 11, 0.4)",
+            }}
+          >
+            <ChevronLeft size={28} color={'rgb(255, 255, 255)'} />
+          </BlurView>
         </TouchableOpacity>
 
-        <View
+        <BlurView
+          intensity={22}
           style={{
             flexDirection: "row",
             gap: 4,
             alignItems: "center",
             flex: 1,
             height: 48,
-            backgroundColor: "rgb(218, 218, 218)",
+            backgroundColor: "rgba(11, 11, 11, 0.4)",
             borderRadius: 32,
             paddingHorizontal: 12,
+            overflow: "hidden"
           }}
         >
-          <Search size={22} strokeWidth={1.8} />
+          <Search size={22} strokeWidth={1.8} color={'rgba(255, 255, 255, 0.8)'} />
           <TextInput
             placeholder='Search Podcast'
             value={searchQuery}
@@ -97,7 +153,9 @@ const SearchScreen = () => {
               fontFamily: "SF Pro",
               fontSize: 16,
               fontWeight: "400",
+              color: 'rgb(255, 255, 255)',
             }}
+            placeholderTextColor={"rgba(255, 255, 255, 0.6)"}
             keyboardAppearance="default"
             keyboardType="ascii-capable"
             autoFocus={true}
@@ -107,25 +165,12 @@ const SearchScreen = () => {
               <Pressable
                 onPress={() => setSearchQuery("")}
               >
-                <X size={16} />
+                <X size={16} color={'rgba(255, 255, 255, 0.8)'} />
               </Pressable>
             )
           }
 
-        </View>
-
-        {/* {searchQuery.length === 0 && (
-          <TouchableOpacity
-            style={{
-              height: 36,
-              width: 36,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Settings size={24} />
-          </TouchableOpacity>
-        )} */}
+        </BlurView>
 
       </View>
 
@@ -189,7 +234,8 @@ const SearchScreen = () => {
                   numberOfLines={1}
                   ellipsizeMode='tail'
                   style={{
-                    width: 249
+                    width: 249,
+                    color: "rgba(255, 255, 255, 0.9)"
                   }}
                 >
                   {item.title}
@@ -198,7 +244,8 @@ const SearchScreen = () => {
                   numberOfLines={1}
                   ellipsizeMode='tail'
                   style={{
-                    width: 249
+                    width: 249,
+                    color: "rgba(255, 255, 255, 0.6)"
                   }}
                 >
                   {item.artist}
@@ -216,11 +263,14 @@ const SearchScreen = () => {
                 width: 30
               }}
             >
-              <EllipsisVertical size={20} />
+              <EllipsisVertical size={20} color={'rgba(255, 255, 255, 0.8)'} />
             </Pressable>
           </Pressable>
         )}
         bounces={false}
+        contentContainerStyle={{
+          paddingTop: insets.top + 32
+        }}
       />
     </View>
   )

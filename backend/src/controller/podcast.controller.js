@@ -29,7 +29,8 @@ export const savePodcast = async (req, res) => {
         artist: podcast.artist,
         thumbnail: podcast.thumbnail,
         genres: podcast.genres,
-        feedUrl: podcast.feedUrl
+        feedUrl: podcast.feedUrl,
+        description: podcast.description
       });
 
       saveToPodcast = await newPodcastDoc.save();

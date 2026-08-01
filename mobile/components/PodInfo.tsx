@@ -1,18 +1,23 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import React, { useState } from 'react'
 import { Image } from 'expo-image';
-import { Podcast} from '@/store/usePodcastStore';
-import { Settings, Share2, Star } from 'lucide-react-native';
+import { Podcast } from '@/store/usePodcastStore';
+import { Star } from 'lucide-react-native';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const PodInfo: React.FC<{podcast: Podcast | null}> = ({podcast}) => {
+const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefined }> = ({ podcast, description }) => {
   const { toggleSubscription, subscriptionIds } = useSubscriptionStore();
+  const [ collapsed, setCollapsed ] = useState(true);
 
   const isSubscribed = podcast?.id !== undefined ? subscriptionIds.has(podcast?.id) : false;
 
-  if(!podcast) {
+  if (!podcast) {
     return <View><Text>Loading...</Text></View>
   }
+
+  const genres = podcast.genres;
 
   return (
     <View>
@@ -34,7 +39,7 @@ const PodInfo: React.FC<{podcast: Podcast | null}> = ({podcast}) => {
           }}
         >
           <Image
-            source={{uri: podcast.thumbnail}}
+            source={{ uri: podcast.thumbnail }}
             style={{
               height: "100%",
               width: "100%",
@@ -53,31 +58,6 @@ const PodInfo: React.FC<{podcast: Podcast | null}> = ({podcast}) => {
           alignItems: "center"
         }}
       >
-        {/* rating tag */}
-        <View
-          style={{
-            width: 74,
-            flexDirection: "row",
-            gap: 4,
-            paddingHorizontal: 6,
-            paddingVertical: 4,
-            backgroundColor: "rgb(217, 217, 217)",
-            borderRadius: 4
-          }}
-        >
-          <Star size={16} fill={"black"} strokeWidth={0}/>
-
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 12,
-              fontWeight: "400",
-              lineHeight: 16
-            }}
-          >
-            4.5(2k)
-          </Text>
-        </View>
 
         {/* Text container */}
         <View
@@ -97,7 +77,8 @@ const PodInfo: React.FC<{podcast: Podcast | null}> = ({podcast}) => {
               fontSize: 24,
               fontWeight: "600",
               lineHeight: 32,
-              textAlign: "center"
+              textAlign: "center",
+              color: "rgba(255, 255, 255, 0.9)"
             }}
           >
             {podcast.title}
@@ -109,7 +90,7 @@ const PodInfo: React.FC<{podcast: Podcast | null}> = ({podcast}) => {
               fontSize: 14,
               fontWeight: "500",
               lineHeight: 16,
-              color: "grey"
+              color: "rgba(255, 255, 255, 0.6)"
             }}
           >
             {podcast.artist}
@@ -121,64 +102,157 @@ const PodInfo: React.FC<{podcast: Podcast | null}> = ({podcast}) => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: "center",
           paddingHorizontal: 50.5,
           marginBottom: 24
         }}
       >
-        <View
-          style={{
-            height: 44,
-            width: 44,
-            borderRadius: 88,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgb(217, 217, 217)"
-          }}
-        >
-          <Settings size={22} strokeWidth={2}/>
-        </View>
 
         {/* Button */}
         <TouchableOpacity
           onPress={() => toggleSubscription(podcast.id)}
           style={{
-            height: 44,
-            width: 172,
+            height: 48,
+            width: 200,
             borderRadius: 88,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "black",
+            overflow: "hidden"
           }}
         >
-          <Text
+          <BlurView
+            intensity={22}
+            tint='light'
             style={{
-              fontFamily: "SF Pro",
-              fontSize: 18,
-              fontWeight: "500",
-              lineHeight: 28,
-              color: "white"
+              height: '100%',
+              width: '100%',
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
             }}
           >
-            {isSubscribed 
-              ? "Unfollow"
-              : "Follow"
-            }
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontSize: 18,
+                fontWeight: "500",
+                lineHeight: 28,
+                color: "white"
+              }}
+            >
+              {isSubscribed
+                ? "Unfollow"
+                : "Follow"
+              }
+            </Text>
+          </BlurView>
+        </TouchableOpacity>
+      </View>
+
+      {/* discription and other info */}
+      <View
+        style={{
+          paddingHorizontal: 20
+        }}
+      >
+        <View>
+          <Text
+            numberOfLines={collapsed ? 2 : 0}
+            ellipsizeMode='tail'
+            style={{
+              color: "rgba(255, 255, 255, 0.8)",
+              fontFamily: "SF Pro",
+              fontSize: 14,
+              fontWeight: "400",
+              lineHeight: 20
+            }}
+          >
+            {description}
           </Text>
 
-        </TouchableOpacity>
+          <Pressable
+            onPress={() => {
+              setCollapsed(false);
+            }}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              opacity: collapsed ? 1 : 0
+            }}
+          >
+            <LinearGradient
+              style={{
+                width: 60,
+              }}
+              colors={["rgba(11, 11, 11, 1)", "rgba(11, 11, 11, 0)"]}
+              start={{ x: 1, y: 0 }}
+              end={{ x: 0, y: 0 }}
+            >
+              <BlurView
+                intensity={2}
+                tint="systemMaterialDark"
+                style={{
+                  width: "100%",
+                  backgroundColor: "rgba(11, 11, 11, 0.2)",
+                  alignItems: "flex-end"
+                }}
+              >
+                <Text
+                  style={{
+                    color: "rgb(255, 255, 255)",
+                    fontFamily: "SF Pro",
+                    fontWeight: "500",
+                    fontSize: 14
+                  }}
+                >
+                  MORE
+                </Text>
+              </BlurView>
+            </LinearGradient>
+          </Pressable>
+        </View>
+
+        {/* Rating and genres */}
 
         <View
           style={{
-            height: 44,
-            width: 44,
-            borderRadius: 88,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgb(217, 217, 217)"
+            flexDirection: "row",
+            paddingVertical: 12
           }}
         >
-          <Share2 size={22} strokeWidth={2}/>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: "center"
+            }}
+          >
+            <Star size={18} fill={'rgba(255, 255, 255, 0.9)'} />
+            <Text
+              style={{
+                color: "rgba(255, 255, 255, 1)",
+                fontFamily: "SF Pro",
+                fontSize: 13,
+                lineHeight: 16,
+                fontWeight: "400"
+              }}
+            >
+              4.8 (95)
+            </Text>
+          </View>
+
+          {genres.map((genre) => (
+            <Text key={genre}
+              style={{
+                color: "rgb(255, 255, 255)",
+                paddingLeft: 3,
+                fontFamily: "SF Pro",
+                fontSize: 13,
+                fontWeight: "400",
+                lineHeight: 16
+              }}
+            >
+              &middot; {genre}
+            </Text>
+          ))}
         </View>
       </View>
 

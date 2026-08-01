@@ -32,13 +32,14 @@ const Section = ({ title, data, tab, onPress }: { title: string; data: Podcast[]
             fontFamily: "SF Pro",
             fontSize: 20,
             fontWeight: '700',
-            lineHeight: 28
+            lineHeight: 28,
+            color: 'rgba(255, 255, 255, 0.8)'
           }}
         >
           {title}
         </Text>
 
-        <ChevronRight size={22} strokeWidth={1.8} />
+        <ChevronRight size={22} strokeWidth={1.8} color={'rgb(255, 255, 255)'} />
       </Pressable>
 
       <FlatList
@@ -111,7 +112,8 @@ const Section = ({ title, data, tab, onPress }: { title: string; data: Podcast[]
                     fontFamily: "SF Pro",
                     fontWeight: '500',
                     fontSize: 14,
-                    lineHeight: 16
+                    lineHeight: 16,
+                    color: 'rgba(255, 255, 255, 0.95)'
                   }}
                 >
                   {item.title}
@@ -125,7 +127,8 @@ const Section = ({ title, data, tab, onPress }: { title: string; data: Podcast[]
                     fontFamily: "SF Pro",
                     fontWeight: '400',
                     fontSize: 14,
-                    lineHeight: 16
+                    lineHeight: 16,
+                    color: 'rgba(255, 255, 255, 0.6)'
                   }}
                 >
                   {item.artist}

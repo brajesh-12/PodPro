@@ -49,14 +49,15 @@ const NewEpisodes = () => {
                   fontFamily: "SF Pro",
                   fontWeight: "700",
                   fontSize: 18,
-                  lineHeight: 28
+                  lineHeight: 28,
+                  color: "rgba(255, 255, 255, 0.8)"
                 }}
               >
                 New Episodes
               </Text>
 
               <View>
-                <ChevronRight size={22} strokeWidth={1.8} />
+                <ChevronRight size={22} strokeWidth={1.8} color={"rgba(255, 255, 255, 0.8)"} />
               </View>
             </Pressable>
 
@@ -121,7 +122,7 @@ const NewEpisodes = () => {
                           fontSize: 14,
                           fontWeight: "500",
                           lineHeight: 20,
-                          color: "black",
+                          color: "rgba(255, 255, 255, 0.9)",
                           // width: 220
                         }}
                         numberOfLines={1}
@@ -138,7 +139,7 @@ const NewEpisodes = () => {
                           fontSize: 14,
                           fontWeight: "500",
                           lineHeight: 20,
-                          color: "grey",
+                          color: "rgba(255, 255, 255, 0.6)",
                           // width: 220
                         }}
                       >

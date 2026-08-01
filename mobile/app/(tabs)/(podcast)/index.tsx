@@ -33,7 +33,7 @@ const PodcastsScreen = () => {
     if (hasNextPage) {
       await singlePodFeed(currentPage + 1);
     }
-  }
+  };
 
   useEffect(() => {
     fetchFeed(currentPage);
@@ -77,7 +77,7 @@ const PodcastsScreen = () => {
         style={{
           flex: 1,
           paddingTop: insets.top,
-          backgroundColor: "rgb(15, 15, 15)"
+          backgroundColor: "rgb(11, 11, 11)"
         }}
       >
         <StatusBar
@@ -212,6 +212,7 @@ const PodcastsScreen = () => {
       collapsable={false}
       style={{
         flex: 1,
+        backgroundColor: "rgb(11, 11, 11)"
       }}
     >
       <View
@@ -221,7 +222,7 @@ const PodcastsScreen = () => {
           right: 0,
           left: 0,
           paddingTop: insets.top,
-          backgroundColor: "rgb(242, 242, 242)",
+          backgroundColor: "rgb(11, 11, 11)",
           zIndex: 30
         }}
       />

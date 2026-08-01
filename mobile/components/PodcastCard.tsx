@@ -67,7 +67,8 @@ const PodcastCard = ({ item, tab }: { item: Podcast, tab: string }) => {
             fontFamily: "SF Pro",
             fontWeight: '500',
             fontSize: 14,
-            lineHeight: 16
+            lineHeight: 16,
+            color: 'rgba(255, 255, 255, 0.9)'
           }}
         >
           {item.title}
@@ -81,7 +82,8 @@ const PodcastCard = ({ item, tab }: { item: Podcast, tab: string }) => {
             fontFamily: "SF Pro",
             fontWeight: '400',
             fontSize: 14,
-            lineHeight: 16
+            lineHeight: 16,
+            color: 'rgba(255, 255, 255, 0.6)'
           }}
         >
           {item.artist}
