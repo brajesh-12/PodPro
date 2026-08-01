@@ -72,7 +72,7 @@ export default function RootLayout() {
         <StatusBar
           translucent={true}
           backgroundColor={"transparent"}
-          style="auto"
+          style="light"
         />
 
         <AudioController />

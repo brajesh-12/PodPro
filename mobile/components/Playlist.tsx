@@ -66,7 +66,8 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
               fontSize: 16,
               fontWeight: '500',
               lineHeight: 24,
-              width: "100%"
+              width: "100%",
+              color: 'rgba(255, 255, 255, 0.9)'
             }}
           >
             {playlist.title}
@@ -76,7 +77,8 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
               fontFamily: "SF Pro",
               fontSize: 14,
               fontWeight: "400",
-              lineHeight: 20
+              lineHeight: 20,
+              color: 'rgba(255, 255, 255, 0.6)'
             }}
           >
             {playlist.type === 'Save' || playlist.type === 'Download'
@@ -101,7 +103,7 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
             borderRadius: 60
           }}
         >
-          <EllipsisVertical size={20} strokeWidth={2} />
+          <EllipsisVertical size={20} strokeWidth={2} color={'rgb(255, 255, 255)'} />
         </Pressable>
       }
     </Pressable>
@@ -163,7 +165,8 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
             fontSize: 16,
             fontWeight: "500",
             lineHeight: 24,
-            width: 168
+            width: 168,
+            color: "rgba(255, 255, 255, 0.9)"
           }}
         >
           {playlist.title}
@@ -174,7 +177,8 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
             fontFamily: "SF Pro",
             fontSize: 14,
             fontWeight: "400",
-            lineHeight: 20
+            lineHeight: 20,
+            color: 'rgba(255, 255, 255, 0.6)'
           }}
         >
           {playlist.type === 'Save' || playlist.type === 'Download'

@@ -4,9 +4,10 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } fr
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useEffect } from 'react';
 import { scheduleOnRN } from 'react-native-worklets';
-import { Captions } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import usePlaylistStore from '@/store/usePlaylistStore';
+import { BlurView } from 'expo-blur';
+import { CloseIcon } from '@/Icons-assets/Icon';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
 const sheetHeight = SCREEN_HEIGHT * 0.5;
@@ -67,7 +68,7 @@ const PlaylistSelection = () => {
   return (
     <View
       style={{
-        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
         position: "absolute",
         right: 0,
         left: 0,
@@ -82,24 +83,31 @@ const PlaylistSelection = () => {
       >
         <Animated.View
           style={[{
-            height: sheetHeight,
-            width: "100%",
-            backgroundColor: "white",
-            borderTopLeftRadius: 36,
-            borderTopRightRadius: 36,
+            // height: sheetHeight,
+            backgroundColor: "rgb(28, 28, 30)",
+            borderTopLeftRadius: 48,
+            borderTopRightRadius: 48,
+            borderRadius: 56,
             overflow: "hidden",
             paddingHorizontal: 20,
-            paddingBottom: 32
+            paddingBottom: 20,
+            position: "absolute",
+            bottom: 6,
+            right: 6,
+            left: 6,
           }, bottomSheetStyle]}
         >
           <Pressable
+            onPress={() => {
+              handleClose();
+            }}
             style={{
               position: "absolute",
-              top: 12,
-              right: 12,
+              top: 20,
+              right: 20,
               height: 44,
               width: 44,
-              backgroundColor: "white",
+              backgroundColor: "rgba(11, 11, 11, 0.6)",
               justifyContent: "center",
               alignItems: "center",
               borderRadius: 24,
@@ -109,32 +117,43 @@ const PlaylistSelection = () => {
                 width: -3
               },
               shadowColor: "rgb(0, 0, 0)",
-              shadowOpacity: 0.18,
-              shadowRadius: 8,
+              shadowOpacity: 0.15,
+              shadowRadius: 16,
 
-              elevation: 5
-            }}
-            onPress={() => {
-              handleClose();
+              elevation: 5,
+              overflow: "hidden"
             }}
           >
-            <Captions size={20} strokeWidth={1.5} />
+            <BlurView
+              intensity={22}
+              tint='dark'
+              style={{
+                height: "100%",
+                width: '100%',
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(255, 255, 255, 0.1)"
+              }}
+            >
+              <CloseIcon size={24} strokeWidth={2} color='rgb(255, 255, 255)' />
+            </BlurView>
           </Pressable>
 
           <View
             style={{
               height: 12,
               width: "100%",
-              justifyContent: "center",
+              paddingTop: 7,
+              // justifyContent: "center",
               alignItems: "center"
             }}
           >
             <View
               style={{
                 height: 5,
-                width: 36,
+                width: 32,
                 borderRadius: 32,
-                backgroundColor: "rgb(137, 137, 137)"
+                backgroundColor: "rgba(120, 120, 128, 0.7)"
               }}
             />
           </View>
@@ -145,18 +164,32 @@ const PlaylistSelection = () => {
               paddingVertical: 12,
               justifyContent: "center",
               borderBottomWidth: 1,
-              borderBottomColor: "rgb(221, 221, 221)"
+              borderBottomColor: "rgba(255, 255, 255, 0.2)",
+              marginBottom: 8
             }}
           >
             <Text
               style={{
                 fontFamily: "SF Pro",
                 fontWeight: "600",
-                fontSize: 18,
-                lineHeight: 28
+                fontSize: 22,
+                lineHeight: 32,
+                color: 'rgba(255, 255, 255, 0.9)'
               }}
             >
               Select Playlist
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: "SF Pro",
+                fontWeight: "400",
+                fontSize: 16,
+                lineHeight: 24,
+                color: "rgba(255, 255, 255, 0.6)"
+              }}
+            >
+              Select or Create new playlist
             </Text>
           </View>
 
@@ -213,7 +246,8 @@ const PlaylistSelection = () => {
                           fontFamily: "SF Pro",
                           fontWeight: "600",
                           fontSize: 16,
-                          lineHeight: 24
+                          lineHeight: 24,
+                          color: 'rgba(255, 255, 255, 0.9)'
                         }}
                       >
                         {item.title}
@@ -223,7 +257,8 @@ const PlaylistSelection = () => {
                           fontFamily: "SF Pro",
                           fontWeight: "400",
                           fontSize: 14,
-                          lineHeight: 20
+                          lineHeight: 20,
+                          color: "rgba(255, 255, 255, 0.6)"
                         }}
                       >
                         {item.createdAt}

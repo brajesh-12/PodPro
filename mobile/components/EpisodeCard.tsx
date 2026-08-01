@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from 'react-native';
-import { CirclePlay, EllipsisVertical } from 'lucide-react-native';
+import { EllipsisVertical, Play } from 'lucide-react-native';
 import useSubscriptionStore, { SavedEpisode } from '@/store/useSubscriptionStore';
 import { formatDuration, formatDate } from '@/lib/utils';
 import { Image } from 'expo-image';
@@ -115,7 +115,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
         paddingBottom: 8,
         paddingTop: 6,
         borderBottomWidth: 0.8,
-        borderBottomColor: 'grey',
+        borderBottomColor: "rgba(255, 255, 255, 0.2)",
         marginBottom: 8,
         paddingLeft: 20,
       }}
@@ -181,6 +181,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
                   fontSize: 16,
                   fontWeight: '600',
                   lineHeight: 24,
+                  color: 'rgba(255, 255, 255, 0.9)'
                 }}
               >
                 {episode.title}
@@ -191,7 +192,8 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
                   fontFamily: "SF Pro",
                   fontSize: 14,
                   fontWeight: '400',
-                  lineHeight: 16
+                  lineHeight: 16,
+                  color: 'rgba(255, 255, 255, 0.6)'
                 }}
               >
                 {episode.podcastTitle}
@@ -215,7 +217,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
               openModal("episode");
             }}
           >
-            <EllipsisVertical size={20} strokeWidth={2} />
+            <EllipsisVertical size={20} strokeWidth={2} color={'rgb(255, 255, 255)'} />
           </Pressable>
         </View>
 
@@ -228,7 +230,8 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
             fontFamily: "SF Pro",
             fontSize: 14,
             lineHeight: 20,
-            fontWeight: '400'
+            fontWeight: '400',
+            color: 'rgba(255, 255, 255, 0.6)'
           }}
         >
           {episode.description}
@@ -253,7 +256,8 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
               fontFamily: "SF Pro",
               fontSize: 14,
               fontWeight: '400',
-              lineHeight: 20
+              lineHeight: 20,
+              color: 'rgb(255, 255, 255)'
             }}
           >
             {formatDate(episode.publishDate)} &#xB7; {formatDuration(episode.duration)}
@@ -268,7 +272,6 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
             gap: 2,
             alignItems: "center",
             justifyContent: "flex-end",
-            // backgroundColor: "red"
           }}
         >
 
@@ -282,7 +285,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
             }}
             onPress={handleSave}
           >
-            <Save size={22} fill={isSaved ? 'black' : 'none'} />
+            <Save size={22} fill={isSaved ? 'rgb(255, 255, 255)' : 'none'} color='rgb(255, 255, 255)' />
           </Pressable>
 
           <Pressable
@@ -292,12 +295,11 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
               justifyContent: "center",
               alignItems: "center",
               borderRadius: 32,
-              // backgroundColor: "rgb(217, 217, 217)"
             }}
             onPress={handleDownloadPress}
           >
             {task.status === 'COMPLETED' || isHistoricallyDownladed
-              ? <Downloaded size={28} />
+              ? <Downloaded size={28} fill={'rgb(255, 255, 255)'} />
               : <AnimatedDownloadIcon episode={episode} />
             }
           </Pressable>
@@ -315,7 +317,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
               setActiveEpisode(episode);
             }}
           >
-            <CirclePlay size={24} strokeWidth={2} />
+            <Play size={22} fill={'rgb(255, 255, 255)'} color={'rgb(255, 255, 255)'} />
           </Pressable>
 
         </View>

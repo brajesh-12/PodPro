@@ -86,6 +86,9 @@ export const fetchEpisodes = async (feedUrl: string,) => {
 
     const jsonObj = parser.parse(responseText);
     const channel = jsonObj.rss.channel;
+
+    const podDescription = channel.description;
+
     const items = Array.isArray(channel.item) ? channel.item : [channel.item];
 
     const allMappedEpisodes = items.map((ep: any) => ({
@@ -100,12 +103,15 @@ export const fetchEpisodes = async (feedUrl: string,) => {
       podcastTitle: channel.title
     }));
 
-    const trailers = allMappedEpisodes.filter((ep: any) => ep.episodeType === 'trailer');
-    const mainEpisodes = allMappedEpisodes.filter((ep: any) => ep.episodeType !== 'trailer');
+    // const trailers = allMappedEpisodes.filter((ep: any) => ep.episodeType === 'trailer');
+    // const mainEpisodes = allMappedEpisodes.filter((ep: any) => ep.episodeType !== 'trailer');
 
-    const sortedEpisodes = [...trailers, ...mainEpisodes];
+    // const sortedEpisodes = [...trailers, ...mainEpisodes];
 
-    return sortedEpisodes;
+    return {
+      podDescription,
+      allMappedEpisodes
+    }
   } catch (error) {
     console.error("Error fetching episodes:", error);
   }

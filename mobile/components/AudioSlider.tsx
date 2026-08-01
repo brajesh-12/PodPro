@@ -91,7 +91,7 @@ const AudioSlider = () => {
               style={[{
                 height: 6,
                 width: "100%",
-                backgroundColor: "rgb(228, 228, 228)",
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
                 position: "absolute",
                 borderRadius: 16
               }, focusAnimationStyle]}
@@ -101,7 +101,7 @@ const AudioSlider = () => {
             <Animated.View
               style={[{
                 height: 6,
-                backgroundColor: "black",
+                backgroundColor: "rgb(255, 255, 255)",
                 position: "absolute",
                 borderRadius: 16
               }, activeTrackStyle, focusAnimationStyle]}
@@ -148,7 +148,8 @@ const AudioSlider = () => {
               fontFamily: "SF Pro",
               fontSize: 12,
               fontWeight: "600",
-              lineHeight: 12
+              lineHeight: 12,
+              color: 'rgb(255, 255, 255)'
             }}
           >
             {isDragging 
@@ -162,7 +163,8 @@ const AudioSlider = () => {
               fontFamily: "SF Pro",
               fontSize: 12,
               fontWeight: "600",
-              lineHeight: 12
+              lineHeight: 12,
+              color: 'rgb(255, 255, 255)'
             }}
           >
             {formatProgress(progress.duration)}

@@ -1,11 +1,13 @@
 import { View, TouchableOpacity, Text } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
-import { ArrowLeft, Search } from 'lucide-react-native';
+import { ChevronLeft, EllipsisVertical } from 'lucide-react-native';
 import PodInfo from '@/components/PodInfo';
 import EpisodeCard from '@/components/EpisodeCard';
 import Animated, { interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import useModalStore from '@/store/useModalStore';
 
 const HEADER_HEIGHT = 48
 const TRIGGER_POINT = 320;
@@ -20,8 +22,9 @@ const Podcast = () => {
   const router = useRouter();
 
   const { selectedPodcast, singlePodFeed, feed, hasNextPage, currentPage } = useSubscriptionStore();
+  const { setTappedPodcast, openModal } = useModalStore();
 
-  const data = [{ id: "PodInfo_id", type: "header" }, { id: "tab_id", type: "tabs" }, ...feed];
+  const data = [{ id: "PodInfo_id", type: "podInfo" }, { id: "header_id", type: "heading" }, ...feed];
 
   const handleFeed = () => {
     if (hasNextPage) {
@@ -41,7 +44,7 @@ const Podcast = () => {
     const backgroundColor = interpolateColor(
       scrollY.value,
       [TRIGGER_POINT, TRIGGER_POINT + 66],
-      ['rgba(242, 242, 242, 0)', 'rgba(242, 242, 242, 1)']
+      ['rgba(11, 11, 11, 0)', 'rgba(11, 11, 11, 1)']
     )
     return { backgroundColor }
   });
@@ -55,83 +58,58 @@ const Podcast = () => {
   });
 
   const renterItem = ({ item }: { item: any }) => {
-    if (item.type === 'header') {
+    if (item.type === 'podInfo') {
       return (
-        <PodInfo podcast={selectedPodcast} />
+        <PodInfo podcast={selectedPodcast} description={selectedPodcast?.description} />
       )
-    } else if (item.type === 'tabs') {
+    } else if (item.type === 'heading') {
       return (
-        <Animated.View
-          style={{backgroundColor: "rgb(242, 242, 242)"}}
+        <View
+          style={{
+            backgroundColor: "rgb(11, 11, 11)"
+          }}
         >
           <View
             style={{
               flexDirection: "row",
-              gap: '8',
+              gap: 4,
               paddingLeft: 20,
               alignItems: "center",
-              height: 44
+              paddingVertical: 14
             }}
           >
-            <View
+            <Text
               style={{
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-                borderRadius: 6,
-                backgroundColor: "black",
-                flexWrap: "wrap",
-                alignItems: "center"
+                fontFamily: "SF Pro",
+                fontSize: 20,
+                fontWeight: "700",
+                color: 'rgba(255, 255, 255, 0.8)'
               }}
             >
-              <Text
-                style={{
-                  fontFamily: "SF Pro",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                  color: "white"
-                }}
-              >
-                Episodes
-              </Text>
-            </View>
+              Episodes
+            </Text>
 
-            <View
-              style={{
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-                borderRadius: 6,
-                backgroundColor: "rgb(217, 217, 217)",
-                flexWrap: "wrap",
-                alignItems: "center"
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "SF Pro",
-                  fontSize: 14,
-                  fontWeight: "400",
-                  lineHeight: 16
-                }}
-              >
-                More like this
-              </Text>
-            </View>
+            {/* <View>
+              <ChevronRight size={22} />
+            </View> */}
           </View>
-        </Animated.View>
+        </View>
       )
     }
 
     return (
       <EpisodeCard episode={item} tab='Podcasts' />
     )
-  }
+  };
 
   const insets = useSafeAreaInsets()
 
   return (
     <View
-      style={{paddingTop: insets.top}}
+      style={{
+        paddingTop: insets.top,
+        backgroundColor: "rgb(11, 11, 11)"
+      }}
     >
       {/* Header section */}
       <Animated.View
@@ -154,7 +132,7 @@ const Podcast = () => {
           style={{
             flexDirection: 'row',
             alignItems: "center",
-            gap: 8
+            gap: 12
           }}
         >
           <TouchableOpacity
@@ -162,14 +140,33 @@ const Podcast = () => {
               router.back();
             }}
             style={{
-              alignItems: "center",
-              justifyContent: "center",
-              height: 36,
-              width: 36,
-              borderRadius: 72
+              height: 44,
+              width: 44,
+              backgroundColor: "rgb(255, 255, 255, 0.2)",
+              borderRadius: 100,
+              shadowOpacity: 0.12,
+              shadowColor: "rgb(0, 0, 0)",
+              shadowOffset: {
+                height: 2,
+                width: 1,
+              },
+              shadowRadius: 8,
+              overflow: "hidden"
             }}
           >
-            <ArrowLeft size={24} strokeWidth={2} />
+            <BlurView
+              tint='dark'
+              intensity={22}
+              style={{
+                height: "100%",
+                width: "100%",
+                justifyContent: "center",
+                paddingLeft: 7,
+                backgroundColor: "rgba(255, 255, 255, 0.1)"
+              }}
+            >
+              <ChevronLeft size={26} color={'rgb(255, 255, 255)'} />
+            </BlurView>
           </TouchableOpacity>
 
           <Animated.View
@@ -181,7 +178,7 @@ const Podcast = () => {
                 fontWeight: "600",
                 fontSize: 16,
                 lineHeight: 24,
-                color: "black"
+                color: "rgb(255, 255, 255)"
               }}
             >
               {selectedPodcast?.title}
@@ -190,27 +187,40 @@ const Podcast = () => {
         </View>
 
         <TouchableOpacity
-          onPress={() => router.navigate({
-            pathname: '/search'
-          })}
+          onPress={() => {
+            setTappedPodcast(selectedPodcast);
+            openModal("podcast");
+          }}
           style={{
-            alignItems: "center",
-            justifyContent: "center",
-            height: 36,
-            width: 36,
-            borderRadius: 72
+            height: 44,
+            width: 44,
+            backgroundColor: "rgb(255, 255, 255, 0.2)",
+            borderRadius: 100,
+            shadowOpacity: 0.12,
+            shadowColor: "rgb(0, 0, 0)",
+            shadowOffset: {
+              height: 2,
+              width: 1,
+            },
+            shadowRadius: 8,
+            overflow: "hidden"
           }}
         >
-          <Search size={24} strokeWidth={2} />
+          <BlurView
+            tint='dark'
+            intensity={22}
+            style={{
+              height: "100%",
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(255, 255, 255, 0.1)"
+            }}
+          >
+            <EllipsisVertical size={22} color={'rgb(255, 255, 255)'} />
+          </BlurView>
         </TouchableOpacity>
       </Animated.View>
-
-      {/* Top Section */}
-      {/* <Animated.ScrollView
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-      > */}
-      {/* <PodInfo podcast={selectedPodcast} /> */}
 
       <Animated.FlatList
         scrollEnabled={true}

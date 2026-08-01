@@ -26,6 +26,7 @@ const PodcastDetail = () => {
   const { setTappedPodcast, openModal } = useModalStore();
   const { fetchPod,
     podcast,
+    podDescription,
     fetchEpisodesData,
     setPodcast,
     resetPodcast,
@@ -93,7 +94,7 @@ const PodcastDetail = () => {
     const backgroundColor = interpolateColor(
       scrollY.value,
       [TRIGGER_POINT, podInfoContainerHeight],
-      [`rgba(242, 242, 242, 0)`, `rgba(242, 242, 242, 1)`]
+      [`rgba(11, 11, 11, 0)`, `rgba(11, 11, 11, 1)`]
     )
     return { backgroundColor }
   });
@@ -111,7 +112,7 @@ const PodcastDetail = () => {
             setContainerHeight(height);
           }}
         >
-          <PodInfo podcast={podcast} />
+          <PodInfo podcast={podcast} description={podDescription} />
         </View>
       );
     }
@@ -119,7 +120,7 @@ const PodcastDetail = () => {
       return (
         <View
           style={{
-            backgroundColor: "rgb(242, 242, 242)"
+            backgroundColor: "rgb(11, 11, 11)"
           }}
         >
           <View
@@ -135,7 +136,8 @@ const PodcastDetail = () => {
               style={{
                 fontFamily: "SF Pro",
                 fontSize: 20,
-                fontWeight: "700"
+                fontWeight: "700",
+                color: 'rgba(255, 255, 255, 0.8)'
               }}
             >
               Episodes
@@ -157,7 +159,7 @@ const PodcastDetail = () => {
     <View
       style={{
         flex: 1,
-        backgroundColor: "rgb(242, 242, 242)",
+        backgroundColor: "rgb(11, 11, 11)",
         paddingTop: insets.top
       }}
     >
@@ -219,7 +221,7 @@ const PodcastDetail = () => {
                 fontWeight: "600",
                 fontSize: 18,
                 lineHeight: 28,
-                color: "black"
+                color: "rgba(255, 255, 255, 0.9)"
               }}
             >
               {podcast?.title}
@@ -269,7 +271,7 @@ const PodcastDetail = () => {
         }}
       />
     </View>
-  )
-}
+  );
+};
 
 export default PodcastDetail;

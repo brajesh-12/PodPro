@@ -89,7 +89,8 @@ const API = {
         artist: item.podcast.artist,
         genres: item.podcast.genres,
         thumbnail: item.podcast.thumbnail,
-        feedUrl: item.podcast.feedUrl
+        feedUrl: item.podcast.feedUrl,
+        description: item.podcast.description
       }));
     } catch (error: any) {
       console.log(error.response?.data?.message);

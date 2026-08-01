@@ -1,4 +1,4 @@
-import { View, Text, Pressable, FlatList, TouchableOpacity, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
 import { useRouter } from 'expo-router';
 import { Search } from 'lucide-react-native';
@@ -9,30 +9,44 @@ import useSearchStore from '@/store/useSearchStore';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { createAnimatedComponent, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
-const { width: SCREEN_WIDTH } = Dimensions.get("screen");
+const AnimatedMaskedView = createAnimatedComponent(MaskedView);
 
 const SearchIndex = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  const scrollY = useSharedValue(0);
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    }
+  });
+
+  const blurStyle = useAnimatedStyle(() => {
+    const opacity = scrollY.value > 18 ? 1 : 0;
+    return {opacity};
+  });
+
   return (
     <View
       style={{
         flex: 1,
-        // backgroundColor: "black"
+        backgroundColor: "rgb(11, 11, 11)"
       }}
     >
       {/* top blur */}
-      <MaskedView
-        style={{
+      <AnimatedMaskedView
+        style={[{
           position: "absolute",
           right: 0,
           left: 0,
           top: 0,
-          height: 150,
-          zIndex: 10
-        }}
+          height: 140,
+          zIndex: 10,
+        }, blurStyle]}
         maskElement={
           <LinearGradient
             style={StyleSheet.absoluteFill}
@@ -42,71 +56,80 @@ const SearchIndex = () => {
           />}
       >
         <BlurView
-          intensity={30}
-          tint="light"
+          intensity={200}
+          tint="dark"
           style={{
             position: "absolute",
             top: 0,
             right: 0,
             left: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.2)'
+            backgroundColor: 'rgba(0, 0, 0, 0.6)'
           }}
         />
-      </MaskedView>
-
-      {/* Search Bar */}
-      <Pressable
-        onPress={() =>
-          router.navigate({
-            pathname: "/(tabs)/(search)/search"
-          })
-        }
-        style={{
-          position: "absolute",
-          top: insets.top + 12,
-          height: 48,
-          width: SCREEN_WIDTH - 40,
-          flexDirection: 'row',
-          alignItems: "center",
-          gap: 8,
-          backgroundColor: 'rgb(218, 218, 218)',
-          marginHorizontal: 16,
-          paddingHorizontal: 12,
-          borderRadius: 32,
-          zIndex: 50
-        }}
-      >
-        <View>
-          <Search size={22} strokeWidth={1.8} />
-        </View>
-
-        <View
-          style={{
-            height: "100%",
-            width: "auto",
-            justifyContent: "center"
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "SF Pro",
-              fontSize: 16,
-              fontWeight: "500",
-              lineHeight: 24,
-              color: "grey"
-            }}
-          >
-            Search Podcast
-          </Text>
-        </View>
-      </Pressable>
+      </AnimatedMaskedView>
 
       {/* Categories */}
-      <FlatList
+      <Animated.FlatList
+        onScroll={onScroll}
         data={categories}
         bounces={false}
         keyExtractor={(item) => item.code}
+        ListHeaderComponent={
+          < Pressable
+            onPress={() =>
+              router.navigate({
+                pathname: "/(tabs)/(search)/search"
+              })
+            }
+            style={{
+              height: 48,
+              // paddingHorizontal: 16,
+              zIndex: 50,
+              borderRadius: 32,
+              overflow: "hidden",
+              shadowColor: "rgb(255, 255, 255)",
+              shadowOpacity: 0.15,
+              shadowRadius: 6,
+              shadowOffset: {
+                height: 2,
+                width: 2
+              },
+              marginBottom: 16,
+              flexDirection: 'row',
+              alignItems: "center",
+              gap: 8,
+              paddingHorizontal: 12,
+              backgroundColor: "rgba(255, 255, 255, 0.09)",
+              borderWidth: 0.8,
+              borderColor: "rgba(255, 255, 255, 0.15)"
+            }}
+          >
+            <View>
+              <Search size={22} strokeWidth={1.8} color={'rgba(255, 255, 255, 0.6)'} />
+            </View>
+
+            <View
+              style={{
+                height: "100%",
+                width: "auto",
+                justifyContent: "center"
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "SF Pro",
+                  fontSize: 16,
+                  fontWeight: "500",
+                  lineHeight: 24,
+                  color: "rgba(255, 255, 255, 0.8)"
+                }}
+              >
+                Search Podcast
+              </Text>
+            </View>
+          </Pressable>
+        }
         renderItem={({ item }) => <GenreCard item={item} />}
         numColumns={2}
         ListHeaderComponentStyle={{
@@ -114,11 +137,11 @@ const SearchIndex = () => {
         }}
         style={{
           paddingHorizontal: 20,
-          paddingTop: 20,
+          paddingTop: 12,
         }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: 48 + 16 + insets.top,
+          paddingTop: insets.top,
           gap: 10,
           paddingBottom: 250,
         }}

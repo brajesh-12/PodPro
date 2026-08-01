@@ -9,7 +9,8 @@ export interface FollowedPod {
   artist: string,
   thumbnail: string,
   genres: [],
-  feedUrl: string
+  feedUrl: string,
+  description: string
 }
 
 export interface SavedEpisode {
