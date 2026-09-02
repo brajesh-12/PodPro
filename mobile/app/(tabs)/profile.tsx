@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Alert, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, Pressable, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useState } from 'react'
 import useAuthStore from '@/store/useAuthStore'
 // import { useNetworkStore } from '@/store/useNetworkStore';
@@ -9,6 +9,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraIcon, ChevronRight } from 'lucide-react-native';
 import useModalStore from '@/store/useModalStore';
 import { ProfileIcon } from '@/Icons-assets/Icon';
+import Animated, { createAnimatedComponent, useAnimatedScrollHandler, useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const AnimatedMaskedView = createAnimatedComponent(MaskedView);
 
 const ProfileScreen = () => {
   const insets = useSafeAreaInsets();
@@ -63,12 +69,54 @@ const ProfileScreen = () => {
     )
   };
 
+  const scrollY = useSharedValue(0)
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    }
+  });
+
+  const blurLayoutOpacity = useAnimatedStyle(() => {
+    const opacity = scrollY.value >= 24 ? 1 : 0
+    return { opacity }
+  });
+
   return (
     <View
       style={{
         flex: 1
       }}
     >
+      <AnimatedMaskedView
+        style={[{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          left: 0,
+          height: insets.top + 100,
+          zIndex: 20,
+          // backgroundColor: 'red'
+        }, blurLayoutOpacity]}
+        maskElement={
+          <LinearGradient
+            style={StyleSheet.absoluteFill}
+            colors={['rgba(11, 11, 11, 1)', 'rgba(11, 11, 11, 0)']}
+            start={{ x: 0, y: 0.4 }}
+            end={{ x: 0, y: 1 }}
+          />
+        }
+      >
+        <BlurView
+          intensity={60}
+          tint='dark'
+          style={{
+            height: '100%',
+            width: '100%',
+            backgroundColor: "rgba(11, 11, 11, 0.6)"
+          }}
+        />
+      </AnimatedMaskedView>
       {/* Header */}
       <View
         style={{
@@ -88,21 +136,23 @@ const ProfileScreen = () => {
               fontFamily: "SF Pro",
               fontSize: 22,
               lineHeight: 28,
-              fontWeight: "700"
+              fontWeight: "700",
+              color: "rgb(255, 255, 255)"
             }}
           >
             Profile
           </Text>
         </View>
       </View>
-      <ScrollView
+      <Animated.ScrollView
+        onScroll={onScroll}
         showsVerticalScrollIndicator={false}
         bounces={false}
         style={{
           paddingTop: insets.top + 48,
         }}
         contentContainerStyle={{
-          paddingBottom: 200 
+          paddingBottom: 200
         }}
       >
 
@@ -135,7 +185,7 @@ const ProfileScreen = () => {
               <ProfileIcon
                 size={72}
                 strokeWidth={2}
-                color="rgb(141, 11, 167)"
+                color="rgb(158, 158, 158)"
               />
               {/* <Image
                 style={{
@@ -179,7 +229,8 @@ const ProfileScreen = () => {
                   fontFamily: "SF Pro",
                   fontWeight: "700",
                   lineHeight: 22,
-                  fontSize: 15
+                  fontSize: 15,
+                  color: "rgba(255, 255, 255, 0.9)"
                 }}
               >
                 {user?.userName}
@@ -190,8 +241,9 @@ const ProfileScreen = () => {
               style={{
                 paddingVertical: 8,
                 paddingHorizontal: 16,
-                backgroundColor: "white",
-                borderRadius: 32
+                backgroundColor: "rgb(26, 26, 26)",
+                borderRadius: 32,
+
               }}
             >
               <Text
@@ -199,7 +251,8 @@ const ProfileScreen = () => {
                   fontFamily: "SF Pro",
                   fontWeight: "400",
                   lineHeight: 22,
-                  fontSize: 15
+                  fontSize: 14,
+                  color: 'rgb(255, 255, 255)'
                 }}
               >
                 Edit Name
@@ -218,7 +271,7 @@ const ProfileScreen = () => {
           <View
             style={{
               borderRadius: 28,
-              backgroundColor: "white",
+              backgroundColor: "rgb(26, 26, 26)",
               paddingHorizontal: 16
             }}
           >
@@ -236,13 +289,14 @@ const ProfileScreen = () => {
                   fontFamily: "SF Pro",
                   fontSize: 17,
                   fontWeight: "400",
-                  lineHeight: 22
+                  lineHeight: 22,
+                  color: "rgb(255, 255, 255)"
                 }}
               >
                 Downloads
               </Text>
 
-              <ChevronRight size={18} strokeWidth={1.5} />
+              <ChevronRight size={18} strokeWidth={1.5} color={"rgb(255, 255, 255)"} />
             </View>
 
             <View
@@ -253,7 +307,7 @@ const ProfileScreen = () => {
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderTopWidth: 1,
-                borderTopColor: "rgb(200, 200, 200)"
+                borderTopColor: "rgba(255, 255, 255, 0.2)"
               }}
             >
               <Text
@@ -261,13 +315,14 @@ const ProfileScreen = () => {
                   fontFamily: "SF Pro",
                   fontSize: 17,
                   fontWeight: "400",
-                  lineHeight: 22
+                  lineHeight: 22,
+                  color: "rgb(255, 255, 255)"
                 }}
               >
                 Save Playlists
               </Text>
 
-              <ChevronRight size={18} strokeWidth={1.5} />
+              <ChevronRight size={18} strokeWidth={1.5} color={"rgb(255, 255, 255)"} />
             </View>
 
           </View>
@@ -282,7 +337,7 @@ const ProfileScreen = () => {
           <View
             style={{
               borderRadius: 28,
-              backgroundColor: "white",
+              backgroundColor: "rgb(26, 26, 26)",
               paddingHorizontal: 16
             }}
           >
@@ -300,13 +355,14 @@ const ProfileScreen = () => {
                   fontFamily: "SF Pro",
                   fontSize: 17,
                   fontWeight: "400",
-                  lineHeight: 22
+                  lineHeight: 22,
+                  color: "rgb(255, 255, 255)"
                 }}
               >
                 Terms and conditions
               </Text>
 
-              <ChevronRight size={18} strokeWidth={1.5} />
+              <ChevronRight size={18} strokeWidth={1.5} color={'rgb(255, 255, 255)'} />
             </View>
 
             <View
@@ -317,7 +373,7 @@ const ProfileScreen = () => {
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderTopWidth: 1,
-                borderTopColor: "rgb(200, 200, 200)"
+                borderTopColor: "rgba(255, 255, 255, 0.2)"
               }}
             >
               <Text
@@ -325,7 +381,8 @@ const ProfileScreen = () => {
                   fontFamily: "SF Pro",
                   fontSize: 17,
                   fontWeight: "400",
-                  lineHeight: 22
+                  lineHeight: 22,
+                  color: "rgb(255, 255, 255)"
                 }}
               >
                 Data control
@@ -340,7 +397,7 @@ const ProfileScreen = () => {
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderTopWidth: 1,
-                borderTopColor: "rgb(200, 200, 200)"
+                borderTopColor: "rgba(255, 255, 255, 0.2)"
               }}
             >
               <Text
@@ -348,13 +405,14 @@ const ProfileScreen = () => {
                   fontFamily: "SF Pro",
                   fontSize: 17,
                   fontWeight: "400",
-                  lineHeight: 22
+                  lineHeight: 22,
+                  color: "rgb(255, 255, 255)"
                 }}
               >
                 Privacy Policy
               </Text>
 
-              <ChevronRight size={18} strokeWidth={1.5} />
+              <ChevronRight size={18} strokeWidth={1.5} color={'rgb(255, 255, 255)'} />
             </View>
 
           </View>
@@ -372,7 +430,7 @@ const ProfileScreen = () => {
           <View
             style={{
               borderRadius: 28,
-              backgroundColor: "white",
+              backgroundColor: "rgb(26, 26, 26)",
               paddingHorizontal: 16
             }}
           >
@@ -414,7 +472,7 @@ const ProfileScreen = () => {
             }}
             style={{
               borderRadius: 28,
-              backgroundColor: "white",
+              backgroundColor: "rgb(26, 26, 26)",
               paddingHorizontal: 16
             }}
           >
@@ -442,7 +500,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
 
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };

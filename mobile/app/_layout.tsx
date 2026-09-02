@@ -9,13 +9,26 @@ import useDownloadStore from "@/store/useDownloadStore";
 import CustomModal from "@/components/CustomModal";
 // import { StatusBar } from "react-native";
 import { StatusBar } from 'expo-status-bar';
-// import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PlaylistSelection from "@/components/PlaylistSelection";
 import PlaylistBottomSheet from "@/components/PlaylistBottomSheet";
 import GlobalPlaylistCreation from "@/components/GlobalPlaylistCreation";
 import ProfileScreenModal from "@/components/ProfileScreenModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+
+const MyCustomTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: 'rgb(11, 11, 11)',
+    background: "rgb(11, 11, 11)",
+    card: '#1A1A1A', // Background color for headers/tab bars
+    text: 'rgb(255, 255, 255)', 
+    border: '#272729',
+    notification: '#FF4500',
+  },
+};
 
 export default function RootLayout() {
   // here we use isHydration for loading splash screen
@@ -67,7 +80,9 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <>
+    <ThemeProvider
+      value={MyCustomTheme}
+    >
       <GestureHandlerRootView>
         <StatusBar
           translucent={true}
@@ -107,9 +122,7 @@ export default function RootLayout() {
         <PlaylistBottomSheet />
         <GlobalPlaylistCreation />
         <ProfileScreenModal />
-
       </GestureHandlerRootView>
-
-    </>
+    </ThemeProvider>
   );
 };

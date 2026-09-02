@@ -63,7 +63,7 @@ const CreatePlaylistModal = () => {
 
       <Animated.View
         style={{
-          backgroundColor: "white",
+          backgroundColor: "rgb(28, 28, 30)",
           padding: 14,
           borderRadius: 34,
           gap: 16
@@ -80,6 +80,7 @@ const CreatePlaylistModal = () => {
               fontWeight: "500",
               fontSize: 17,
               lineHeight: 22,
+              color: "rgb(255, 255, 255)"
             }}
           >
             Please enter the title for new playlist.
@@ -89,7 +90,7 @@ const CreatePlaylistModal = () => {
         <View
           style={{
             height: 48,
-            backgroundColor: "rgba(0, 0, 0, 0.2)",
+            backgroundColor: "rgba(255, 255, 255, 0.04)",
             borderRadius: 24,
             paddingLeft: 12,
             justifyContent: "center"
@@ -104,6 +105,7 @@ const CreatePlaylistModal = () => {
               fontFamily: "SF Pro",
               fontSize: 16,
               fontWeight: "500",
+              color: 'rgb(255, 255, 255)'
             }}
           />
         </View>
@@ -122,7 +124,7 @@ const CreatePlaylistModal = () => {
               flex: 1,
               paddingVertical: 12,
               paddingHorizontal: 24,
-              backgroundColor: "rgba(0, 0, 0, 0.2)",
+              backgroundColor: "rgba(255, 255, 255, 0.04)",
               borderRadius: 24,
               justifyContent: "center",
               alignItems: "center"
@@ -133,7 +135,8 @@ const CreatePlaylistModal = () => {
                 fontFamily: "SF Pro",
                 fontSize: 16,
                 fontWeight: "500",
-                lineHeight: 24
+                lineHeight: 24,
+                color: 'rgb(255, 255, 255)'
               }}
             >
               Cancel
@@ -149,7 +152,7 @@ const CreatePlaylistModal = () => {
               flex: 1,
               paddingVertical: 12,
               paddingHorizontal: 24,
-              backgroundColor: isInputEmpty ? "rgba(0, 0, 0, 0.2)" : "rgb(0, 136, 255)",
+              backgroundColor: isInputEmpty ? "rgba(255, 255, 255, 0.04)" : "rgb(255, 255, 255)",
               borderRadius: 24,
               justifyContent: "center",
               alignItems: "center"
@@ -161,7 +164,7 @@ const CreatePlaylistModal = () => {
                 fontSize: 16,
                 fontWeight: "500",
                 lineHeight: 24,
-                color: isInputEmpty ? "rgba(0, 0, 0, 0.4)" : "white"
+                color: isInputEmpty ? "rgba(255, 255, 255, 0.5)" : "rgb(0, 0, 0)"
               }}
             >
               Save

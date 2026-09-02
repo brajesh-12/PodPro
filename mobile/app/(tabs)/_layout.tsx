@@ -40,29 +40,29 @@ const TabsLayout = () => {
         tabBar={(props) => <CustomTab {...props} />}
         screenOptions={{ headerShown: false }}
       >
-        <Tabs.Screen name='(home)' options={{ title: "Home", tabBarIcon: ({ focused, color }) => <Home size={22} fill={focused ? 'rgb(255, 255, 255)' : "rgba(255, 255, 255, 0.6)"} color={focused ? 'rgb(255, 255, 255)' : "rgba(255, 255, 255, 0.5)"} />}} />
+        <Tabs.Screen name='(home)' options={{ title: "Home", tabBarIcon: ({ focused }) => <Home size={22} fill={focused ? 'rgb(255, 255, 255)' : "rgba(171, 171, 170, 1)"} color={focused ? 'rgb(255, 255, 255)' : "rgba(171, 171, 170, 1)"} />}} />
 
         <Tabs.Screen name='(podcast)' options={{
           title: "Podcasts", tabBarIcon: ({ focused }) => <Podcasts size={22}
-            color={focused ? 'rgb(255, 255, 255)' : "rgba(255, 255, 255, 0.6)"}
+            color={focused ? 'rgb(255, 255, 255)' : "rgba(171, 171, 170, 1)"}
           />
         }} />
 
         <Tabs.Screen name='(search)' options={{
           title: "Search", tabBarIcon: ({ focused }) => <Search size={22}
-            color={focused ? 'rgb(255, 255, 255)' : "rgba(255, 255, 255, 0.6)"}
+            color={focused ? 'rgb(255, 255, 255)' : "rgba(171, 171, 170, 1)"}
           />
         }} />
 
         <Tabs.Screen name='(library)' options={{ title: "Library", tabBarIcon: ({focused}) => 
           <Library size={22} 
-            color={focused ? 'rgb(255, 255, 255)' : "rgba(255, 255, 255, 0.6)"}
+            color={focused ? 'rgb(255, 255, 255)' : "rgba(171, 171, 170, 1)"}
           /> 
           }} />
 
         <Tabs.Screen name='profile' options={{
           title: "Profile",
-          tabBarIcon: ({ focused }) => <ProfileIcon size={22} color={focused ? 'rgb(255, 255, 255)' : "rgba(255, 255, 255, 0.6)"} />
+          tabBarIcon: ({ focused }) => <ProfileIcon size={22} color={focused ? 'rgb(255, 255, 255)' : "rgba(171, 171, 170, 1)"} />
         }}
         />
       </Tabs>

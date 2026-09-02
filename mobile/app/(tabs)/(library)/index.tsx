@@ -10,7 +10,6 @@ import { Image } from 'expo-image';
 import usePlayerStore from '@/store/usePlayerStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useModalStore from '@/store/useModalStore';
-// import { Add } from '@/Icons-assets/Icon';
 
 const LibraryScreen = () => {
   const insets = useSafeAreaInsets();
@@ -63,28 +62,22 @@ const LibraryScreen = () => {
               createPlaylist();
             }}
             style={{
+              borderRadius: 128,
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
               paddingVertical: 10,
-              paddingLeft: 16,
-              paddingRight: 16,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              borderRadius: 32,
-              flexDirection: "row",
-              gap: 6,
-
-              shadowColor: "rgb(0, 0, 0)",
-              shadowOpacity: 0.1,
-              shadowRadius: 20,
-              shadowOffset: {
-                height: 2,
-                width: 2
-              }
+              paddingHorizontal: 16,
+              borderTopWidth: 0.8,
+              borderBottomWidth: 0.8,
+              borderLeftWidth: 0.6,
+              borderRightWidth: 0.6,
+              borderTopColor: "rgba(255, 255, 255, 0.9)",
+              borderBottomColor: "rgba(255, 255, 255, 0.9)",
+              borderLeftColor: "rgba(255, 255, 255, 0.8)",
+              borderRightColor: "rgba(255, 255, 255, 0.8)"
             }}
           >
             <Text
               style={{
-                // color: "white"
                 fontFamily: "SF Pro",
                 fontSize: 16,
                 fontWeight: "500",
@@ -171,6 +164,7 @@ const LibraryScreen = () => {
             fontSize: 24,
             fontWeight: "700",
             lineHeight: 32,
+            color: "rgb(255, 255, 255)"
           }}
         >
           Downloads
@@ -248,7 +242,8 @@ const LibraryScreen = () => {
                         fontSize: 16,
                         fontWeight: "500",
                         lineHeight: 24,
-                        width: "auto"
+                        width: "auto",
+                        color: 'rgb(255, 255, 255)'
                       }}
                     >
                       {item.title}
@@ -261,7 +256,8 @@ const LibraryScreen = () => {
                         fontFamily: "SF Pro",
                         fontSize: 14,
                         fontWeight: "400",
-                        lineHeight: 20
+                        lineHeight: 20,
+                        color: "rgba(255, 255, 255, 0.6)"
                       }}
                     >
                       {formatDuration(item.duration)} &#183; {item.podcastTitle}

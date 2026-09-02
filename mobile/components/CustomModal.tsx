@@ -1,7 +1,7 @@
 import useModalStore from '@/store/useModalStore';
 import { Play } from 'lucide-react-native';
 import { useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { scheduleOnRN } from 'react-native-worklets';
-import { CloseIcon, Download, Downloaded, Follow, Podcasts, Save, Share, Unfollow } from '@/Icons-assets/Icon';
+import { AddToPlaylist, CloseIcon, Download, Downloaded, Follow, InfoIcon, Save, Share, Share2, SinglePodcast, Unfollow } from '@/Icons-assets/Icon';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import useDownloadStore from '@/store/useDownloadStore';
 import usePlaylistStore from '@/store/usePlaylistStore';
@@ -95,7 +95,7 @@ const CustomModal = () => {
             borderTopRightRadius: 48,
             borderRadius: 56,
             overflow: "hidden",
-            paddingHorizontal: 20,
+            paddingHorizontal: 16,
             paddingBottom: 20,
             position: "absolute",
             bottom: 6,
@@ -211,9 +211,9 @@ const PodcastSheet = () => {
             numberOfLines={1}
             style={{
               fontFamily: "SF Pro",
-              fontSize: 24,
-              fontWeight: "600",
-              lineHeight: 32,
+              fontSize: 18,
+              fontWeight: "500",
+              lineHeight: 28,
               color: "rgba(255, 255, 255, 0.9)"
             }}
           >
@@ -239,12 +239,11 @@ const PodcastSheet = () => {
       {/* options */}
       <View
         style={{
-          backgroundColor: 'rgba(120, 120, 128, 0.3)',
-            borderRadius: 32,
-            marginTop: 12
+          borderRadius: 32,
+          marginTop: 12
         }}
       >
-        <Pressable
+        <TouchableOpacity
           onPress={() => toggleSubscription(podcastId)}
           style={style.optionContainer}
         >
@@ -266,7 +265,7 @@ const PodcastSheet = () => {
               {isSubscribed ? "Unfollow" : "Follow"}
             </Text>
           </View>
-        </Pressable>
+        </TouchableOpacity>
 
         <View
           style={style.optionContainer}
@@ -392,7 +391,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
               borderBottomWidth: 1,
               borderBottomColor: "rgba(255, 255, 255, 0.2)",
               paddingVertical: 12,
-              paddingRight: 32,
+              paddingRight: 40,
               paddingLeft: 4
             }}
           >
@@ -400,10 +399,10 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
               numberOfLines={1}
               style={{
                 fontFamily: "SF Pro",
-                fontSize: 24,
-                fontWeight: "600",
-                lineHeight: 32,
-                color: "rgba(255, 255, 255, 0.9)"
+                fontSize: 18,
+                fontWeight: "500",
+                lineHeight: 28,
+                color: "rgba(255, 255, 255, 0.8)"
               }}
             >
               {tappedEpisode?.title}
@@ -430,9 +429,8 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
         {/* options */}
         <View
           style={{
-            backgroundColor: 'rgba(120, 120, 128, 0.3)',
             borderRadius: 32,
-            marginTop: 12
+            marginTop: 8
           }}
         >
           <View
@@ -442,7 +440,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Share size={24} strokeWidth={1.8} color='rgb(255, 255, 255)' />
+              <Share2 size={26} strokeWidth={1.8} color='rgb(255, 255, 255)' />
             </View>
 
             {/* text */}
@@ -458,7 +456,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             </View>
           </View>
 
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setActiveEpisode(tappedEpisode);
               handleClose();
@@ -483,7 +481,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
                 Play
               </Text>
             </View>
-          </Pressable>
+          </TouchableOpacity>
 
           <Pressable
             onPress={() => {
@@ -554,7 +552,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Save size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
+              <AddToPlaylist size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
             </View>
 
             {/* text */}
@@ -577,7 +575,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Save size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
+              <InfoIcon size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
             </View>
 
             {/* text */}
@@ -600,7 +598,7 @@ const EpisodeSheet = ({ handleClose }: { handleClose: () => void }) => {
             <View
               style={style.iconContainer}
             >
-              <Podcasts size={24} strokeWidth={1.8} color='rgba(255, 255, 255, 0.9)' />
+              <SinglePodcast size={24} strokeWidth={1.8} color='rgb(255, 255, 255)'/>
             </View>
 
             {/* text */}
@@ -628,8 +626,8 @@ export const style = StyleSheet.create({
     height: 52,
     flexDirection: "row",
     alignItems: "center",
-    paddingLeft: 14,
-    paddingRight: 11
+    paddingLeft: 0,
+    paddingRight: 0
   },
   text: {
     fontWeight: "400",
@@ -642,8 +640,8 @@ export const style = StyleSheet.create({
   textContainer: {
     height: "100%",
     flex: 1,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "rgba(255, 255, 255, 0.2)",
+    // borderBottomWidth: 0.5,
+    // borderBottomColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
   },
   iconContainer: {

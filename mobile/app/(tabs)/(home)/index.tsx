@@ -177,6 +177,7 @@ const HomeScreen = () => {
     <View
       style={{
         flex: 1,
+        backgroundColor: 'rgb(11, 11, 11)'
       }}
     >
       <AnimatedMaskedView
@@ -198,6 +199,7 @@ const HomeScreen = () => {
         }
       >
         <BlurView
+          tint='dark'
           intensity={16}
           style={{
             height: '100%',
@@ -212,7 +214,6 @@ const HomeScreen = () => {
         showsVerticalScrollIndicator={false}
         style={{
           paddingBottom: 180,
-          backgroundColor: "rgb(11, 11, 11)"
         }}
         contentContainerStyle={{
           paddingBottom: 170,

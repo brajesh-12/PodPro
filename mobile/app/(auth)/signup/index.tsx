@@ -82,7 +82,7 @@ const Signup = () => {
             alignItems: "center"
           }}
         >
-          <ChevronLeft size={24} strokeWidth={2} />
+          <ChevronLeft size={24} strokeWidth={2} color={"white"} />
         </Pressable>
 
       </View>
@@ -105,7 +105,8 @@ const Signup = () => {
             style={{
               fontFamily: "SF Pro",
               fontWeight: "700",
-              fontSize: 26
+              fontSize: 26,
+              color: 'rgb(255, 255, 255)'
             }}
           >
             What&apos;s your email?

@@ -1,17 +1,32 @@
-import { View, Text, TouchableOpacity, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, Pressable, TextLayoutEvent } from 'react-native';
+import React, { useCallback, useState } from 'react';
 import { Image } from 'expo-image';
 import { Podcast } from '@/store/usePodcastStore';
 import { Star } from 'lucide-react-native';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Follow, Unfollow } from '@/Icons-assets/Icon';
+import ButtonStyle from '@/constants/buttonStyles';
+
+
 
 const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefined }> = ({ podcast, description }) => {
   const { toggleSubscription, subscriptionIds } = useSubscriptionStore();
-  const [ collapsed, setCollapsed ] = useState(true);
+
+  const [collapsed, setCollapsed] = useState(true);
+  const [hasMeasured, setHasMeasured] = useState(false);
+  const [ showMoreButton, setShowMoreButton ] = useState(false)
 
   const isSubscribed = podcast?.id !== undefined ? subscriptionIds.has(podcast?.id) : false;
+
+  const handleTextLayout = useCallback(
+    (event: TextLayoutEvent) => {
+        if (event.nativeEvent.lines.length > 2) {
+          setShowMoreButton(true);
+        }
+    },
+    []
+  );
+
 
   if (!podcast) {
     return <View><Text>Loading...</Text></View>
@@ -111,39 +126,41 @@ const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefin
         {/* Button */}
         <TouchableOpacity
           onPress={() => toggleSubscription(podcast.id)}
-          style={{
-            height: 48,
-            width: 200,
-            borderRadius: 88,
-            overflow: "hidden"
-          }}
+          style={[{
+            height: 50,
+            borderRadius: 128,
+            alignItems: "center",
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            flexDirection: "row",
+            paddingHorizontal: 16,
+            justifyContent: "space-between"
+          }, ButtonStyle.buttonGroup]}
         >
-          <BlurView
-            intensity={22}
-            tint='light'
+          <View
             style={{
-              height: '100%',
-              width: '100%',
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              paddingHorizontal: 12
             }}
           >
-            <Text
-              style={{
-                fontFamily: "SF Pro",
-                fontSize: 18,
-                fontWeight: "500",
-                lineHeight: 28,
-                color: "white"
-              }}
-            >
-              {isSubscribed
-                ? "Unfollow"
-                : "Follow"
-              }
-            </Text>
-          </BlurView>
+            {isSubscribed
+              ? <Unfollow size={22} color='rgb(255, 255, 255)' />
+              : <Follow size={22} color='rgb(255, 255, 255)' />
+            }
+          </View>
+          <Text
+            style={{
+              fontFamily: "SF Pro",
+              fontSize: 17,
+              fontWeight: "500",
+              lineHeight: 28,
+              color: "rgb(255, 255, 255)",
+              letterSpacing: 0.3
+            }}
+          >
+            {isSubscribed
+              ? "Unfollow"
+              : "Follow"
+            }
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -153,47 +170,48 @@ const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefin
           paddingHorizontal: 20
         }}
       >
-        <View>
-          <Text
-            numberOfLines={collapsed ? 2 : 0}
-            ellipsizeMode='tail'
+        {description &&
+          <View
             style={{
-              color: "rgba(255, 255, 255, 0.8)",
-              fontFamily: "SF Pro",
-              fontSize: 14,
-              fontWeight: "400",
-              lineHeight: 20
+              paddingRight: collapsed ? 36 : 0
             }}
           >
-            {description}
-          </Text>
-
-          <Pressable
-            onPress={() => {
-              setCollapsed(false);
-            }}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              opacity: collapsed ? 1 : 0
-            }}
-          >
-            <LinearGradient
-              style={{
-                width: 60,
+            <Text
+              onTextLayout={(event) => {
+                if(event.nativeEvent.lines.length > 0) {
+                  const numberOfLines = event.nativeEvent.lines;
+                  console.log("numberOfLines:", numberOfLines);
+                  setShowMoreButton(true);
+                  console.log(showMoreButton);
+                }
               }}
-              colors={["rgba(11, 11, 11, 1)", "rgba(11, 11, 11, 0)"]}
-              start={{ x: 1, y: 0 }}
-              end={{ x: 0, y: 0 }}
+              numberOfLines={collapsed ? 2 : 0}
+              ellipsizeMode='tail'
+              style={{
+                color: "rgba(255, 255, 255, 0.8)",
+                fontFamily: "SF Pro",
+                fontSize: 14,
+                fontWeight: "400",
+                lineHeight: 20
+              }}
             >
-              <BlurView
-                intensity={2}
-                tint="systemMaterialDark"
+              {description}
+            </Text>
+
+            {showMoreButton && (
+              <Pressable
+                onPress={() => {
+                  setCollapsed(false);
+                }}
                 style={{
-                  width: "100%",
-                  backgroundColor: "rgba(11, 11, 11, 0.2)",
-                  alignItems: "flex-end"
+                  position: "absolute",
+                  bottom: -2,
+                  right: -6,
+                  opacity: collapsed ? 1 : 0,
+                  backgroundColor: "rgb(36, 36, 36)",
+                  paddingHorizontal: 6,
+                  paddingVertical: 3,
+                  borderRadius: 12
                 }}
               >
                 <Text
@@ -206,10 +224,10 @@ const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefin
                 >
                   MORE
                 </Text>
-              </BlurView>
-            </LinearGradient>
-          </Pressable>
-        </View>
+              </Pressable>
+            )}
+          </View>
+        }
 
         {/* Rating and genres */}
 

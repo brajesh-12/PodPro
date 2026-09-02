@@ -51,12 +51,15 @@ export const createPlaylist = async (req, res) => {
 
     if (!title) {
       return res.status(401).json({ message: "Please set title" });
-    }
+    };
+
+    const defaultCoverUrl = "https://res.cloudinary.com/dglyfeqwv/image/upload/v1788368094/DefaltCover_xwrh47.png";
 
     const newPlaylist = new Playlist({
       userId,
       title,
       description,
+      image: defaultCoverUrl
     });
 
     const savedPlaylist = await newPlaylist.save();
