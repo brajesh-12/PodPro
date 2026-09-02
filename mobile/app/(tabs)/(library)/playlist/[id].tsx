@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity, FlatList, Pressable, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Pressable, Alert, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import usePlaylistStore from '@/store/usePlaylistStore';
-import { ArrowLeft, EllipsisVertical, Download, Play, Edit } from 'lucide-react-native';
+import { EllipsisVertical, Download, Play, Edit, ChevronLeft } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { formatDate, formatDuration } from '@/lib/utils';
 import API from '@/services/api';
@@ -11,6 +11,8 @@ import UP_API from '@/services/updateAPI';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import useModalStore from '@/store/useModalStore';
+import { BlurView } from 'expo-blur';
+import { Share } from '@/Icons-assets/Icon';
 
 const HEADER_HEIGHT = 48;
 
@@ -96,16 +98,46 @@ const SelectedPlaylist = () => {
         }, headerStyle]}
       >
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            router.back();
+          }}
           style={{
+            height: 48,
+            width: 48,
+            borderRadius: 24,
             alignItems: "center",
-            justifyContent: "center",
-            height: 36,
-            width: 36,
-            borderRadius: 72
+            shadowOpacity: 0.12,
+            shadowColor: "rgb(0, 0, 0)",
+            shadowOffset: {
+              height: 2,
+              width: 1,
+            },
+            shadowRadius: 8,
+            overflow: "hidden",
           }}
         >
-          <ArrowLeft size={24} strokeWidth={2} />
+          <BlurView
+            intensity={18}
+            style={StyleSheet.absoluteFill}
+          />
+          <View
+            style={[StyleSheet.absoluteFill, {
+              justifyContent: "center",
+              paddingLeft: 8,
+
+              borderTopWidth: 0.6,
+              borderBottomWidth: 0.6,
+              borderRightWidth: 0.8,
+              borderLeftWidth: 0.8,
+              borderRadius: 24,
+              borderTopColor: 'rgba(255, 255, 255, 0.7)',
+              borderBottomColor: "rgba(255, 255, 255, 0.7)",
+              borderLeftColor: "rgba(255, 255, 255, 0.8)",
+              borderRightColor: "rgba(255, 255, 255, 0.8)"
+            }]}
+          >
+            <ChevronLeft size={26} color={'rgb(255, 255, 255)'} />
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -147,8 +179,6 @@ const SelectedPlaylist = () => {
               style={{
                 height: 204,
                 width: 204,
-                backgroundColor: "grey",
-                borderRadius: 4,
                 position: "relative",
               }}
             >
@@ -156,7 +186,7 @@ const SelectedPlaylist = () => {
                 style={{
                   height: "100%",
                   width: "100%",
-                  borderRadius: 6
+                  borderRadius: 8
                 }}
                 source={{ uri: selectedPlaylist?.image }}
               />
@@ -194,7 +224,8 @@ const SelectedPlaylist = () => {
               gap: 6,
               width: "100%",
               paddingVertical: 16,
-              alignItems: "center"
+              alignItems: "center",
+              marginBottom: 12
             }}
           >
             <Text
@@ -203,7 +234,8 @@ const SelectedPlaylist = () => {
                 fontSize: 24,
                 fontWeight: "800",
                 lineHeight: 32,
-                textAlign: "center"
+                textAlign: "center",
+                color: 'rgb(255, 255, 255)'
               }}
             >
               {selectedPlaylist?.title}
@@ -215,8 +247,8 @@ const SelectedPlaylist = () => {
                 fontSize: 12,
                 fontWeight: "400",
                 lineHeight: 16,
-                color: "grey",
-                textAlign: "center"
+                color: "rgba(255, 255, 255, 0.6)",
+                textAlign: "center",
               }}
             >
               {formatDate(selectedPlaylist?.createdAt)}
@@ -228,52 +260,109 @@ const SelectedPlaylist = () => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "space-between",
               marginBottom: 12,
-              gap: 16
+              gap: 16,
+              paddingHorizontal: 20
             }}
           >
-
             <View
               style={{
-                height: 44,
-                width: 44,
+                height: 50,
+                width: 50,
+                paddingRight: 4,
                 borderRadius: 88,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: "rgb(217, 217, 217)"
+
+                backgroundColor: "rgb(255, 255, 255, 0.04)",
+                borderTopWidth: 0.2,
+                borderBottomWidth: 0.2,
+                borderLeftWidth: 1,
+                borderRightWidth: 1,
+                borderTopColor: "rgba(255, 255, 255, 0.8)",
+                borderBottomColor: "rgba(255, 255, 255, 0.8)",
+                borderLeftColor: "rgba(255, 255, 255, 0.9)",
+                borderRightColor: "rgba(255, 255, 255, 0.9)"
               }}
             >
-              <Download size={22} strokeWidth={2} />
+              <Share size={22} color='rgb(255, 255, 255)' />
             </View>
 
+            <View
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                borderRadius: 88,
+                flexDirection: "row",
+                paddingLeft: 4,
+                borderTopWidth: 0.8,
+                borderBottomWidth: 0.8,
+                borderLeftWidth: 0.6,
+                borderRightWidth: 0.6,
+                borderTopColor: "rgba(255, 255, 255, 0.9)",
+                borderBottomColor: "rgba(255, 255, 255, 0.9)",
+                borderLeftColor: "rgba(255, 255, 255, 0.8)",
+                borderRightColor: "rgba(255, 255, 255, 0.8)"
+              }}
+            >
+              <View
+                style={{
+                  height: 50,
+                  width: 48,
+                  borderRadius: 88,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Share size={22} color='rgb(255, 255, 255)' />
+              </View>
 
+              <View
+                style={{
+                  height: 50,
+                  width: 50,
+                  borderRadius: 88,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Download size={22} strokeWidth={2} color={'rgb(255, 255, 255)'} />
+              </View>
+
+              <View
+                style={{
+                  height: 50,
+                  width: 48,
+                  borderRadius: 88,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <EllipsisVertical size={22} strokeWidth={2} color={'rgb(255, 255, 255)'} />
+              </View>
+            </View>
 
             <TouchableOpacity
               style={{
-                height: 64,
-                width: 64,
+                height: 50,
+                width: 50,
                 borderRadius: 128,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: "rgb(217, 217, 217)"
-              }}
-            >
-              <Play size={22} strokeWidth={2} fill={"black"} />
-            </TouchableOpacity>
 
-            <View
-              style={{
-                height: 44,
-                width: 44,
-                borderRadius: 88,
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "rgb(217, 217, 217)"
+                backgroundColor: "rgb(255, 255, 255, 0.04)",
+                borderTopWidth: 0.2,
+                borderBottomWidth: 0.2,
+                borderLeftWidth: 1,
+                borderRightWidth: 1,
+                borderTopColor: "rgba(255, 255, 255, 0.8)",
+                borderBottomColor: "rgba(255, 255, 255, 0.8)",
+                borderLeftColor: "rgba(255, 255, 255, 0.9)",
+                borderRightColor: "rgba(255, 255, 255, 0.9)"
               }}
             >
-              <EllipsisVertical size={22} strokeWidth={2} />
-            </View>
+              <Play size={24} strokeWidth={2} fill={"rgb(255, 255, 255)"} color={"none"} />
+            </TouchableOpacity>
 
           </View>
         </View>
@@ -283,7 +372,8 @@ const SelectedPlaylist = () => {
           data={playlistEpisodes}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{
-            paddingBottom: 180
+            paddingBottom: 180,
+            paddingTop: 16
           }}
           renderItem={({ item }) => {
 
@@ -327,8 +417,8 @@ const SelectedPlaylist = () => {
                   {/* image */}
                   <View
                     style={{
-                      height: 64,
-                      width: 64,
+                      height: 56,
+                      width: 56,
                     }}
                   >
                     <Image
@@ -357,7 +447,8 @@ const SelectedPlaylist = () => {
                         fontSize: 16,
                         fontWeight: "500",
                         lineHeight: 24,
-                        width: "auto"
+                        width: "auto",
+                        color: 'rgba(255, 255, 255, 1)'
                       }}
                     >
                       {item.title}
@@ -370,7 +461,8 @@ const SelectedPlaylist = () => {
                         fontFamily: "SF Pro",
                         fontSize: 14,
                         fontWeight: "400",
-                        lineHeight: 20
+                        lineHeight: 20,
+                        color: "rgba(255, 255, 255, 0.8)"
                       }}
                     >
                       {formatDuration(item.duration)} &#183; {item.podcastTitle}
@@ -388,18 +480,19 @@ const SelectedPlaylist = () => {
                       alignContent: "center"
                     }}
                   >
-                    <EllipsisVertical size={20} />
+                    <EllipsisVertical size={20} color={'rgb(255, 255, 255)'} />
                   </Pressable>
                 </View>
               </View>
             )
           }}
+
         />
 
       </Animated.ScrollView>
     </View>
 
-  )
-}
+  );
+};
 
 export default SelectedPlaylist;

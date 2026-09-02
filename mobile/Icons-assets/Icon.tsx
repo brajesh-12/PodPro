@@ -174,11 +174,59 @@ export const Follow = ({ size = 24, strokeWidth = 2, color = "black" }) => {
   );
 };
 
-export const Unfollow = ({size=24, color="black", strokeWidth=2}) => {
+export const Unfollow = ({ size = 24, color = "black", strokeWidth = 2 }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" >
       <Path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M8 12H16" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+export const Remove = ({ size = 24, strokeWidth = 1.8, color = 'rgb(0, 0, 0)' }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx="12" cy="12" r="9.1" stroke={color} strokeWidth={strokeWidth} />
+      <Path d="M9.17154 9.17145L14.8284 14.8283" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M14.8285 9.17163L9.17161 14.8285" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+};
+
+export const Delete = ({ size = 24, fill = 'rgb(0, 0, 0)' }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M20 5.25H16.528L16.189 4.306C15.907 3.093 14.934 2.25 13.804 2.25H10.196C9.067 2.25 8.093 3.093 7.811 4.306L7.472 5.25H4C3.586 5.25 3.25 5.586 3.25 6C3.25 6.414 3.586 6.75 4 6.75H5.25V19C5.25 20.517 6.483 21.75 8 21.75H16C17.517 21.75 18.75 20.517 18.75 19V6.75H20C20.414 6.75 20.75 6.414 20.75 6C20.75 5.586 20.414 5.25 20 5.25ZM9.239 4.768L9.266 4.672C9.382 4.129 9.765 3.75 10.196 3.75H13.804C14.235 3.75 14.617 4.129 14.734 4.672L14.934 5.25H9.066L9.239 4.768ZM17.25 19C17.25 19.689 16.689 20.25 16 20.25H8C7.311 20.25 6.75 19.689 6.75 19V6.75H17.25V19ZM9.25 16V11C9.25 10.586 9.586 10.25 10 10.25C10.414 10.25 10.75 10.586 10.75 11V16C10.75 16.414 10.414 16.75 10 16.75C9.586 16.75 9.25 16.414 9.25 16ZM13.25 16V11C13.25 10.586 13.586 10.25 14 10.25C14.414 10.25 14.75 10.586 14.75 11V16C14.75 16.414 14.414 16.75 14 16.75C13.586 16.75 13.25 16.414 13.25 16Z" fill={fill} />
+    </Svg>
+  );
+};
+
+export const InfoIcon = ({ size = 24, strokeWidth = 1.5, color = 'rgb(0, 0, 0)', fill = 'rgb(255, 255, 255)' }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx="12" cy="12" r="9.25" stroke={color} strokeWidth={strokeWidth} />
+      <Path d="M10 10H12.5V17.5M12.5 17.5H10M12.5 17.5H15" stroke={color} strokeWidth="1.8" />
+      <Circle cx="12.25" cy="7.25" r="1.25" fill={fill} />
+    </Svg>
+  );
+};
+
+export const Share2 = ({ size = 24, strokeWidth = 1.5, color = 'rgb(255, 255, 255)' }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" >
+      <Path d="M15 8.5H17C18.1046 8.5 19 9.39543 19 10.5V18.9124C19 20.017 18.1046 20.9124 17 20.9124H7C5.89543 20.9124 5 20.017 5 18.9124V10.5C5 9.39543 5.89543 8.5 7 8.5H9M12 3V13.5M15.5 5.91241L12 3L8.5 6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    </Svg>
+  );
+};
+
+export const AddToPlaylist = ({ size = 24, strokeWidth = 1.5, color = 'rgb(255, 255, 255)' }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" >
+      <Path d="M16 5H3" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M11 12H3" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M16 19H3" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M18 9V15" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M21 12H15" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 };

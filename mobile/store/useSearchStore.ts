@@ -12,7 +12,10 @@ export interface Category {
 
 interface SearchStore {
   isSearching: boolean;
+
   searchedPodcast: Podcast | null;
+  searchPodDescription: string;
+
   results: Podcast[];
   recent: Podcast[];
   searchQuery: string;
@@ -44,6 +47,8 @@ const useSearchStore = create<SearchStore>(
     results: [],
     recent: [],
     searchedPodcast: null,
+    searchPodDescription: "",
+
     episodes: [],
     episodesToRender: [],
     selectedEpisode: null,
@@ -75,7 +80,12 @@ const useSearchStore = create<SearchStore>(
 
     setEpisodes: async (feedUrl) => {
       const data = await fetchEpisodes(feedUrl);
-      set({episodes: data});
+
+      const episodes = data?.allMappedEpisodes;
+      const description = data?.podDescription;
+
+      set({searchPodDescription: description});
+      set({episodes: episodes});
       set({episodesToRender: get().episodes.slice(0, 10)});
     },
 

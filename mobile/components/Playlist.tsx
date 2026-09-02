@@ -42,8 +42,6 @@ export const ListLayout = ({ playlist }: { playlist: Playlist }) => {
           style={{
             height: 64,
             width: 64,
-            borderRadius: 4,
-            backgroundColor: 'grey'
           }}
         >
           <Image
@@ -137,8 +135,6 @@ export const BoardLayout: React.FC<{ playlist: Playlist }> = ({ playlist }) => {
         style={{
           height: 168,
           width: 168,
-          borderRadius: 6,
-          backgroundColor: 'grey'
         }}
       >
         <Image

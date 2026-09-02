@@ -112,7 +112,7 @@ const Login = () => {
             alignItems: "center"
           }}
         >
-          <ChevronLeft size={24} strokeWidth={2} />
+          <ChevronLeft size={24} strokeWidth={2} color={"white"} />
         </Pressable>
 
       </View>
@@ -134,7 +134,8 @@ const Login = () => {
             style={{
               fontFamily: "SF Pro",
               fontWeight: "700",
-              fontSize: 26
+              fontSize: 26,
+              color: "rgb(255, 255, 255)"
             }}
           >
             Welcome back
@@ -145,7 +146,7 @@ const Login = () => {
               fontFamily: "SF Pro",
               fontWeight: "500",
               fontSize: 14,
-              color: "rgba(0, 0, 0, 0.6)"
+              color: "rgba(255, 255, 255, 0.7)"
             }}
           >
             {email.length > 0 ? 'Enter your password to sign in' : 'Enter your email address'}

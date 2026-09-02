@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { EllipsisVertical, Play, ChevronLeft } from 'lucide-react-native';
 import { Image } from 'expo-image';
@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { formatDate, formatDuration } from '@/lib/utils';
 import usePlayerStore from '@/store/usePlayerStore';
 import useModalStore from '@/store/useModalStore';
-import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import Animated, { createAnimatedComponent, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { Downloaded, Save, Share } from '@/Icons-assets/Icon';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
@@ -15,8 +15,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useSearchStore from '@/store/useSearchStore';
 import DownloadEngine from '@/lib/DownloadEngine';
 import AnimatedDownloadIcon from '@/components/AnimatedDownloadIcon';
+import { BlurView } from 'expo-blur';
+import ButtonStyle from '@/constants/buttonStyles';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const HEADER_HEIGHT = 48;
+
+const AnimatedMaskedView = createAnimatedComponent(MaskedView);
 
 const EpisodeDetail = () => {
   const router = useRouter();
@@ -43,21 +49,16 @@ const EpisodeDetail = () => {
     }
   });
 
-  const backgroundStyle = useAnimatedStyle(() => {
-    const scrolled = scrollY.value >= containerHeight;
-
-    return {
-      backgroundColor: scrolled ? 'rgb(242, 242, 242)' : 'none',
-      borderBottomWidth: scrolled ? 0.8 : 0,
-      borderBottomColor: scrolled ? "grey" : "none"
-    };
-  });
-
   const textStyle = useAnimatedStyle(() => {
     const scrolled = scrollY.value >= containerHeight;
     return {
       opacity: scrolled ? 1 : 0
     };
+  });
+
+  const blurLayoutOpacity = useAnimatedStyle(() => {
+    const opacity = scrollY.value >= containerHeight - 60 ? 1 : 0
+    return { opacity }
   });
 
   const insets = useSafeAreaInsets();
@@ -94,11 +95,11 @@ const EpisodeDetail = () => {
       }
     };
 
-    const task = tasks[episodeId] || {status: 'IDLE', progress: 0};
+    const task = tasks[episodeId] || { status: 'IDLE', progress: 0 };
     const isHistoricallyDownladed = !!downloadEpisodes[episodeId];
 
     const handleDownload = () => {
-      switch(task.status) {
+      switch (task.status) {
         case 'IDLE':
         case 'FAILED':
           DownloadEngine.enqueue(selectedEpisode, podcastId);
@@ -110,14 +111,14 @@ const EpisodeDetail = () => {
         case 'PAUSED':
           DownloadEngine.resume(selectedEpisode.id);
           break;
-        
+
         case 'QUEUED':
         case 'COMPLETED':
           DownloadEngine.cancel(selectedEpisode.id);
           break;
       };
 
-      if(isHistoricallyDownladed && task.status === 'IDLE') {
+      if (isHistoricallyDownladed && task.status === 'IDLE') {
         DownloadEngine.cancel(selectedEpisode.id);
       };
     };
@@ -128,6 +129,34 @@ const EpisodeDetail = () => {
           paddingTop: insets.top,
         }}
       >
+        <AnimatedMaskedView
+          style={[{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            left: 0,
+            height: insets.top + 116,
+            zIndex: 20,
+          }, blurLayoutOpacity]}
+          maskElement={
+            <LinearGradient
+              style={StyleSheet.absoluteFill}
+              colors={['rgba(11, 11, 11, 1)', 'rgba(11, 11, 11, 0)']}
+              start={{ x: 0, y: 0.6 }}
+              end={{ x: 0, y: 1 }}
+            />
+          }
+        >
+          <BlurView
+            intensity={50}
+            tint='dark'
+            style={{
+              height: '100%',
+              width: '100%',
+              backgroundColor: "rgba(11, 11, 11, 0.6)"
+            }}
+          />
+        </AnimatedMaskedView>
 
         {/* Header */}
         <Animated.View
@@ -143,29 +172,36 @@ const EpisodeDetail = () => {
             right: 0,
             left: 0,
             zIndex: 20
-          }, backgroundStyle]}
+          }]}
         >
           <TouchableOpacity
             onPress={() => {
               router.back();
             }}
             style={{
-              height: 44,
-              width: 44,
-              justifyContent: "center",
-              paddingLeft: 7,
-              backgroundColor: "white",
-              borderRadius: 100,
+              height: 48,
+              width: 48,
+              borderRadius: 24,
+              alignItems: "center",
               shadowOpacity: 0.12,
               shadowColor: "rgb(0, 0, 0)",
               shadowOffset: {
                 height: 2,
                 width: 1,
               },
-              shadowRadius: 8
+              shadowRadius: 8,
+              overflow: "hidden",
             }}
           >
-            <ChevronLeft size={26} />
+            <BlurView
+              intensity={18}
+              style={StyleSheet.absoluteFill}
+            />
+            <View
+              style={[StyleSheet.absoluteFill, ButtonStyle.backbutton]}
+            >
+              <ChevronLeft size={26} color={'rgb(255, 255, 255)'} />
+            </View>
           </TouchableOpacity>
 
           <Animated.View
@@ -187,8 +223,8 @@ const EpisodeDetail = () => {
                 fontWeight: "600",
                 fontSize: 18,
                 lineHeight: 28,
-                color: "black",
-                width: 297
+                color: "rgb(255, 255, 255)",
+                width: 297,
               }}
             >
               {selectedEpisode?.title}
@@ -212,10 +248,6 @@ const EpisodeDetail = () => {
               const { height } = event.nativeEvent.layout;
               setContainerHeight(height);
             }}
-            style={{
-              borderBottomWidth: 0.6,
-              borderBottomColor: "grey"
-            }}
           >
 
             {/* Podcast Title */}
@@ -233,6 +265,7 @@ const EpisodeDetail = () => {
                   fontSize: 14,
                   fontWeight: "400",
                   lineHeight: 16,
+                  color: 'rgba(255, 255, 255, 0.9)'
                 }}
               >
                 {searchedPodcast?.title}
@@ -280,7 +313,8 @@ const EpisodeDetail = () => {
                     fontSize: 14,
                     fontWeight: "400",
                     lineHeight: 16,
-                    textAlign: "center"
+                    textAlign: "center",
+                    color: 'rgba(255, 255, 255, 0.6)'
                   }}
                 >
                   {formatDate(selectedEpisode?.publishDate)} &#8226; {formatDuration(selectedEpisode?.duration)}
@@ -311,7 +345,8 @@ const EpisodeDetail = () => {
                     fontWeight: "700",
                     lineHeight: 32,
                     width: 288,
-                    textAlign: "center"
+                    textAlign: "center",
+                    color: 'rgba(255, 255, 255, 0.9)'
                   }}
                 >
                   {selectedEpisode?.title}
@@ -325,87 +360,100 @@ const EpisodeDetail = () => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
+                justifyContent: "space-between",
                 marginBottom: 12,
-                gap: 12
+                paddingHorizontal: 20
               }}
             >
 
               <Pressable
-                onPress={handleDownload}
-                style={{
-                  height: 44,
-                  width: 44,
-                  borderRadius: 88,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgb(217, 217, 217)"
-                }}
-              >
-                {task.status === 'COMPLETED' || isHistoricallyDownladed
-                  ? <Downloaded size={28}/>
-                  : <AnimatedDownloadIcon episode={selectedEpisode} />
-                }
-              </Pressable>
-
-              <Pressable
-                onPress={handleSave}
-                style={{
-                  height: 44,
-                  width: 44,
-                  borderRadius: 88,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgb(217, 217, 217)"
-                }}
-              >
-                <Save size={22} strokeWidth={2} fill={isSaved ? 'black' : 'none'} />
-              </Pressable>
-
-              <TouchableOpacity
-                onPress={() => handlePlay()}
-                style={{
-                  height: 64,
-                  width: 64,
+                style={[{
+                  height: 50,
+                  width: 50,
                   borderRadius: 128,
                   justifyContent: "center",
                   alignItems: "center",
-                  backgroundColor: "rgb(217, 217, 217)"
-                }}
+                  paddingRight: 4
+                }, ButtonStyle.singleButton]}
               >
-                <Play size={22} strokeWidth={2} fill={"black"} />
+                <Share size={22} strokeWidth={2} color='rgb(255, 255, 255)' />
+              </Pressable>
+
+              <View
+                style={[{
+                  height: 50,
+                  borderRadius: 128,
+                  alignItems: "center",
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  paddingLeft: 4,
+                  flexDirection: "row",
+                }, ButtonStyle.buttonGroup]}
+              >
+                <Pressable
+                  onPress={handleSave}
+                  style={{
+                    height: 50,
+                    width: 48,
+                    borderRadius: 88,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Save size={22}
+                    strokeWidth={2}
+                    fill={isSaved ? 'rgb(255, 255, 255)' : 'none'}
+                    color='rgb(255, 255, 255)'
+                  />
+                </Pressable>
+
+                <Pressable
+                  onPress={handleDownload}
+                  style={{
+                    height: 50,
+                    width: 48,
+                    borderRadius: 88,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {
+                    isHistoricallyDownladed || task.status === 'COMPLETED'
+                      ? <Downloaded size={28} />
+                      : <AnimatedDownloadIcon episode={selectedEpisode} />
+                  }
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setTappedEpisode(selectedEpisode);
+                    setPodcastId(podcastId);
+                    openModal("episode");
+                  }}
+                  style={{
+                    height: 50,
+                    width: 48,
+                    borderRadius: 88,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <EllipsisVertical size={22} strokeWidth={2} color={'rgb(255, 255, 255)'} />
+                </Pressable>
+
+              </View>
+
+              <TouchableOpacity
+                onPress={() => handlePlay()}
+                style={[{
+                  height: 50,
+                  width: 50,
+                  borderRadius: 128,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }, ButtonStyle.singleButton]}
+              >
+                <Play size={22} strokeWidth={2} fill={"rgb(255, 255, 255)"} color={'rgb(255, 255, 255)'} />
               </TouchableOpacity>
-
-              <Pressable
-                style={{
-                  height: 44,
-                  width: 44,
-                  borderRadius: 88,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgb(217, 217, 217)"
-                }}
-              >
-                <Share size={22} strokeWidth={2} />
-              </Pressable>
-
-              <Pressable
-                onPress={() => {
-                  setPodcastId(podcastId);
-                  setTappedEpisode(selectedEpisode);
-                  openModal("episode");
-                }}
-                style={{
-                  height: 44,
-                  width: 44,
-                  borderRadius: 88,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgb(217, 217, 217)"
-                }}
-              >
-                <EllipsisVertical size={22} strokeWidth={2} />
-              </Pressable>
 
             </View>
           </View>
@@ -416,12 +464,30 @@ const EpisodeDetail = () => {
               paddingTop: 16
             }}
           >
+            <View
+              style={{
+                paddingBottom: 12
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "SF Pro",
+                  fontSize: 22,
+                  fontWeight: "600",
+                  lineHeight: 32,
+                  color: "rgb(255, 255, 255)"
+                }}
+              >
+                About
+              </Text>
+            </View>
             <Text
               style={{
                 fontFamily: "SF Pro",
                 fontSize: 14,
                 fontWeight: "400",
-                lineHeight: 20
+                lineHeight: 20,
+                color: 'rgba(255, 255, 255, 0.8)'
               }}
             >
               {selectedEpisode?.description}
