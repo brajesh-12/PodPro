@@ -5,13 +5,20 @@ import { connectDB } from './lib/db.js';
 import playlistsRoutes from './routes/playlist.route.js';
 import podcastRoutes from './routes/podcast.route.js';
 import { initCronJobs } from './lib/cronJobs.js';
+import cors from 'cors';
+import { globalRateLimiter } from './lib/ratelimit.js';
 
 const app = express();
+
+app.use(cors());
+
 const PORT = ENV.PORT || 3000;
 
 app.get("/api/test", (req,res) => {
   res.send('Test successful: Server is working');
 });
+
+app.use(globalRateLimiter);
 
 app.use(express.json());
 

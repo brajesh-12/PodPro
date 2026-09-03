@@ -92,10 +92,10 @@ const CreatePasswordScreen = () => {
             height: 32,
             width: 32,
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
-          <ChevronLeft size={24} strokeWidth={2} />
+          <ChevronLeft size={24} strokeWidth={2} color={'rgb(255, 255, 255)'} />
         </Pressable>
 
       </View>
@@ -114,7 +114,8 @@ const CreatePasswordScreen = () => {
             style={{
               fontFamily: "SF Pro",
               fontWeight: "700",
-              fontSize: 26
+              fontSize: 26,
+              color: 'rgb(255, 255, 255)'
             }}
           >
             Set a password
@@ -134,11 +135,11 @@ const CreatePasswordScreen = () => {
               paddingLeft: 12,
               paddingRight: 12,
               borderWidth: password.length > 0 || errorText.length > 0 ? 1.5 : 0,
-              borderColor: errorText.length > 0 ? "rgb(251, 59, 59)" : "black",
+              borderColor: errorText.length > 0 ? "rgb(251, 59, 59)" : "rgba(255, 255, 255, 0.4)",
               alignItems: "center",
               borderRadius: 8,
               flexDirection: "row",
-              backgroundColor: "rgb(226, 226, 226)"
+              backgroundColor: "rgb(26, 26, 26)"
             }}
           >
             <View
@@ -153,10 +154,12 @@ const CreatePasswordScreen = () => {
                 onChangeText={setPassword}
                 autoCapitalize="none"
                 secureTextEntry={secure}
+                placeholderTextColor={'rgba(255, 255, 255, 0.5)'}
                 // autoFocus={true}
                 style={{
                   fontFamily: "SF Pro",
-                  fontSize: 15
+                  fontSize: 15,
+                  color: 'rgb(255, 255, 255)'
                 }}
               />
             </View>
@@ -166,7 +169,7 @@ const CreatePasswordScreen = () => {
                 setVisibility(!secure);
               }}
             >
-              {secure ? <EyeOff size={22} /> : <Eye size={22} />}
+              {secure ? <EyeOff size={22} color={'rgb(255, 255, 255)'} /> : <Eye size={22} color={'rgb(255, 255, 255)'} />}
             </Pressable>
 
           </View>
@@ -182,7 +185,7 @@ const CreatePasswordScreen = () => {
                 fontFamily: "SF Pro",
                 fontSize: 12,
                 fontWeight: "500",
-                color: errorText.length > 0 ? "rgb(251, 59, 59)" : "black"
+                color: errorText.length > 0 ? "rgb(251, 59, 59)" : "rgba(255, 255, 255, 0.8)"
               }}
             >
               {errorText.length > 0 ? errorText : "Must have at least 6 characters"}
@@ -209,12 +212,11 @@ const CreatePasswordScreen = () => {
             return;
           }}
           style={{
-            opacity: password.length > 0 ? 1 : 0.5,
             height: 48,
             width: "100%",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "black",
+            backgroundColor: password.length > 0 ? "rgb(248, 216, 73)" : 'rgba(255, 255, 255, 0.5)',
             borderRadius: 32
           }}
         // onPress={handleSignup}
@@ -224,7 +226,7 @@ const CreatePasswordScreen = () => {
               fontFamily: "SF Pro",
               fontSize: 15,
               fontWeight: "500",
-              color: "white"
+              color: "rgb(11, 11, 11)"
             }}
           >
             Continue

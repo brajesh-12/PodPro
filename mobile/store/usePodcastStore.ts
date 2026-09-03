@@ -186,6 +186,7 @@ export const usePodcastStore = create<PodcastState>((set, get) => ({
   resetPodcast: () => {
     set({ podcast: null });
     set({ episodes: [] });
+    set({podDescription: ""});
   }
 
 }));

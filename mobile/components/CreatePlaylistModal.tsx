@@ -100,6 +100,7 @@ const CreatePlaylistModal = () => {
             placeholder='Title'
             value={title}
             onChangeText={handleTextChange}
+            placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
             autoFocus={true}
             style={{
               fontFamily: "SF Pro",

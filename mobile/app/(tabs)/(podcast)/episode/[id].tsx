@@ -8,7 +8,7 @@ import usePlayerStore from '@/store/usePlayerStore';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import useModalStore from '@/store/useModalStore';
 import Animated, { createAnimatedComponent, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
-import { Downloaded, Save, Share } from '@/Icons-assets/Icon';
+import { Downloaded, Save, Share2 } from '@/Icons-assets/Icon';
 import usePlaylistStore from '@/store/usePlaylistStore';
 import API from '@/services/api';
 import useDownloadStore from '@/store/useDownloadStore';
@@ -384,7 +384,7 @@ const EpisodeDetail = () => {
                   paddingRight: 4
                 }, ButtonStyle.singleButton]}
               >
-                <Share size={22} strokeWidth={2} color='rgb(255, 255, 255)' />
+                <Share2 size={24} strokeWidth={1.8} color='rgb(255, 255, 255)' />
               </Pressable>
 
               <View
@@ -426,7 +426,7 @@ const EpisodeDetail = () => {
                 >
                   {
                     isHistoricallyDownladed || task.status === 'COMPLETED'
-                      ? <Downloaded size={28} />
+                      ? <Downloaded size={28} fill='rgb(255, 255, 255)' />
                       : <AnimatedDownloadIcon episode={selectedEpisode} />
                   }
                 </Pressable>

@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { scheduleOnRN } from 'react-native-worklets';
-import { AddToPlaylist, CloseIcon, Download, Downloaded, Follow, InfoIcon, Save, Share, Share2, SinglePodcast, Unfollow } from '@/Icons-assets/Icon';
+import { AddToPlaylist, CloseIcon, Download, Downloaded, Follow, InfoIcon, Save, Share2, SinglePodcast, Unfollow, } from '@/Icons-assets/Icon';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import useDownloadStore from '@/store/useDownloadStore';
 import usePlaylistStore from '@/store/usePlaylistStore';
@@ -297,7 +297,7 @@ const PodcastSheet = () => {
           <View
             style={style.iconContainer}
           >
-            <Share size={22} strokeWidth={1.8} color='rgb(255, 255, 255)' />
+            <Share2 size={24} strokeWidth={1.8} color='rgb(255, 255, 255)' />
           </View>
 
           {/* text */}

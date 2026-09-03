@@ -170,10 +170,10 @@ const Login = () => {
                 width: "100%",
                 paddingLeft: 12,
                 borderWidth: email.trim().length > 0 || emailError.trim().length > 0 ? 1.5 : 0,
-                borderColor: emailError.length > 0 ? "rgb(251, 59, 59)" : 'black',
+                borderColor: emailError.length > 0 ? "rgb(251, 59, 59)" : 'rgba(255, 255, 255, 0.4)',
                 justifyContent: "center",
                 borderRadius: 8,
-                backgroundColor: "rgb(226, 226, 226)"
+                backgroundColor: "rgb(26, 26, 26)"
               }}
             >
               <TextInput
@@ -183,10 +183,12 @@ const Login = () => {
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor={'rgba(255, 255, 255, 0.5)'}
                 // autoFocus={true}
                 style={{
                   fontFamily: "SF Pro",
                   fontSize: 15,
+                  color: 'rgb(255, 255, 255)'
                 }}
               />
             </View>
@@ -220,10 +222,11 @@ const Login = () => {
                 paddingLeft: 12,
                 paddingRight: 12,
                 borderWidth: password.length > 0 || passwordError.length > 0 ? 1.5 : 0,
+                borderColor: "rgba(255, 255, 255, 0.4)",
                 alignItems: "center",
                 borderRadius: 8,
                 flexDirection: "row",
-                backgroundColor: "rgb(226, 226, 226)"
+                backgroundColor: "rgb(26, 26, 26)"
               }}
             >
               <View
@@ -237,10 +240,12 @@ const Login = () => {
                   onChangeText={setPassword}
                   autoCapitalize="none"
                   secureTextEntry={secure}
+                  placeholderTextColor={'rgba(255, 255, 255, 0.5)'}
                   // autoFocus={true}
                   style={{
                     fontFamily: "SF Pro",
-                    fontSize: 15
+                    fontSize: 15,
+                    color: 'rgb(255, 255, 255)'
                   }}
                 />
               </View>
@@ -250,7 +255,7 @@ const Login = () => {
                   setVisibility(!secure);
                 }}
               >
-                {secure ? <EyeOff size={22} /> : <Eye size={22} />}
+                {secure ? <EyeOff size={22} color={'rgb(255, 255, 255)'} /> : <Eye size={22} color={'rgb(255, 255, 255)'} />}
               </Pressable>
 
             </View>
@@ -294,12 +299,11 @@ const Login = () => {
             return;
           }}
           style={{
-            opacity: email.trim().length > 0 && password.length > 0 ? 1 : 0.5,
             height: 48,
             width: "100%",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "black",
+            backgroundColor:  email.trim().length > 0 && password.length > 0 ? "rgb(248, 216, 73)" : 'rgba(255, 255, 255, 0.5)',
             borderRadius: 32
           }}
         >
@@ -308,7 +312,7 @@ const Login = () => {
               fontFamily: "SF Pro",
               fontSize: 15,
               fontWeight: "500",
-              color: "white"
+              color: "rgb(11, 11, 11)"
             }}
           >
             Continue

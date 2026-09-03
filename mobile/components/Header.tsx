@@ -314,8 +314,12 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
         ))}
       </ScrollView>
 
-      { isSelected &&
-        <View>
+      {isSelected &&
+        <View
+          style={{
+            paddingHorizontal: 16
+          }}
+        >
           <Pressable
             onPress={() => {
               router.navigate({
@@ -324,9 +328,18 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
               })
             }}
             style={{
-              height: 32,
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              borderTopWidth: 0.8,
+              borderBottomWidth: 0.8,
+              borderLeftWidth: 0.6,
+              borderRightWidth: 0.6,
+              borderTopColor: "rgba(255, 255, 255, 0.9)",
+              borderBottomColor: "rgba(255, 255, 255, 0.9)",
+              borderLeftColor: "rgba(255, 255, 255, 0.8)",
+              borderRightColor: "rgba(255, 255, 255, 0.8)",
+              borderRadius: 32,
+              paddingVertical: 8
             }}
           >
             <Text

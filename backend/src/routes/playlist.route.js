@@ -2,10 +2,11 @@ import { Router } from "express";
 import { addEpisode, createPlaylist, deletePlaylist, getPlaylists, lookupPlaylist, playlistEpisodes, removeEpisode, updateCover, updatePlaylist, updateText } from "../controller/playlists.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import upload from "../middleware/multer.js";
+import { routeRateLimiter } from "../lib/ratelimit.js";
 
 const router = Router();
 
-router.use(protectRoute);
+router.use(protectRoute, routeRateLimiter);
 
 router.get("/", getPlaylists);
 router.get("/lookup", lookupPlaylist);
