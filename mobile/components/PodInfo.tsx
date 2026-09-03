@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Pressable, TextLayoutEvent } from 'react-native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Image } from 'expo-image';
 import { Podcast } from '@/store/usePodcastStore';
 import { Star } from 'lucide-react-native';
@@ -12,19 +12,30 @@ import ButtonStyle from '@/constants/buttonStyles';
 const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefined }> = ({ podcast, description }) => {
   const { toggleSubscription, subscriptionIds } = useSubscriptionStore();
 
-  const [collapsed, setCollapsed] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [hasMeasured, setHasMeasured] = useState(false);
-  const [ showMoreButton, setShowMoreButton ] = useState(false)
+  const [showMoreButton, setShowMoreButton] = useState(false);
+
+  useEffect(() => {
+    setIsExpanded(false);
+    setHasMeasured(false);
+    setShowMoreButton(false);
+  }, [description]);
 
   const isSubscribed = podcast?.id !== undefined ? subscriptionIds.has(podcast?.id) : false;
 
   const handleTextLayout = useCallback(
     (event: TextLayoutEvent) => {
+      if (!hasMeasured) {
         if (event.nativeEvent.lines.length > 2) {
+          const numberOfLines = event.nativeEvent.lines.length
+          console.log("Number of lines:", numberOfLines);
           setShowMoreButton(true);
         }
+      }
+      setHasMeasured(true);
     },
-    []
+    [hasMeasured]
   );
 
 
@@ -173,19 +184,12 @@ const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefin
         {description &&
           <View
             style={{
-              paddingRight: collapsed ? 36 : 0
+              paddingRight: !isExpanded ? 36 : 0
             }}
           >
             <Text
-              onTextLayout={(event) => {
-                if(event.nativeEvent.lines.length > 0) {
-                  const numberOfLines = event.nativeEvent.lines;
-                  console.log("numberOfLines:", numberOfLines);
-                  setShowMoreButton(true);
-                  console.log(showMoreButton);
-                }
-              }}
-              numberOfLines={collapsed ? 2 : 0}
+              onTextLayout={handleTextLayout}
+              numberOfLines={hasMeasured && !isExpanded ? 2 : undefined}
               ellipsizeMode='tail'
               style={{
                 color: "rgba(255, 255, 255, 0.8)",
@@ -201,13 +205,13 @@ const PodInfo: React.FC<{ podcast: Podcast | null, description: string | undefin
             {showMoreButton && (
               <Pressable
                 onPress={() => {
-                  setCollapsed(false);
+                  setIsExpanded(true);
                 }}
                 style={{
                   position: "absolute",
                   bottom: -2,
                   right: -6,
-                  opacity: collapsed ? 1 : 0,
+                  opacity: !isExpanded ? 1 : 0,
                   backgroundColor: "rgb(36, 36, 36)",
                   paddingHorizontal: 6,
                   paddingVertical: 3,

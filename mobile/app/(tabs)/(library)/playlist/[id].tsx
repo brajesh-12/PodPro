@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, FlatList, Pressable, Alert, StyleSheet } 
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import usePlaylistStore from '@/store/usePlaylistStore';
-import { EllipsisVertical, Download, Play, Edit, ChevronLeft } from 'lucide-react-native';
+import { EllipsisVertical, Download, Play, ChevronLeft } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { formatDate, formatDuration } from '@/lib/utils';
 import API from '@/services/api';
@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import useModalStore from '@/store/useModalStore';
 import { BlurView } from 'expo-blur';
-import { Share } from '@/Icons-assets/Icon';
+import { EditIcon, Share } from '@/Icons-assets/Icon';
 
 const HEADER_HEIGHT = 48;
 
@@ -201,16 +201,16 @@ const SelectedPlaylist = () => {
                     style={{
                       justifyContent: "center",
                       alignItems: "center",
-                      height: 54,
-                      width: 54,
+                      height: 40,
+                      width: 40,
                       position: "absolute",
-                      right: -8,
-                      bottom: -8,
-                      backgroundColor: "white",
+                      right: 2,
+                      bottom: 2,
+                      backgroundColor: "rgba(11, 11, 11, 0.6)",
                       borderRadius: 64
                     }}
                   >
-                    <Edit size={22} />
+                    <EditIcon size={22} color='rgb(255, 255, 255)' />
                   </Pressable>
                 )
               }

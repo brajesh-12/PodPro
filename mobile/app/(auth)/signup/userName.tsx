@@ -55,7 +55,8 @@ const CreateUserName = () => {
               style={{
                 fontFamily: "SF Pro",
                 fontSize: 14,
-                fontWeight: "500"
+                fontWeight: "500",
+                color: 'rgb(255, 255, 255)'
               }}
             >
               Skip
@@ -81,7 +82,8 @@ const CreateUserName = () => {
               style={{
                 fontFamily: "SF Pro",
                 fontWeight: "700",
-                fontSize: 26
+                fontSize: 26,
+                color: 'rgb(255, 255, 255)'
               }}
             >
               What Should we call your?
@@ -92,7 +94,7 @@ const CreateUserName = () => {
                 fontFamily: "SF Pro",
                 fontWeight: "500",
                 fontSize: 14,
-                color: "rgba(0, 0, 0, 0.6)"
+                color: "rgba(255, 255, 255, 0.8)"
               }}
             >
               Will display on your profile.
@@ -106,10 +108,10 @@ const CreateUserName = () => {
                 width: "100%",
                 paddingLeft: 12,
                 borderWidth: userName.length > 0 ? 1.4 : 0,
-                borderColor: 'black',
+                borderColor: 'rgba(255, 255, 255, 0.4)',
                 justifyContent: "center",
                 borderRadius: 8,
-                backgroundColor: "rgb(226, 226, 226)"
+                backgroundColor: "rgb(26, 26, 26)"
               }}
             >
               <TextInput
@@ -119,10 +121,12 @@ const CreateUserName = () => {
                 onChangeText={setUserName}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor={'rgba(255, 255, 255, 0.5)'}
                 // autoFocus={true}
                 style={{
                   fontFamily: "SF Pro",
                   fontSize: 15,
+                  color: 'rgb(255, 255, 255)'
                 }}
               />
             </View>
@@ -144,12 +148,11 @@ const CreateUserName = () => {
               pathname: "/signup/userName"
             })}
             style={{
-              opacity: userName.trim().length > 0 ? 1 : 0.5,
               height: 48,
               width: "100%",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "black",
+              backgroundColor: userName.trim().length > 0 ? "rgb(248, 216, 73)" : 'rgba(255, 255, 255, 0.5)',
               borderRadius: 32
             }}
           // onPress={handleSignup}
@@ -159,7 +162,7 @@ const CreateUserName = () => {
                 fontFamily: "SF Pro",
                 fontSize: 15,
                 fontWeight: "500",
-                color: "white"
+                color: "rgb(11, 11, 11)"
               }}
             >
               Continue

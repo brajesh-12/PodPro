@@ -193,7 +193,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
                   fontSize: 14,
                   fontWeight: '400',
                   lineHeight: 16,
-                  color: 'rgba(255, 255, 255, 0.6)'
+                  color: 'rgba(255, 255, 255, 0.7)'
                 }}
               >
                 {episode.podcastTitle}
@@ -231,7 +231,7 @@ const EpisodeCard: React.FC<{ episode: SavedEpisode, tab: string }> = ({ episode
             fontSize: 14,
             lineHeight: 20,
             fontWeight: '400',
-            color: 'rgba(255, 255, 255, 0.6)'
+            color: 'rgba(255, 255, 255, 0.7)'
           }}
         >
           {episode.description}

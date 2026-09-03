@@ -117,7 +117,7 @@ const Signup = () => {
               fontFamily: "SF Pro",
               fontWeight: "500",
               fontSize: 14,
-              color: "rgba(0, 0, 0, 0.6)"
+              color: "rgba(255, 255, 255, 0.6)"
             }}
           >
             To start, create a new account.
@@ -132,10 +132,10 @@ const Signup = () => {
               width: "100%",
               paddingLeft: 12,
               borderWidth: email.trim().length > 0 || errorText.trim().length > 0 ? 1.4 : 0,
-              borderColor: errorText.length > 0 ? "rgb(251, 59, 59)" : 'black',
+              borderColor: errorText.length > 0 ? "rgb(251, 59, 59)" : 'rgba(255, 255, 255, 0.4)',
               justifyContent: "center",
               borderRadius: 8,
-              backgroundColor: "rgb(226, 226, 226)"
+              backgroundColor: "rgb(26, 26, 26)"
             }}
           >
             <TextInput
@@ -145,10 +145,12 @@ const Signup = () => {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              placeholderTextColor={'rgba(255, 255, 255, 0.5)'}
               // autoFocus={true}
               style={{
                 fontFamily: "SF Pro",
                 fontSize: 15,
+                color: 'rgb(255, 255, 255)'
               }}
             />
           </View>
@@ -196,7 +198,7 @@ const Signup = () => {
             width: "100%",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "black",
+            backgroundColor: email.trim().length > 0 ? "rgb(248, 216, 73)" : 'rgba(255, 255, 255, 0.5)',
             borderRadius: 32
           }}
         >
@@ -205,7 +207,7 @@ const Signup = () => {
               fontFamily: "SF Pro",
               fontSize: 15,
               fontWeight: "500",
-              color: "white"
+              color: "rgb(11, 11, 11)"
             }}
           >
             Continue
@@ -224,18 +226,18 @@ const Signup = () => {
               fontWeight: "400",
               fontSize: 13,
               textAlign: "center",
-              lineHeight: 18
+              lineHeight: 18,
+              color: 'rgba(255, 255, 255, 0.8)'
             }}
           >
             By signing up you agree to our <Text
               style={{
-                fontWeight: "600"
+                fontWeight: "600",
+                color: 'rgb(255, 255, 255)'
               }}
-            >Privacy Policy</Text> and <Text
-              style={{
-                fontWeight: "600"
-              }}
-            >Terms of use.</Text>
+            >
+              Privacy Policy and Terms of use.
+            </Text>
           </Text>
         </View>
       </View>

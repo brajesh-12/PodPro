@@ -27,7 +27,7 @@ const PodcastDetail = () => {
   const router = useRouter();
 
   const insets = useSafeAreaInsets();
-
+  
   const { setTappedPodcast, openModal } = useModalStore();
   const { fetchPod,
     podcast,
@@ -56,7 +56,7 @@ const PodcastDetail = () => {
     } else {
       fetchPod(podcastId);
     }
-  }
+  };
 
   useEffect(() => {
     fetchingPodcast();

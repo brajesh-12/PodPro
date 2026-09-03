@@ -5,9 +5,9 @@ import { useEffect } from 'react';
 import { scheduleOnRN } from 'react-native-worklets';
 import useModalStore from '@/store/useModalStore';
 import { style } from './CustomModal';
-import { Edit, Play } from 'lucide-react-native';
+import { Play } from 'lucide-react-native';
 import usePlaylistStore from '@/store/usePlaylistStore';
-import { Download, CloseIcon, Save, Downloaded, SinglePodcast, Delete, Remove, InfoIcon, Share2 } from '@/Icons-assets/Icon';
+import { Download, CloseIcon, Save, Downloaded, SinglePodcast, Delete, Remove, InfoIcon, Share2, EditIcon } from '@/Icons-assets/Icon';
 import useDownloadStore from '@/store/useDownloadStore';
 import DownloadEngine from '@/lib/DownloadEngine';
 import API from '@/services/api';
@@ -227,7 +227,7 @@ const PlaylistModal = ({ handleClose }: { handleClose: () => void }) => {
           <View
             style={style.iconContainer}
           >
-            <Edit size={22} strokeWidth={1.8} color={'rgb(255, 255, 255)'} />
+            <EditIcon size={22} color={'rgb(255, 255, 255)'} />
           </View>
 
           {/* text */}
