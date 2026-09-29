@@ -40,6 +40,7 @@ const usePlayerStore = create<PlayerState>()(
 
       togglePlay: () => {
         set({isPlaying: !get().isPlaying});
+        console.log('playerState:', get().isPlaying);
       },
 
       setProgress: (progress) => {

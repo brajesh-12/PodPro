@@ -12,7 +12,10 @@ const DownloadManager = {
   // Ensure download directory exists
   async init() {
     if(!Download_Dir.exists) {
-      Download_Dir.create();
+      Download_Dir.create({
+        idempotent: true,
+        intermediates: true,
+      });
     }
 
     DownloadDatabase.init();
@@ -33,7 +36,10 @@ const DownloadManager = {
 
     // Now checks if this episode folder is already exists
     if(!epidoseFolder.exists) {
-      epidoseFolder.create();
+      epidoseFolder.create({
+        idempotent: true,
+        intermediates: true
+      });
     };
 
     // file inside the folder

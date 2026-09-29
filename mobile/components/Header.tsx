@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Pressable, ScrollView } from 'react-native';
-import { Cast, Search, ChevronDown, ArrowLeft } from 'lucide-react-native';
+import { Cast, Search, ChevronDown, ChevronLeft } from 'lucide-react-native';
 import useSubscriptionStore from '@/store/useSubscriptionStore';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -7,6 +7,7 @@ import { Bell } from '@/Icons-assets/Icon';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import useSearchStore from '@/store/useSearchStore';
+import ButtonStyle from '@/constants/buttonStyles';
 
 interface Screen {
   screen: string
@@ -221,22 +222,46 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
               </Text>
               )
               : (
-                <Pressable
-                  onPress={() => {
-                    setIsSelected(false);
-                    clearSelectedPodcast();
-                    fetchFeed(1);
-                  }}
+                <View
                   style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: 36,
-                    width: 36,
-                    borderRadius: 72,
+                    gap: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center'
                   }}
                 >
-                  <ArrowLeft size={24} color={'rgba(255, 255, 255, 0.8)'} />
-                </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setIsSelected(false);
+                      clearSelectedPodcast();
+                      fetchFeed(1);
+                    }}
+                    style={[
+                      {
+                        height: 48,
+                        width: 48,
+                      },
+                      ButtonStyle.backbutton
+                    ]}
+                  >
+                    <ChevronLeft size={24} color={'rgb(255, 255, 255)'}/>
+                  </Pressable>
+
+                  <View>
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode='tail'
+                      style={{
+                        fontFamily: "SF Pro",
+                        fontSize: 18,
+                        fontWeight: "600",
+                        lineHeight: 28,
+                        color: 'rgba(255, 255, 255, 0.9)'
+                      }}
+                    >
+                      {selectedPodcast?.title}
+                    </Text>
+                  </View>
+                </View>
               )
           }
         </View>
@@ -249,6 +274,7 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           paddingLeft: 12,
+          marginTop: 12
         }}
       >
         {followingPodcasts.map((pod) => (
@@ -281,7 +307,7 @@ export const SubscriptionHeader = ({ style }: { style: any }) => {
                 borderRadius: 112,
                 padding: 2,
                 borderWidth: 2,
-                borderColor: selectedPodcast?.id === pod.id ? "grey" : "rgb(11, 11, 11)"
+                borderColor: selectedPodcast?.id === pod.id ? "rgb(255, 255, 255)" : "rgb(11, 11, 11)"
               }}
             >
               <Image

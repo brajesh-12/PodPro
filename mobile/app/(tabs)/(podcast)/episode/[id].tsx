@@ -136,9 +136,7 @@ const EpisodeDetail = () => {
     };
 
     return (
-      <View
-        style={{ paddingTop: insets.top }}
-      >
+      <View>
         <AnimatedMaskedView
           style={[{
             position: "absolute",
@@ -246,7 +244,7 @@ const EpisodeDetail = () => {
         <Animated.ScrollView
           showsVerticalScrollIndicator={false}
           style={{
-            paddingTop: HEADER_HEIGHT,
+            paddingTop: HEADER_HEIGHT + insets.top,
           }}
           bounces={false}
           onScroll={onScroll}

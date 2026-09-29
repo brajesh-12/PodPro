@@ -15,7 +15,8 @@ import PlaylistBottomSheet from "@/components/PlaylistBottomSheet";
 import GlobalPlaylistCreation from "@/components/GlobalPlaylistCreation";
 import ProfileScreenModal from "@/components/ProfileScreenModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+// import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import {DarkTheme, ThemeProvider} from 'expo-router/react-navigation';
 
 const MyCustomTheme = {
   ...DarkTheme,
@@ -84,11 +85,6 @@ export default function RootLayout() {
       value={MyCustomTheme}
     >
       <GestureHandlerRootView>
-        <StatusBar
-          translucent={true}
-          backgroundColor={"transparent"}
-          style="light"
-        />
 
         <AudioController />
 

@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import usePlayerStore from '@/store/usePlayerStore';
 import { useEffect, useState } from 'react';
@@ -8,22 +8,16 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 const AudioSlider = () => {
 
-  const { progress, seekTo, isPlaying } = usePlayerStore();
-  const [ isDragging, setIsDragging ] = useState(false);
-  const [ draggingValue, setDraggingValue ] = useState(0);
+  const { progress, seekTo } = usePlayerStore();
+  const [isDragging, setIsDragging] = useState(false);
+  const [draggingValue, setDraggingValue] = useState(0);
 
   // const isDragging = useSharedValue(false);
   const playingProgress = useSharedValue(0);
   const sliderWidth = useSharedValue(0);
 
-  useEffect(() => {
-    if(!isDragging) {
-      playingProgress.value = withTiming(progress.position / progress.duration, {duration: 300});
-    };
-  }, [progress.position, progress.duration, playingProgress, isDragging, isPlaying]);
-
   const finishSeeking = (targetTime: any) => {
-    if(seekTo) {
+    if (seekTo) {
       seekTo(targetTime);
     }
 
@@ -56,13 +50,19 @@ const AudioSlider = () => {
       // scheduleOnRN(finishSeeking, targetTime);
     });
 
+  useEffect(() => {
+    if (!isDragging) {
+      playingProgress.value = withTiming(progress.position / progress.duration, { duration: 300 });
+    };
+  }, [progress.position, progress.duration, playingProgress, isDragging]);
+
   const activeTrackStyle = useAnimatedStyle(() => {
     return { width: `${playingProgress.value * 100}%` }
   });
 
   const focusAnimationStyle = useAnimatedStyle(() => {
     return {
-      height: isDragging ? 10 : 6
+      height: isDragging ? withSpring(10) : withSpring(6)
     }
   });
 
@@ -70,8 +70,7 @@ const AudioSlider = () => {
     <View
       style={{
         width: "100%",
-        paddingHorizontal: 20,
-        paddingVertical: 12
+        paddingHorizontal: 24,
       }}
     >
       <Animated.View>
@@ -152,7 +151,7 @@ const AudioSlider = () => {
               color: 'rgb(255, 255, 255)'
             }}
           >
-            {isDragging 
+            {isDragging
               ? formatProgress(draggingValue)
               : formatProgress(progress.position)
             }

@@ -1,17 +1,18 @@
-import { Dimensions, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Dimensions, View, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { createAnimatedComponent, Extrapolation, interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
-import { Gesture, GestureDetector, Pressable } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { Play, Pause } from 'lucide-react-native';
 import usePlayerStore from '@/store/usePlayerStore';
 import AudioSlider from './AudioSlider';
-import { Backward, Forward, SleepTimer, SpeedControl } from '@/Icons-assets/Icon';
+import { SleepTimer, SpeedControl, Forward2, Backward2, Save, PlayQueue } from '@/Icons-assets/Icon';
 import { useEffect } from 'react';
 import { BlurView } from 'expo-blur';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
+import ButtonStyle from '@/constants/buttonStyles';
 
 const { height: SCREEN_HEIGHT, width } = Dimensions.get("screen");
 const MINIPLAYER_HEIGHT = 54
@@ -79,7 +80,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     const marginHorizontal = interpolate(
       animationProgress.value,
       [0, 1],
-      [0, 16]
+      [0, 24]
     );
 
     const paddingTop = interpolate(
@@ -198,7 +199,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
       // bottom: 32,
       width: "100%",
       left: 0,
-      zIndex: 0,
+      zIndex: animationProgress.value > 0.5 ? -1 : 10,
       transform: [{ translateY: translateY }]
     };
   });
@@ -404,34 +405,38 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                   </Pressable>
 
                   {/* Change  */}
-                  <Pressable
+                  <TouchableOpacity
                     onPress={handleForward}
                   >
-                    <Forward size={22} strokeWidth={1.2} color='rgb(255, 255, 255)' />
-                  </Pressable>
+                    <Forward2 size={24} fill='rgb(255, 255, 255)' />
+                  </TouchableOpacity>
                 </View>
               </Animated.View>
 
               <Animated.View
+                pointerEvents={"none"}
                 style={[{
                   backgroundColor: "rgba(255, 255, 255, 0.2)",
                   position: 'absolute',
                   top: 0,
                   bottom: 0,
-                  zIndex: -4
+                  zIndex: -1
                 }, progressAnimationStyle, miniControlsStyle]}
               />
             </Animated.View>
 
             {/* FUll Screen controls */}
             <Animated.View
-              style={[controlsStyle]}
+              style={[{
+                gap: 32
+              }, controlsStyle]}
             >
               {/* title */}
               <View
                 style={{
                   gap: 2,
-                  paddingHorizontal: 16
+                  paddingHorizontal: 24,
+                  justifyContent: "center"
                 }}
               >
                 {/* Episode Title */}
@@ -443,7 +448,7 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                     fontFamily: "SF Pro",
                     fontSize: 24,
                     fontWeight: "600",
-                    lineHeight: 32,
+                    lineHeight: 28,
                     color: "rgb(255, 255, 255)"
                   }}
                 >
@@ -456,29 +461,32 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                     fontFamily: "SF Pro",
                     fontSize: 18,
                     fontWeight: "400",
-                    lineHeight: 28,
-                    color: "rgb(255, 255, 255)"
+                    lineHeight: 24,
+                    color: "rgb(255, 255, 255)",
+                    textAlignVertical: "center"
                   }}
                 >
                   {activeEpisode?.podcastTitle}
                 </Text>
               </View>
 
-              {/* Slider */}
-              <AudioSlider />
+              <View style={{
+                gap: 32
+              }}>
+                {/* Slider */}
+                <AudioSlider />
 
-              {/* Controls */}
-              <View>
+                {/* Controls */}
                 <View
                   style={{
                     flexDirection: "row",
-                    paddingHorizontal: 20,
+                    paddingHorizontal: 28,
                     alignItems: "center",
                     justifyContent: "space-between"
                   }}
                 >
                   <View>
-                    <SpeedControl size={24} color='rgb(255, 255, 255)' />
+                    <SpeedControl size={24} color='rgba(255, 255, 255, 0.8)' />
                   </View>
 
                   <TouchableOpacity
@@ -490,30 +498,29 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                       height: 40
                     }}
                   >
-                    <Backward size={32} strokeWidth={1.88} color='rgb(255, 255, 255)' />
+                    <Backward2 size={40} fill='rgba(255, 255, 255, 0.8)' />
                   </TouchableOpacity>
 
                   {/* Play and Pause */}
                   <Pressable
                     onPress={() => togglePlay()}
                     style={{
-                      height: 70,
-                      width: 70,
+                      height: 48,
+                      width: 48,
                       borderRadius: 140,
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgb(217, 217, 217)"
                     }}
                   >
                     {isPlaying ? (
-                      <Pause size={28} strokeWidth={2} fill={'black'} />
+                      <Pause size={48} strokeWidth={0} fill={'rgb(255, 255, 255)'} />
                     ) : (
-                      <Play size={28} strokeWidth={2} fill={'black'} />
+                      <Play size={48} strokeWidth={0} fill={'rgb(255, 255, 255)'} />
                     )}
                   </Pressable>
 
                   <TouchableOpacity
-                    onPress={() => handleForward()}
+                    onPress={handleForward}
                     style={{
                       alignContent: 'center',
                       justifyContent: 'center',
@@ -521,15 +528,46 @@ const CustomTab = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                       height: 40
                     }}
                   >
-                    <Forward size={32} strokeWidth={1.88} color='rgb(255, 255, 255)' />
+                    <Forward2 size={40} fill='rgba(255, 255, 255, 0.8)' />
                   </TouchableOpacity>
 
                   <View>
-                    <SleepTimer size={24} color='rgb(255, 255, 255)' />
+                    <SleepTimer size={24} color='rgba(255, 255, 255, 0.8)' />
                   </View>
                 </View>
+              </View>
 
-                <View></View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingHorizontal: 24
+                }}
+              >
+                <Pressable
+                  style={[{
+                    height: 50,
+                    width: 50,
+                    alignItems: "center",
+                    justifyContent: 'center',
+                    borderRadius: 24
+                  }, ButtonStyle.singleButton]}
+                >
+                  <Save size={24} strokeWidth={1.5} color='rgb(255, 255, 255)' />
+                </Pressable>
+
+                <Pressable
+                  style={[{
+                    height: 50,
+                    width: 50,
+                    alignItems: "center",
+                    justifyContent: 'center',
+                    borderRadius: 24
+                  }, ButtonStyle.singleButton]}
+                >
+                  <PlayQueue size={24} fill='rgb(255, 255, 255)' />
+                </Pressable>
               </View>
             </Animated.View>
 

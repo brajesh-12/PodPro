@@ -7,7 +7,7 @@ import Animated, { clamp, useAnimatedScrollHandler, useAnimatedStyle, useSharedV
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 
-const HEADER_HEIGHT = 182;
+const HEADER_HEIGHT = 200;
 
 const PodcastsScreen = () => {
 
@@ -243,7 +243,7 @@ const PodcastsScreen = () => {
         scrollEventThrottle={16}
         overScrollMode="never"
         contentContainerStyle={{
-          paddingTop: isSelected ? 190 + insets.top : 142 + insets.top,
+          paddingTop: isSelected ? 210 + insets.top : 160 + insets.top,
           paddingBottom: 120
         }}
       />

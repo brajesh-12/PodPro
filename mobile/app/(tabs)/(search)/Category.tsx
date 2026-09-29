@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import useSearchStore, { Category } from '@/store/useSearchStore';
+import useSearchStore from '@/store/useSearchStore';
 import Section from '@/components/Section';
 import { fetchPodcasts } from '@/services/podcastAPI';
 import { Podcast } from '@/store/usePodcastStore';
@@ -20,15 +20,9 @@ const GenreScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  const [subGenres, setSubGenres] = useState<Category[]>([]);
-
   const { selectedCategory, categoryTopPodcasts, setCategoryTitle } = useSearchStore();
 
-  useEffect(() => {
-    if (selectedCategory?.subGenres) {
-      setSubGenres(selectedCategory.subGenres);
-    }
-  }, [selectedCategory]);
+  const subGenres = selectedCategory?.subGenres || [];
 
   const scrollY = useSharedValue(0)
 
@@ -148,7 +142,7 @@ const GenreScreen = () => {
             nestedScrollEnabled={true}
             contentContainerStyle={{
               paddingBottom: 250,
-              paddingTop: insets.top
+              paddingTop: insets.top + 56
             }}
           >
             <Section title="Top Shows" data={categoryTopPodcasts} tab='search'
@@ -207,6 +201,7 @@ const SubGenre = ({ item }: { item: any }) => {
   };
 
   useEffect(() => {
+    //eslint-disable-next-line
     fetchData();
     // eslint-disable-next-line
   }, []);
