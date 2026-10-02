@@ -78,3 +78,40 @@ Each part of this project helped me understand more about building apps, managin
 
 
 ## 🍿 Images and Video
+
+Some screens from the App:
+
+* Overview
+<img width="1933" height="1160" alt="Podpro_Overview_Image" src="https://github.com/user-attachments/assets/70bc3740-af15-4629-94cf-7ff777d6b355" />
+
+* Onboarding
+
+https://github.com/user-attachments/assets/fedd4879-9c94-467d-89d1-88428caa92ee 
+
+
+* Search Screen > Categories
+
+<img width="602" height="1034" alt="category_based_search" src="https://github.com/user-attachments/assets/1c21185c-69c2-4ca1-b254-36da04e52aeb" />
+
+
+* Audio Player
+
+https://github.com/user-attachments/assets/07a24973-5710-48b2-a8ea-cad4e18fd720
+
+* Screen Screen flow
+
+https://github.com/user-attachments/assets/efb3554d-74ea-4982-9d17-62bd8c6e58c4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
